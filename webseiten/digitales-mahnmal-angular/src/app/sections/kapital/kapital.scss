@@ -1,0 +1,111 @@
+@use 'mixins' as *;
+
+.kt {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  background: #0e0d0c;
+}
+
+.kt__bild {
+  position: absolute;
+  inset: 0;
+  @include nacht-kulisse;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 58%;
+    /* Das Motiv ist schon dunkel. Die Nacht-Kulisse darf es nicht
+       noch einmal in die Schwärze drücken. */
+    filter: grayscale(0.18) saturate(0.72) brightness(0.88) contrast(1.12);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(
+      ellipse 78% 70% at 50% 42%,
+      rgba(10, 9, 8, 0.58) 0%,
+      rgba(10, 9, 8, 0.18) 58%,
+      rgba(10, 9, 8, 0.32) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+.kt__text {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  z-index: 2;
+  width: min(40rem, calc(100% - 2.5rem));
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-20);
+  color: var(--color-paper);
+
+  opacity: 0;
+  transition: opacity 900ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+  }
+}
+
+@include motion-reduce {
+  .kt__text {
+    opacity: 1;
+  }
+}
+
+.kt__frage {
+  @include serif-monument;
+  margin: 0;
+  text-wrap: nowrap;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
+}
+
+/* Der Satz laeuft in die Folgen-Liste hinein — beide stehen deshalb auf
+   derselben Stufe, das Gewicht trennt die Anrede vom Aufzaehlen. */
+.kt__voraussetzung {
+  @include grotesk-stat;
+  margin: 0;
+  /* Breit genug fuer den ganzen Satz in einer Zeile — sonst steht das
+     "gibt es" allein unter der Aufzaehlung, auf die es zeigt. */
+  max-width: 52ch;
+  text-wrap: balance;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.kt__folgen {
+  @include grotesk-stat;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28em;
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.kt__schluss {
+  @include serif-heading-sm;
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+@include tablet {
+  .kt__text {
+    top: 46%;
+    gap: var(--spacing-16);
+  }
+}

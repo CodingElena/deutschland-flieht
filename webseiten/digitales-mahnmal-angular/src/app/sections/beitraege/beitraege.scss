@@ -1,0 +1,125 @@
+@use 'mixins' as *;
+
+.bl {
+  padding-block: var(--spacing-96);
+}
+
+/*
+ * Eine Spalte auf dem Telefon, zwei ab Tablet. Das Papier steht im Quelltext
+ * vorn (mobil oben) und wird ab Tablet per Rasterplatzierung nach rechts
+ * neben die Entwicklungen gesetzt — ohne `order`, damit die Tab-Reihenfolge
+ * der Lesereihenfolge folgt.
+ */
+.bl__raster {
+  display: grid;
+  gap: var(--spacing-52);
+}
+
+@include from($bp-md) {
+  .bl__raster {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    column-gap: var(--spacing-60);
+    align-items: start;
+  }
+
+  .bl__haupt {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .bl__papier {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.bl__kopf {
+  max-width: 40rem;
+}
+
+.bl__titel {
+  @include serif-heading-lg;
+  margin: 0;
+  color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+}
+
+.bl__titel-zeile {
+  display: block;
+}
+
+.bl__einleitung {
+  @include grotesk-body;
+  margin: var(--spacing-20) 0 0;
+  max-width: 42ch;
+  color: var(--color-graphite);
+}
+
+.bl__liste {
+  list-style: none;
+  margin: var(--spacing-52) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bl__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8, 8px);
+  padding-block: var(--spacing-20);
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+  color: var(--color-ink);
+  text-decoration: none;
+
+  &:hover .bl__zeile {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.bl__liste li:last-child .bl__link {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.bl__meta {
+  color: var(--color-graphite);
+  letter-spacing: 0.12em;
+}
+
+.bl__zeile {
+  @include grotesk-body;
+  max-width: 62ch;
+}
+
+/* Die Liste bricht bewusst ab; der Rest steht auf der eigenen Seite. */
+.bl__weiter {
+  margin: var(--spacing-28) 0 0;
+
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .bl__weiter {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bl__weiter-link {
+  color: var(--color-ink);
+
+  &::after {
+    content: ' →';
+  }
+}

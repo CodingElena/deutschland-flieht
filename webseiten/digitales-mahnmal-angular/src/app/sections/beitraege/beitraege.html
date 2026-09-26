@@ -1,0 +1,34 @@
+<section class="bl surface-bone inset" aria-labelledby="bl-titel">
+  <div class="bl__raster">
+    <!-- Im Quelltext zuerst, damit das Papier auf schmalen Schirmen oben
+         steht. Ab Tablet setzt das Raster es in die rechte Spalte. -->
+    <app-papier class="bl__papier" />
+
+    <div class="bl__haupt">
+      <header class="bl__kopf" appReveal>
+        <h2 id="bl-titel" class="bl__titel">
+          <span class="bl__titel-zeile">{{ sektion.titelZeile1 }}</span>
+          <span class="bl__titel-zeile t-italic">{{ sektion.titelZeile2Kursiv }}</span>
+        </h2>
+        <p class="bl__einleitung">{{ sektion.einleitung }}</p>
+      </header>
+
+      <ul class="bl__liste">
+        @for (beitrag of beitraege; track beitrag.id; let i = $index) {
+          <li appReveal [appRevealDelay]="i * 80">
+            <a class="bl__link" [href]="beitrag.url" target="_blank" rel="noopener noreferrer">
+              <span class="bl__meta t-micro">{{ beitrag.medium }} — {{ beitrag.datum }}</span>
+              <span class="bl__zeile">{{ beitrag.zeile }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+
+      <p class="bl__weiter" appReveal>
+        <a class="bl__weiter-link ghost-link" [routerLink]="weiter.pfad">
+          {{ weiter.weiterLabel }}
+        </a>
+      </p>
+    </div>
+  </div>
+</section>

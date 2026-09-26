@@ -1,0 +1,49 @@
+<nav
+  class="wm"
+  [class.wm--offen]="offen()"
+  [class.wm--hell]="aufDunkel()"
+  [class.wm--auftakt]="imAuftakt()"
+  [attr.aria-label]="texte.ariaLabel"
+  (keydown.escape)="schliessen()"
+>
+  <button
+    type="button"
+    class="wm__griff"
+    aria-controls="wm-liste"
+    [attr.aria-expanded]="offen()"
+    [attr.aria-label]="offen() ? texte.griffZu : texte.griffAuf"
+    (click)="umschalten()"
+  >
+    <span class="wm__strich" aria-hidden="true"></span>
+  </button>
+
+  <ul
+    id="wm-liste"
+    class="wm__liste"
+    [attr.aria-hidden]="offen() ? null : 'true'"
+    [attr.inert]="offen() ? null : ''"
+  >
+    @for (k of kapitel; track k.id; let i = $index) {
+      <li class="wm__eintrag" [class.wm__eintrag--aktiv]="istAktiv(k.id)">
+        <button
+          type="button"
+          class="wm__sprung"
+          [attr.aria-current]="istAktiv(k.id) ? 'true' : null"
+          (click)="springe(k.id)"
+        >
+          <span class="wm__tick" aria-hidden="true"></span>
+          <span class="wm__nummer" aria-hidden="true">{{ nummer(i) }}</span>
+          <span class="wm__name">{{ k.label }}</span>
+        </button>
+      </li>
+    }
+
+    <li class="wm__eintrag wm__eintrag--seite">
+      <a class="wm__sprung" [routerLink]="seite.pfad" (click)="schliessen()">
+        <span class="wm__tick" aria-hidden="true"></span>
+        <span class="wm__pfeil" aria-hidden="true">→</span>
+        <span class="wm__name">{{ seite.navLabel }}</span>
+      </a>
+    </li>
+  </ul>
+</nav>

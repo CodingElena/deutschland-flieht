@@ -1,0 +1,72 @@
+<section
+  class="aw surface-chalk inset"
+  [class.aw--offen]="geoeffnet()"
+  aria-labelledby="aw-toggle"
+>
+  <button
+    id="aw-toggle"
+    type="button"
+    class="aw__toggle"
+    [attr.aria-expanded]="geoeffnet()"
+    aria-controls="aw-inhalt"
+    (click)="umschalten()"
+  >
+    <span class="aw__toggle-text">
+      {{ geoeffnet() ? sektion.zuklappen : sektion.aufklappen }}
+    </span>
+    <span class="aw__toggle-pfeil" aria-hidden="true"></span>
+  </button>
+
+  @if (geoeffnet()) {
+    <div id="aw-inhalt" class="aw__inhalt">
+      <div class="aw__kopf">
+        <p class="aw__label t-micro">{{ sektion.label }}</p>
+        <p class="aw__stempel t-micro">{{ sektion.stempel }}</p>
+      </div>
+
+      <h2 class="aw__einleitung">{{ sektion.einleitung }}</h2>
+
+      <div class="aw__spalten">
+        <figure class="aw__spalte" appReveal>
+          <figcaption class="aw__spalte-kopf">
+            <p class="aw__spalte-label t-micro">{{ sektion.regionen.label }}</p>
+            <p class="aw__spalte-text">{{ sektion.regionen.text }}</p>
+          </figcaption>
+
+          <ul class="aw__liste">
+            @for (zeile of regionen; track zeile.id) {
+              <li class="aw__zeile">
+                <span class="aw__name">{{ zeile.name }}</span>
+                <span class="aw__wert">{{ anteilText(zeile.anteil) }}</span>
+                <span class="aw__spur" aria-hidden="true">
+                  <span class="aw__fill" [style.width.%]="zeile.breite"></span>
+                </span>
+              </li>
+            }
+          </ul>
+        </figure>
+
+        <figure class="aw__spalte" appReveal [appRevealDelay]="120">
+          <figcaption class="aw__spalte-kopf">
+            <p class="aw__spalte-label t-micro">{{ sektion.gruende.label }}</p>
+            <p class="aw__spalte-text">{{ sektion.gruende.text }}</p>
+          </figcaption>
+
+          <ul class="aw__liste">
+            @for (zeile of gruende; track zeile.id) {
+              <li class="aw__zeile">
+                <span class="aw__name">{{ zeile.name }}</span>
+                <span class="aw__wert">{{ anteilText(zeile.anteil) }}</span>
+                <span class="aw__spur" aria-hidden="true">
+                  <span class="aw__fill" [style.width.%]="zeile.breite"></span>
+                </span>
+              </li>
+            }
+          </ul>
+        </figure>
+      </div>
+
+      <p class="aw__hinweis t-micro">{{ sektion.hinweis }}</p>
+    </div>
+  }
+</section>

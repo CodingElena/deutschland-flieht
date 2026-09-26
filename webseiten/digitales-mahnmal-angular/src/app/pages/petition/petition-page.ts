@@ -1,93 +1,158 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { merge } from 'rxjs';
 
-import { FORDERUNGEN, PETITION, QUIZ_FRAGEN } from '../../core/content';
-import { QuizStore } from '../../core/quiz-store';
+import { FORDERUNGEN, PETITION, PETITION_MOTIVE } from '../../core/content';
 
 /** Felder, zu denen es eine Fehlermeldung gibt. */
-type Pflichtfeld = 'vorname' | 'nachname' | 'email' | 'plz' | 'einwilligung';
+type Pflichtfeld =
+  | 'vorname'
+  | 'nachname'
+  | 'email'
+  | 'plz'
+  | 'ort'
+  | 'land'
+  | 'letztePlz'
+  | 'geschichte'
+  | 'einwilligung';
+
+/** Porträts für die Unterstützer-Reihe: nur diese Typen, höchstens 2 MB. */
+const BILD_TYPEN = ['image/jpeg', 'image/png', 'image/webp'];
+const BILD_MAX_BYTES = 2 * 1024 * 1024;
 
 /**
  * Petitionsseite.
  *
- * Links steht, was unterschrieben wird — Adressat, Petitionstext,
- * Forderungen und der Weg der Daten. Rechts das Formular. Diese Reihenfolge
- * ist keine Geschmacksfrage: Wer nicht weiss, wohin seine E-Mail-Adresse
- * geht, traegt sie nicht ein.
- *
- * Das Formular ist vollstaendig validiert, speichert aber nichts: es gibt
- * kein Backend. Statt einen Erfolg vorzutaeuschen, sagt die Seite nach dem
- * Absenden offen, dass sie im Demo-Modus laeuft.
- *
- * Fuer den Echtbetrieb fehlen:
- *   - Endpunkt, der die Unterschrift entgegennimmt
- *   - Double-Opt-In per E-Mail (sonst sind die Unterschriften wertlos)
- *   - Impressum und Datenschutzerklaerung mit den echten Angaben
- *   - serverseitiger Schutz gegen automatisierte Eintraege
+ * Zwei Beiträge, einzeln oder zusammen: die Unterschrift (deutsche
+ * Postleitzahl) und die veröffentlichte Geschichte (auch aus dem Ausland,
+ * dann mit Ort und Land statt Postleitzahl).
  */
 @Component({
   selector: 'app-petition-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [NgTemplateOutlet, ReactiveFormsModule, RouterLink],
   templateUrl: './petition-page.html',
   styleUrl: './petition-page.scss',
 })
 export class PetitionPage {
   private readonly fb = inject(FormBuilder);
-  private readonly quiz = inject(QuizStore);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly inhalt = PETITION;
   protected readonly forderungen = FORDERUNGEN;
+  protected readonly motivOptionen = PETITION_MOTIVE;
+  protected readonly motive = signal<readonly string[]>([]);
 
-  /** Dieselben Motive wie im Kurz-Check — eine Liste, nicht zwei. */
-  protected readonly motivOptionen =
-    QUIZ_FRAGEN.find((f) => f.id === 'grund')?.optionen ?? [];
-
-  /* Wer den Kurz-Check gemacht hat, findet seine Motive hier vorausgewaehlt.
-     Uebertragen wurde dabei nichts: die Antworten lagen nur im Speicher
-     dieses Tabs, und sie verlassen ihn erst mit dem Absenden. */
-  protected readonly motive = signal<readonly string[]>([...this.quiz.motive()]);
-  protected readonly ausQuiz = this.quiz.motive().length > 0;
-
-  /** Bleibt bei null, solange kein Backend zaehlt. Keine erfundene Zahl. */
   protected readonly zaehler = signal(PETITION.zaehlerStart);
   protected readonly abgeschickt = signal(false);
-  /** Ab dem ersten Absendeversuch werden alle Fehler gezeigt, nicht nur die berührten. */
   protected readonly versucht = signal(false);
+  /** Gewähltes Porträt. Bleibt lokal, solange nichts gespeichert wird. */
+  protected readonly bildVorschau = signal<string | null>(null);
+  protected readonly bildFehler = signal<string | null>(null);
 
-  protected readonly formular = this.fb.nonNullable.group({
-    vorname: ['', [Validators.required, Validators.maxLength(80)]],
-    nachname: ['', [Validators.required, Validators.maxLength(80)]],
-    email: ['', [Validators.required, Validators.email]],
-    plz: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
-    geschichte: ['', [Validators.maxLength(1200)]],
-    einwilligung: [false, [Validators.requiredTrue]],
-    oeffentlich: [false],
-    updates: [false],
-    /* Honigtopf: fuer Menschen unsichtbar und nicht fokussierbar. Was hier
-       steht, hat ein Bot eingetragen. Ein serverseitiger Schutz ersetzt das
-       nicht — er kommt zusaetzlich. */
-    webseite: [''],
-  });
+  /** Von „ergänze deine eigene“: Geschichte ist schon angehakt. */
+  private readonly geschichteGewuenscht =
+    this.route.snapshot.queryParamMap.get('teilnahme') === 'geschichte';
+
+  protected readonly formular = this.fb.nonNullable.group(
+    {
+      unterschreiben: [true],
+      veroeffentlichen: [this.geschichteGewuenscht],
+      vorname: ['', [Validators.required, Validators.maxLength(80)]],
+      nachname: ['', [Validators.required, Validators.maxLength(80)]],
+      email: ['', [Validators.required, Validators.email]],
+      plz: [''],
+      ort: [''],
+      land: [''],
+      letztePlz: [''],
+      geschichte: [''],
+      einwilligung: [false, [Validators.requiredTrue]],
+      nameAuffuehren: [false],
+      oeffentlich: [false],
+      updates: [false],
+      webseite: [''],
+    },
+    { validators: [mindestensEineTeilnahme] },
+  );
 
   private readonly fehlerTexte: Readonly<Record<Pflichtfeld, string>> = {
     vorname: 'Bitte trag deinen Vornamen ein.',
     nachname: 'Bitte trag deinen Nachnamen ein.',
     email: 'Bitte eine gültige E-Mail-Adresse angeben — an sie geht die Bestätigung.',
     plz: 'Die Postleitzahl besteht aus fünf Ziffern.',
-    einwilligung: 'Ohne Einwilligung dürfen wir die Unterschrift nicht annehmen.',
+    ort: 'Bitte trag den Ort ein, an dem du jetzt lebst.',
+    land: 'Bitte trag das Land ein.',
+    letztePlz: 'Die letzte Postleitzahl in Deutschland besteht aus fünf Ziffern.',
+    geschichte: 'Bitte schreib deine Geschichte — ein Satz genügt.',
+    einwilligung: 'Ohne Einwilligung dürfen wir das nicht annehmen.',
   };
 
-  private readonly pflichtfelder: readonly Pflichtfeld[] = [
-    'vorname',
-    'nachname',
-    'email',
-    'plz',
-    'einwilligung',
-  ];
+  constructor() {
+    this.regelnAnwenden();
+    merge(
+      this.formular.controls.unterschreiben.valueChanges,
+      this.formular.controls.veroeffentlichen.valueChanges,
+    )
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.regelnAnwenden());
 
-  /** Zeigt einen Fehler, sobald das Feld berührt wurde oder abgeschickt ist. */
+    merge(
+      this.formular.controls.nameAuffuehren.valueChanges,
+      this.formular.controls.veroeffentlichen.valueChanges,
+    )
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (!this.nameAufgefuehrt && !this.veroeffentlicht) this.bildEntfernen();
+      });
+
+    inject(DestroyRef).onDestroy(() => this.bildVorschauFreigeben());
+  }
+
+  protected get unterschreibt(): boolean {
+    return this.formular.controls.unterschreiben.value;
+  }
+
+  protected get veroeffentlicht(): boolean {
+    return this.formular.controls.veroeffentlichen.value;
+  }
+
+  protected get nameAufgefuehrt(): boolean {
+    return this.formular.controls.nameAuffuehren.value;
+  }
+
+  protected get nurGeschichte(): boolean {
+    return this.veroeffentlicht && !this.unterschreibt;
+  }
+
+  protected formularTitel(): string {
+    if (this.unterschreibt && this.veroeffentlicht) {
+      return this.inhalt.formular.titelBeides;
+    }
+    if (this.veroeffentlicht) {
+      return this.inhalt.formular.titelGeschichte;
+    }
+    return this.inhalt.formular.titelUnterschreiben;
+  }
+
+  protected absendenLabel(): string {
+    if (this.unterschreibt && this.veroeffentlicht) {
+      return this.inhalt.formular.absendenBeides;
+    }
+    if (this.veroeffentlicht) {
+      return this.inhalt.formular.absendenVeroeffentlichen;
+    }
+    return this.inhalt.formular.absendenUnterschreiben;
+  }
+
+  protected einwilligungText(): string {
+    return this.nurGeschichte
+      ? this.inhalt.formular.einwilligungGeschichte
+      : this.inhalt.formular.einwilligung;
+  }
+
   protected fehler(feld: Pflichtfeld): boolean {
     const c = this.formular.controls[feld];
     return c.invalid && (c.touched || c.dirty || this.versucht());
@@ -97,18 +162,40 @@ export class PetitionPage {
     return this.fehlerTexte[feld];
   }
 
-  /** Sammelmeldung über dem Formular: alle offenen Punkte auf einen Blick. */
-  protected offeneFehler(): readonly { feld: Pflichtfeld; text: string }[] {
+  protected teilnahmeOffen(): boolean {
+    return this.versucht() && this.formular.hasError('teilnahme');
+  }
+
+  protected offeneFehler(): readonly { feld: string; text: string }[] {
     if (!this.versucht()) {
       return [];
     }
-    return this.pflichtfelder
+    const felder: Pflichtfeld[] = ['vorname', 'nachname', 'email', 'einwilligung'];
+    if (this.unterschreibt) {
+      felder.push('plz');
+    }
+    if (this.nurGeschichte) {
+      felder.push('ort', 'land', 'letztePlz');
+    }
+    if (this.veroeffentlicht) {
+      felder.push('geschichte');
+    }
+    const liste = felder
       .filter((f) => this.formular.controls[f].invalid)
       .map((f) => ({ feld: f, text: this.fehlerTexte[f] }));
+    if (this.formular.hasError('teilnahme')) {
+      return [
+        {
+          feld: 'unterschreiben',
+          text: 'Wähl aus, ob du unterschreibst, deine Geschichte veröffentlichst oder beides.',
+        },
+        ...liste,
+      ];
+    }
+    return liste;
   }
 
-  /** Springt aus der Sammelmeldung zum betroffenen Feld. */
-  protected fokussieren(feld: Pflichtfeld): void {
+  protected fokussieren(feld: string): void {
     document.getElementById(`pt-${feld}`)?.focus();
   }
 
@@ -120,9 +207,36 @@ export class PetitionPage {
     this.motive.update((m) => (m.includes(id) ? m.filter((x) => x !== id) : [...m, id]));
   }
 
-  /** Restliche Zeichen im Freitextfeld. */
   protected verbleibend(): number {
     return 1200 - this.formular.controls.geschichte.value.length;
+  }
+
+  protected bildGewaehlt(event: Event): void {
+    const eingabe = event.target as HTMLInputElement;
+    const datei = eingabe.files?.[0];
+    if (!datei) return;
+
+    if (!BILD_TYPEN.includes(datei.type)) {
+      this.bildFehler.set(this.inhalt.formular.bildFehlerTyp);
+      eingabe.value = '';
+      return;
+    }
+    if (datei.size > BILD_MAX_BYTES) {
+      this.bildFehler.set(this.inhalt.formular.bildFehlerGroesse);
+      eingabe.value = '';
+      return;
+    }
+
+    this.bildVorschauFreigeben();
+    this.bildVorschau.set(URL.createObjectURL(datei));
+    this.bildFehler.set(null);
+  }
+
+  protected bildEntfernen(eingabe?: HTMLInputElement): void {
+    this.bildVorschauFreigeben();
+    this.bildVorschau.set(null);
+    this.bildFehler.set(null);
+    if (eingabe) eingabe.value = '';
   }
 
   protected absenden(): void {
@@ -130,8 +244,6 @@ export class PetitionPage {
 
     if (this.formular.invalid) {
       this.formular.markAllAsTouched();
-      /* Zum ersten offenen Punkt springen, statt den Menschen suchen zu
-         lassen — bei einem langen Formular sonst der haeufigste Abbruch. */
       const erstes = this.offeneFehler()[0];
       if (erstes) {
         document.getElementById(`pt-${erstes.feld}`)?.focus();
@@ -139,12 +251,57 @@ export class PetitionPage {
       return;
     }
 
-    /* Bewusst kein Netzwerkaufruf und kein Hochzaehlen des Zaehlers:
-       es waere eine Luege gegenueber dem Unterzeichnenden. */
     this.abgeschickt.set(true);
   }
 
   protected zurueckZumFormular(): void {
     this.abgeschickt.set(false);
   }
+
+  /** Pflichtfelder hängen davon ab, was angehakt ist. */
+  private regelnAnwenden(): void {
+    const u = this.formular.controls.unterschreiben.value;
+    const v = this.formular.controls.veroeffentlichen.value;
+    const nurGeschichte = v && !u;
+    const { plz, ort, land, letztePlz, geschichte, oeffentlich } = this.formular.controls;
+
+    if (u) {
+      plz.setValidators([Validators.required, Validators.pattern(/^\d{5}$/)]);
+    } else {
+      plz.clearValidators();
+    }
+
+    if (nurGeschichte) {
+      ort.setValidators([Validators.required, Validators.maxLength(80)]);
+      land.setValidators([Validators.required, Validators.maxLength(80)]);
+      letztePlz.setValidators([Validators.pattern(/^\d{5}$/)]);
+    } else {
+      ort.clearValidators();
+      land.clearValidators();
+      letztePlz.clearValidators();
+    }
+
+    if (v) {
+      geschichte.setValidators([Validators.required, Validators.maxLength(1200)]);
+      oeffentlich.setValue(true, { emitEvent: false });
+    } else {
+      geschichte.setValidators([Validators.maxLength(1200)]);
+      oeffentlich.setValue(false, { emitEvent: false });
+    }
+
+    for (const feld of [plz, ort, land, letztePlz, geschichte]) {
+      feld.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
+  private bildVorschauFreigeben(): void {
+    const url = this.bildVorschau();
+    if (url) URL.revokeObjectURL(url);
+  }
+}
+
+function mindestensEineTeilnahme(group: AbstractControl): { teilnahme: true } | null {
+  const u = group.get('unterschreiben')?.value;
+  const v = group.get('veroeffentlichen')?.value;
+  return u || v ? null : { teilnahme: true };
 }

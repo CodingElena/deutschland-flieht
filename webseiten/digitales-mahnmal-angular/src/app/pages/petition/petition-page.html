@@ -14,8 +14,8 @@
   </header>
 
   <div class="pt__spalten">
-    <!-- Linke Spalte: was unterschrieben wird, an wen es geht und was mit
-         den Daten passiert. Wer das nicht weiss, traegt nichts ein. -->
+    <!-- Unter dem Formular: was unterschrieben wird, an wen es geht und was
+         mit den Daten passiert. -->
     <div class="pt__doku">
       <section class="pt__block" aria-labelledby="pt-empfaenger">
         <h2 id="pt-empfaenger" class="pt__label t-micro">{{ inhalt.empfaenger.label }}</h2>
@@ -63,7 +63,7 @@
       </section>
     </div>
 
-    <!-- Rechte Spalte: das Formular. Laeuft auf breiten Schirmen mit. -->
+    <!-- Oben: das Formular. Der Wortlaut darunter ist fuer die meisten zweitrangig. -->
     <div class="pt__formularblock">
       <div class="pt__karte">
         @if (abgeschickt()) {
@@ -83,10 +83,15 @@
             </button>
           </div>
         } @else {
-          <form class="pt__formular" [formGroup]="formular" (ngSubmit)="absenden()" novalidate>
+          <form
+            id="formular"
+            class="pt__formular"
+            [formGroup]="formular"
+            (ngSubmit)="absenden()"
+            novalidate
+          >
             <header class="pt__formular-kopf">
-              <h2 class="pt__formular-titel">{{ inhalt.formular.titel }}</h2>
-              <p class="pt__formular-untertitel">{{ inhalt.formular.untertitel }}</p>
+              <h2 class="pt__formular-titel">{{ formularTitel() }}</h2>
             </header>
 
             <!-- Sammelmeldung. Erscheint erst nach dem ersten Absendeversuch
@@ -105,6 +110,63 @@
                 </ul>
               </div>
             }
+
+            <fieldset class="pt__wahl" [class.ist-fehlerhaft]="teilnahmeOffen()">
+              <legend class="pt__gruppe-label t-micro">{{ inhalt.formular.abschnittWahl }}</legend>
+
+              <label class="pt__haken">
+                <input
+                  id="pt-unterschreiben"
+                  class="pt__checkbox"
+                  type="checkbox"
+                  formControlName="unterschreiben"
+                />
+                <span class="pt__haken-text">{{ inhalt.formular.unterschreiben }}</span>
+              </label>
+
+              <label class="pt__haken">
+                <input
+                  id="pt-veroeffentlichen"
+                  class="pt__checkbox"
+                  type="checkbox"
+                  formControlName="veroeffentlichen"
+                />
+                <span class="pt__haken-text">{{ inhalt.formular.veroeffentlichen }}</span>
+              </label>
+
+              @if (veroeffentlicht) {
+                <p class="pt__feldhinweis">{{ inhalt.formular.veroeffentlichenHinweis }}</p>
+                <div class="pt__feld">
+                  <label class="pt__feld-label t-micro" for="pt-geschichte">
+                    {{ inhalt.formular.geschichte }} <span aria-hidden="true">*</span>
+                  </label>
+                  <p class="pt__feldhinweis">{{ inhalt.formular.geschichteHinweis }}</p>
+                  <textarea
+                    id="pt-geschichte"
+                    class="pt__input pt__textarea"
+                    rows="5"
+                    maxlength="1200"
+                    formControlName="geschichte"
+                    [class.ist-fehlerhaft]="fehler('geschichte')"
+                    [attr.aria-invalid]="fehler('geschichte') ? 'true' : null"
+                    [placeholder]="inhalt.formular.geschichtePlatzhalter"
+                  ></textarea>
+                  @if (fehler('geschichte')) {
+                    <p class="pt__fehler">{{ fehlerText('geschichte') }}</p>
+                  }
+                  <p class="pt__zeichen t-micro" aria-hidden="true">
+                    {{ verbleibend() }} Zeichen frei
+                  </p>
+                </div>
+                <ng-container [ngTemplateOutlet]="bildwahl" />
+              }
+
+              @if (teilnahmeOffen()) {
+                <p class="pt__fehler">
+                  Wähl aus, ob du unterschreibst, deine Geschichte veröffentlichst oder beides.
+                </p>
+              }
+            </fieldset>
 
             <!-- --- Zur Person --------------------------------------------- -->
             <div class="pt__gruppe">
@@ -178,45 +240,97 @@
                 }
               </div>
 
-              <div class="pt__feld pt__feld--schmal">
-                <label class="pt__feld-label t-micro" for="pt-plz">
-                  {{ inhalt.formular.plz }} <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  id="pt-plz"
-                  class="pt__input"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="5"
-                  formControlName="plz"
-                  autocomplete="postal-code"
-                  required
-                  [class.ist-fehlerhaft]="fehler('plz')"
-                  [attr.aria-invalid]="fehler('plz') ? 'true' : null"
-                  [attr.aria-describedby]="fehler('plz') ? 'pt-plz-fehler' : 'pt-plz-hinweis'"
-                />
-                @if (fehler('plz')) {
-                  <p id="pt-plz-fehler" class="pt__fehler">{{ fehlerText('plz') }}</p>
-                } @else {
-                  <p id="pt-plz-hinweis" class="pt__feldhinweis">
-                    {{ inhalt.formular.plzHinweis }}
-                  </p>
-                }
-              </div>
+              @if (unterschreibt) {
+                <div class="pt__feld pt__feld--schmal">
+                  <label class="pt__feld-label t-micro" for="pt-plz">
+                    {{ inhalt.formular.plz }} <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="pt-plz"
+                    class="pt__input"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="5"
+                    formControlName="plz"
+                    autocomplete="postal-code"
+                    required
+                    [class.ist-fehlerhaft]="fehler('plz')"
+                    [attr.aria-invalid]="fehler('plz') ? 'true' : null"
+                    [attr.aria-describedby]="fehler('plz') ? 'pt-plz-fehler' : 'pt-plz-hinweis'"
+                  />
+                  @if (fehler('plz')) {
+                    <p id="pt-plz-fehler" class="pt__fehler">{{ fehlerText('plz') }}</p>
+                  } @else {
+                    <p id="pt-plz-hinweis" class="pt__feldhinweis">
+                      {{ inhalt.formular.plzHinweis }}
+                    </p>
+                  }
+                </div>
+              } @else if (nurGeschichte) {
+                <div class="pt__paar">
+                  <div class="pt__feld">
+                    <label class="pt__feld-label t-micro" for="pt-ort">
+                      {{ inhalt.formular.ort }} <span aria-hidden="true">*</span>
+                    </label>
+                    <input
+                      id="pt-ort"
+                      class="pt__input"
+                      type="text"
+                      formControlName="ort"
+                      autocomplete="address-level2"
+                      [class.ist-fehlerhaft]="fehler('ort')"
+                      [attr.aria-invalid]="fehler('ort') ? 'true' : null"
+                    />
+                    @if (fehler('ort')) {
+                      <p class="pt__fehler">{{ fehlerText('ort') }}</p>
+                    }
+                  </div>
+                  <div class="pt__feld">
+                    <label class="pt__feld-label t-micro" for="pt-land">
+                      {{ inhalt.formular.land }} <span aria-hidden="true">*</span>
+                    </label>
+                    <input
+                      id="pt-land"
+                      class="pt__input"
+                      type="text"
+                      formControlName="land"
+                      autocomplete="country-name"
+                      [class.ist-fehlerhaft]="fehler('land')"
+                      [attr.aria-invalid]="fehler('land') ? 'true' : null"
+                    />
+                    @if (fehler('land')) {
+                      <p class="pt__fehler">{{ fehlerText('land') }}</p>
+                    }
+                  </div>
+                </div>
+                <div class="pt__feld">
+                  <label class="pt__feld-label t-micro" for="pt-letztePlz">
+                    {{ inhalt.formular.letztePlz }}
+                  </label>
+                  <input
+                    id="pt-letztePlz"
+                    class="pt__input"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="5"
+                    formControlName="letztePlz"
+                    [class.ist-fehlerhaft]="fehler('letztePlz')"
+                    [attr.aria-invalid]="fehler('letztePlz') ? 'true' : null"
+                  />
+                  @if (fehler('letztePlz')) {
+                    <p class="pt__fehler">{{ fehlerText('letztePlz') }}</p>
+                  } @else {
+                    <p class="pt__feldhinweis">{{ inhalt.formular.letztePlzHinweis }}</p>
+                  }
+                </div>
+              }
             </div>
 
             <!-- --- Motiv (freiwillig) ------------------------------------- -->
             <div class="pt__gruppe">
-              <p class="pt__gruppe-label t-micro">{{ inhalt.formular.abschnittMotiv }}</p>
+              <p id="pt-motiv" class="pt__gruppe-label t-micro">{{ inhalt.formular.abschnittMotiv }}</p>
 
-              <fieldset class="pt__motive">
-                <legend class="pt__feld-label t-micro">{{ inhalt.formular.grundLabel }}</legend>
-                <p class="pt__feldhinweis">{{ inhalt.formular.grundHinweis }}</p>
-
-                @if (ausQuiz) {
-                  <p class="pt__quizhinweis">{{ inhalt.formular.grundAusQuiz }}</p>
-                }
-
+              <fieldset class="pt__motive" aria-labelledby="pt-motiv">
                 <ul class="pt__chips">
                   @for (o of motivOptionen; track o.id) {
                     <li>
@@ -234,23 +348,6 @@
                 </ul>
               </fieldset>
 
-              <div class="pt__feld">
-                <label class="pt__feld-label t-micro" for="pt-geschichte">
-                  {{ inhalt.formular.geschichte }}
-                </label>
-                <p class="pt__feldhinweis">{{ inhalt.formular.geschichteHinweis }}</p>
-                <textarea
-                  id="pt-geschichte"
-                  class="pt__input pt__textarea"
-                  rows="5"
-                  maxlength="1200"
-                  formControlName="geschichte"
-                  [placeholder]="inhalt.formular.geschichtePlatzhalter"
-                ></textarea>
-                <p class="pt__zeichen t-micro" aria-hidden="true">
-                  {{ verbleibend() }} Zeichen frei
-                </p>
-              </div>
             </div>
 
             <!-- --- Einwilligung -------------------------------------------- -->
@@ -271,7 +368,7 @@
                     "
                   />
                   <span class="pt__haken-text">
-                    {{ inhalt.formular.einwilligung }} <span aria-hidden="true">*</span>
+                    {{ einwilligungText() }} <span aria-hidden="true">*</span>
                   </span>
                 </label>
                 @if (fehler('einwilligung')) {
@@ -281,16 +378,70 @@
                 }
               </div>
 
-              <label class="pt__haken">
-                <input class="pt__checkbox" type="checkbox" formControlName="oeffentlich" />
-                <span class="pt__haken-text">{{ inhalt.formular.oeffentlich }}</span>
-              </label>
+              <div class="pt__feld">
+                <label class="pt__haken">
+                  <input
+                    id="pt-nameAuffuehren"
+                    class="pt__checkbox"
+                    type="checkbox"
+                    formControlName="nameAuffuehren"
+                  />
+                  <span class="pt__haken-text">{{ inhalt.formular.nameAuffuehren }}</span>
+                </label>
+                <p class="pt__feldhinweis">{{ inhalt.formular.nameAuffuehrenHinweis }}</p>
+              </div>
+
+              @if (nameAufgefuehrt && !veroeffentlicht) {
+                <ng-container [ngTemplateOutlet]="bildwahl" />
+              }
+
+              @if (unterschreibt && !veroeffentlicht) {
+                <label class="pt__haken">
+                  <input class="pt__checkbox" type="checkbox" formControlName="oeffentlich" />
+                  <span class="pt__haken-text">{{ inhalt.formular.oeffentlich }}</span>
+                </label>
+              }
 
               <label class="pt__haken">
                 <input class="pt__checkbox" type="checkbox" formControlName="updates" />
                 <span class="pt__haken-text">{{ inhalt.formular.updates }}</span>
               </label>
             </div>
+
+            <ng-template #bildwahl>
+              <div class="pt__feld pt__bild">
+                <p class="pt__feld-label t-micro" id="pt-bild-label">{{ inhalt.formular.bild }}</p>
+                <p class="pt__feldhinweis" id="pt-bild-hinweis">{{ inhalt.formular.bildHinweis }}</p>
+                <div class="pt__bild-zeile">
+                  @if (bildVorschau(); as src) {
+                    <img class="pt__bild-vorschau" [src]="src" alt="" width="64" height="64" />
+                  }
+                  <label class="pt__bild-wahl" for="pt-bild">
+                    {{ bildVorschau() ? inhalt.formular.bildAendern : inhalt.formular.bildWaehlen }}
+                  </label>
+                  <input
+                    #bildEingabe
+                    id="pt-bild"
+                    class="sr-only"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    aria-labelledby="pt-bild-label"
+                    [attr.aria-describedby]="
+                      bildFehler() ? 'pt-bild-hinweis pt-bild-fehler' : 'pt-bild-hinweis'
+                    "
+                    (change)="bildGewaehlt($event)"
+                  />
+                  @if (bildVorschau()) {
+                    <button class="pt__bild-weg" type="button" (click)="bildEntfernen(bildEingabe)">
+                      {{ inhalt.formular.bildEntfernen }}
+                    </button>
+                  }
+                </div>
+                @if (bildFehler()) {
+                  <p id="pt-bild-fehler" class="pt__fehler">{{ bildFehler() }}</p>
+                }
+              </div>
+            </ng-template>
 
             <!-- Honigtopf gegen automatische Eintraege: fuer Menschen weder
                  sichtbar noch erreichbar. Ersetzt keinen serverseitigen
@@ -308,7 +459,7 @@
 
             <div class="pt__abschluss">
               <button class="pill pt__absenden" type="submit">
-                {{ inhalt.formular.absenden }}
+                {{ absendenLabel() }}
               </button>
 
               <p class="pt__datenschutz">

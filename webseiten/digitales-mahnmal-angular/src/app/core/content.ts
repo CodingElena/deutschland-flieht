@@ -7,8 +7,9 @@
  * -------------------------------------------------------------------------
  * WICHTIG — ZAHLEN VOR VEROEFFENTLICHUNG PRUEFEN
  * -------------------------------------------------------------------------
- * Jede Kennzahl hat ein Feld `geprueft`. Es steht ueberall auf `false`.
- * Die Werte sind Groessenordnungen als Platzhalter, nicht belegt.
+ * Jede Kennzahl hat ein Feld `geprueft`. Fortzüge 2025 und der Abgabenkeil
+ * 2023 sind an Destatis bzw. OECD geprüft. Qualifikation und Investitionen
+ * sind weiter Platzhalter.
  * Die gesamte Kampagne haengt an der Belastbarkeit dieser Zahlen: eine
  * einzige angreifbare Ziffer kostet die Glaubwuerdigkeit der Seite.
  *
@@ -44,9 +45,9 @@ export interface Kennzahl {
 /**
  * Ein Bild.
  *
- * Alle Aufnahmen liegen unter public/bilder/ und stammen aus Wikimedia
- * Commons — freie Lizenzen, echte Fotografien von Frankfurt am Main. Sie
- * sind lokal auf Webgroesse gerechnet; die Originale bleiben bei Commons.
+ * Die Frankfurt-Aufnahmen liegen unter public/bilder/ und stammen aus
+ * Wikimedia Commons — freie Lizenzen, echte Fotografien. Die Porträts der
+ * Forderungs-Karten sind Stockfotos von Unsplash (Unsplash License).
  *
  * WICHTIG: Die CC-BY- und CC-BY-SA-Lizenzen verlangen die Nennung von
  * Urheber und Lizenz. Deshalb traegt jedes Bild seinen Nachweis mit, und
@@ -70,6 +71,8 @@ export interface Bildnachweis {
 /** Ein Schritt der gepinnten Scroll-Sequenz. */
 export interface SequenzSchritt {
   readonly id: string;
+  /** Kleine Zeile ueber der Ueberschrift — Rolle, Zahl oder Zeitraum. */
+  readonly kicker: string;
   readonly ueberschrift: string;
   readonly text: string;
   readonly bild: Bild;
@@ -80,6 +83,8 @@ export interface Forderung {
   readonly id: string;
   readonly titel: string;
   readonly text: string;
+  /** Festes Stockporträt — kein Wechsel, ein Gesicht je Karte. */
+  readonly bild: Bild;
 }
 
 /** Ein Punkt im Drei-Spalten-Raster mit kreisrundem Bildausschnitt. */
@@ -90,30 +95,42 @@ export interface Vignette {
   readonly bild: Bild;
 }
 
-/** Eine Antwortmoeglichkeit im Kurz-Check. */
-export interface QuizOption {
+/** Eine Rolle in der Menge — spaeter eine echte, freigegebene Stimme. */
+export interface Fortgehende {
   readonly id: string;
-  /** Beschriftung der Schaltflaeche. */
-  readonly label: string;
-  /** Kurzform fuer die Auswertung und fuer die Petitionsseite. */
-  readonly kurz: string;
+  readonly rolle: string;
+  /** Ein Satz. Kein Lebenslauf, keine erfundene Biografie. */
+  readonly zeile: string;
+  readonly bild: Bild;
+  /**
+   * Erst `true`, wenn die Person diesen Satz so veroeffentlicht haben will.
+   * Ohne das bleibt die Luecke eine Beispielrolle, kein Testimonial.
+   */
+  readonly echt?: boolean;
+  /** Optionaler Name, nur mit Zustimmung. */
+  readonly name?: string;
+  /** Kurzer Kontext, etwa Ort und Jahr. */
+  readonly kontext?: string;
 }
 
-/** Eine Frage des Kurz-Checks. */
-export interface QuizFrage {
+/** Ein freiwilliges Motiv auf der Petitionsseite. */
+export interface Motiv {
   readonly id: string;
-  readonly frage: string;
-  /** Eine Zeile Kontext unter der Frage. Erklaert, warum gefragt wird. */
-  readonly hinweis: string;
-  /** Mehrfachauswahl statt Einfachauswahl. */
-  readonly mehrfach: boolean;
-  readonly optionen: readonly QuizOption[];
+  readonly label: string;
 }
 
 /** Ein Abschnitt eines Rechtstextes (Impressum, Datenschutz). */
 export interface RechtsAbschnitt {
   readonly titel: string;
   readonly absaetze: readonly string[];
+}
+
+/** Eine Zeile in der Ergebnis-Auswertung (Region oder Grund). */
+export interface AuswertungZeile {
+  readonly id: string;
+  readonly name: string;
+  /** Anteil in Prozent. Bei Gruenden keine Summe von 100 — Mehrfachnennung. */
+  readonly anteil: number;
 }
 
 /* ---------------------------------------------------------------------------
@@ -178,48 +195,101 @@ export const BILDER = {
     alt: '',
     nachweis: 'Camille Corot, „Fontainebleau: Oak Trees at Bas-Bréau“, 1832/33',
   },
+  buero: {
+    pfad: '/bilder/buero-leer.png',
+    alt: 'Leerstehendes Großraumbüro bei Nacht, unbesetzte Schreibtische und Stühle, die meisten Lichter sind aus',
+    nachweis: 'Illustration eines leerstehenden Großraumbüros, KI-generiert (Platzhalter)',
+  },
+  atlas: {
+    pfad: '/bilder/atlas.png',
+    alt: 'Bronzestatue des Atlas, der die Weltkugel auf seinen Schultern trägt',
+    nachweis: 'Illustration: Atlas, der die Welt trägt (Platzhalter)',
+  },
+} as const satisfies Record<string, Bild>;
+
+/* Dummy-Portraets der Stimmen. Keine Fotografien — Silhouetten, bis echte
+   Aufnahmen mit Freigabe vorliegen. */
+const STIMME = {
+  lena: {
+    pfad: '/bilder/stimmen/lena.svg',
+    alt: 'Platzhalterporträt, Lena Hartmann',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  malik: {
+    pfad: '/bilder/stimmen/malik.svg',
+    alt: 'Platzhalterporträt, Malik Rahman',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  nora: {
+    pfad: '/bilder/stimmen/nora.svg',
+    alt: 'Platzhalterporträt, Nora Weiss',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  amina: {
+    pfad: '/bilder/stimmen/amina.svg',
+    alt: 'Platzhalterporträt, Amina Diallo',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  tom: {
+    pfad: '/bilder/stimmen/tom.svg',
+    alt: 'Platzhalterporträt, Tom Berger',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  julian: {
+    pfad: '/bilder/stimmen/julian.svg',
+    alt: 'Platzhalterporträt, Julian Krüger',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  sibel: {
+    pfad: '/bilder/stimmen/sibel.svg',
+    alt: 'Platzhalterporträt, Sibel Yılmaz',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  hannah: {
+    pfad: '/bilder/stimmen/hannah.svg',
+    alt: 'Platzhalterporträt, Hannah Vogt',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
+  piotr: {
+    pfad: '/bilder/stimmen/piotr.svg',
+    alt: 'Platzhalterporträt, Piotr Kowalski',
+    nachweis: 'Dummy-Porträt, vor Veröffentlichung zu ersetzen',
+  },
 } as const satisfies Record<string, Bild>;
 
 /**
- * Bildvorrat der Forderungs-Karten.
+ * Stockporträts der Forderungs-Karten.
  *
- * Die Karten wechseln im Takt durch diesen Vorrat, jede Karte um einen
- * Platz versetzt — dadurch zeigen nie zwei dasselbe Motiv, und die Sektion
- * steht nie still. Aufnahmen der Luminale, des Frankfurter Lichtfestivals:
- * dieselbe Stadt wie im Rest der Seite, nur in Neon.
+ * Ein Gesicht je Karte, fest zugeordnet — kein Wechsel. Unsplash License,
+ * Platzhalter bis eigene, freigegebene Aufnahmen vorliegen.
  */
-export const FORDERUNGS_BILDER: readonly Bild[] = [
-  {
-    pfad: '/bilder/ford-1.jpg',
-    alt: 'Der Frankfurter Hauptbahnhof, in farbiges Licht getaucht',
-    nachweis: 'Norbert Nagel, „Hauptbahnhof Frankfurt, Luminale 2014“ (CC BY-SA 3.0)',
+const FORDERUNGS_PORTRAET = {
+  eins: {
+    pfad: '/bilder/forderungen/gesicht-1.jpg',
+    alt: '',
+    nachweis: 'Joseph Gonzalez, Porträt (Unsplash License)',
   },
-  {
-    pfad: '/bilder/ford-2.jpg',
-    alt: 'Lichtkunst-Installation der Luminale an einer Fassade',
-    nachweis: 'Thomas Wolf, „Luminale 2012 – Resonate“ (CC BY-SA 3.0)',
+  zwei: {
+    pfad: '/bilder/forderungen/gesicht-2.jpg',
+    alt: '',
+    nachweis: 'Štefan Štefančík, Porträt (Unsplash License)',
   },
-  {
-    pfad: '/bilder/ford-3.jpg',
-    alt: 'Der Rententurm in farbigem Licht während der Luminale',
-    nachweis: 'Thomas Wolf, „Luminale 2012 – Rententurm“ (CC BY-SA 3.0)',
+  drei: {
+    pfad: '/bilder/forderungen/gesicht-3.jpg',
+    alt: '',
+    nachweis: 'Prince Akachi, Porträt (Unsplash License)',
   },
-  {
-    pfad: '/bilder/ford-4.jpg',
-    alt: 'Die Bahnsteighalle des Frankfurter Hauptbahnhofs in farbigem Licht',
-    nachweis: 'Norbert Nagel, „Hauptbahnhof Frankfurt, Luminale 2014“ (CC BY-SA 3.0)',
+  vier: {
+    pfad: '/bilder/forderungen/gesicht-4.jpg',
+    alt: '',
+    nachweis: 'Jurica Koletić, Porträt (Unsplash License)',
   },
-  {
-    pfad: '/bilder/ford-5.jpg',
-    alt: 'Die Frankfurter Skyline bei Nacht',
-    nachweis: 'Marvin Reuter, „Frankfurt Skyline bei Nacht“ (CC BY-SA 4.0)',
+  fuenf: {
+    pfad: '/bilder/forderungen/gesicht-5.jpg',
+    alt: '',
+    nachweis: 'Aiony Haust, Porträt (Unsplash License)',
   },
-  {
-    pfad: '/bilder/ford-6.jpg',
-    alt: 'Der Main und die beleuchtete Skyline bei Nacht',
-    nachweis: 'StapelChips, „Frankfurt Main and Skyline at night“ (CC BY-SA 4.0)',
-  },
-];
+} as const satisfies Record<string, Bild>;
 
 /* ---------------------------------------------------------------------------
  * Kennzahlen
@@ -227,20 +297,22 @@ export const FORDERUNGS_BILDER: readonly Bild[] = [
 
 export const KENNZAHLEN = {
   fortzuege: {
-    wert: '270.000',
+    wert: '288.579',
     label: 'Fortzüge deutscher Staatsbürger',
     kurzLabel: 'Fortzüge',
     quelle: 'Statistisches Bundesamt, Wanderungsstatistik',
-    jahr: 'PLATZHALTER',
-    geprueft: false,
+    jahr: '2025',
+    url: 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Wanderungen/Tabellen/wanderungen-zwischen-deutschland-und-dem-ausland-jahr-02.html',
+    geprueft: true,
   },
   abgabenlast: {
     wert: '47,9 %',
     label: 'Abgabenlast auf ein Durchschnittseinkommen',
     kurzLabel: 'Abgabenlast',
-    quelle: 'OECD, Taxing Wages (Tax Wedge, Single 100 % AW)',
-    jahr: 'PLATZHALTER',
-    geprueft: false,
+    quelle: 'OECD, Taxing Wages 2024, Tabelle 1.2',
+    jahr: '2023',
+    url: 'https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/04/taxing-wages-2024_f869da31/dbcbac85-en.pdf',
+    geprueft: true,
   },
   qualifikation: {
     wert: '3 von 4',
@@ -278,17 +350,70 @@ export const MARKE = {
 } as const;
 
 /* ---------------------------------------------------------------------------
+ * Kapitel — die Wegmarken am linken Rand
+ *
+ * Eine Sprungliste durch die Startseite, damit niemand die ganze Strecke
+ * scrollen muss. `id` muss der id des Hosts in landing.ts entsprechen.
+ * `dunkel` sagt, ob das Kapitel auf einer dunklen Flaeche liegt — daran
+ * richtet die Leiste ihre eigene Farbe aus, statt zu raten.
+ *
+ * Nicht jede Sektion braucht eine eigene Wegmarke. Auswertung haengt an
+ * der Petition. Die Kennzahlen gehoeren zur Karte, der Atlas zu den
+ * Unterstuetzern — `dazu` haelt das Kapitel aktiv, ohne einen weiteren
+ * Punkt in der Leiste.
+ * ------------------------------------------------------------------------- */
+
+/** Sektion ohne eigenen Menuepunkt, die ihr Kapitel aktiv haelt. */
+export interface KapitelDazu {
+  readonly id: string;
+  /** Ob diese Sektion auf dunkler Flaeche liegt. */
+  readonly dunkel: boolean;
+}
+
+export interface Kapitel {
+  readonly id: string;
+  readonly label: string;
+  readonly dunkel: boolean;
+  readonly dazu?: readonly KapitelDazu[];
+}
+
+export const KAPITEL: readonly Kapitel[] = [
+  { id: 'auftakt', label: 'Startseite', dunkel: true },
+  { id: 'wer-geht', label: 'Ihre Geschichten', dunkel: true },
+  {
+    id: 'wohin',
+    label: 'Die Zahlen',
+    dunkel: true,
+    dazu: [{ id: 'zahlen', dunkel: true }],
+  },
+  { id: 'und-dann', label: 'Und dann?', dunkel: true },
+  { id: 'forderungen', label: 'Forderungen', dunkel: true },
+  { id: 'petition', label: 'Petition', dunkel: false },
+  { id: 'belege', label: 'Aktuelle Entwicklungen', dunkel: false },
+  {
+    id: 'unterstuetzer',
+    label: 'Unterstützer',
+    dunkel: false,
+    dazu: [{ id: 'atlas', dunkel: true }],
+  },
+];
+
+export const KAPITEL_NAV = {
+  /** Beschriftung der Landmarke fuer Screenreader. */
+  ariaLabel: 'Kapitel dieser Seite',
+  griffAuf: 'Kapitelliste öffnen',
+  griffZu: 'Kapitelliste schließen',
+} as const;
+
+/* ---------------------------------------------------------------------------
  * Hero
  * ------------------------------------------------------------------------- */
 
 export const HERO = {
-  /** Zweizeilige Serif-Headline; die zweite Zeile wird kursiv gesetzt. */
-  zeile1: 'DER ZENIT',
-  zeile2Kursiv: 'ist überschritten',
-  /** Zwei Kennzahlen nebeneinander, wie das Stat-Pair der Vorlage. */
-  stats: [KENNZAHLEN.fortzuege, KENNZAHLEN.abgabenlast],
-  /* Bewusst keine Schaltflaeche: der Hero behauptet nur. Der Weg zur
-     Petition beginnt nach dem Kurz-Check und im Abschluss. */
+  /** Eine Kennzahl — das Signal des Heros. Zaehlt als Counter hoch. */
+  stats: [KENNZAHLEN.fortzuege],
+  /** Direkt zum Unterschreiben, ohne den Rest der Seite zu durchlaufen. */
+  cta: { label: 'Unterschreiben', pfad: '/petition' },
   /** Aufnahme, aus der die Wortmarke aufsteigt. */
   bild: BILDER.hero,
   /** Eichenkronen, die den Hero oben links und rechts rahmen. */
@@ -297,38 +422,182 @@ export const HERO = {
 } as const;
 
 /* ---------------------------------------------------------------------------
- * Gepinnte Scroll-Sequenz
+ * Wer geht — eine kleine Menge, in der einzelne Luecken Geschichten oeffnen
+ *
+ * Die Zahl der Figuren folgt nicht dem statistischen Jahresanteil. Sie soll
+ * als Gruppe lesbar bleiben. Die benannten Loecher sind die Tueren.
+ * ------------------------------------------------------------------------- */
+
+export const WER_GEHT = {
+  titel: 'Sie fehlen.',
+  hinweis: 'Lies ihre Geschichte.',
+  /** Unterstrichen. Öffnet die Petition mit „Geschichte veröffentlichen“. */
+  hinweisLink: 'Ergänze deine eigene',
+  oeffnenLabel: 'Lies ihre Geschichte',
+  schliessen: 'Schließen',
+  platzhalter:
+    'Dummy-Name und -Bild. Echte Stimmen erscheinen hier, sobald jemand sie für die Übergabe freigibt.',
+  cta: { label: 'Eigene Geschichte hinterlassen', pfad: '/petition' },
+  menge: 72,
+} as const;
+
+export const FORTGEHENDE: readonly Fortgehende[] = [
+  {
+    id: 'aerztin',
+    name: 'Lena Hartmann',
+    rolle: 'Ärztin',
+    zeile: 'Die Stelle bleibt. Sie nicht.',
+    kontext: 'Zürich, 2025',
+    bild: STIMME.lena,
+  },
+  {
+    id: 'ingenieur',
+    name: 'Malik Rahman',
+    rolle: 'Ingenieur',
+    zeile: 'Der nächste Entwurf entsteht woanders.',
+    kontext: 'Eindhoven, 2024',
+    bild: STIMME.malik,
+  },
+  {
+    id: 'gruenderin',
+    name: 'Nora Weiss',
+    rolle: 'Gründerin',
+    zeile: 'Das Büro hier ist nur noch die Hülle.',
+    kontext: 'Lissabon, 2025',
+    bild: STIMME.nora,
+  },
+  {
+    id: 'pflege',
+    name: 'Amina Diallo',
+    rolle: 'Pflege',
+    zeile: 'Fachkraft. Nicht ersetzbar durch einen Kurs.',
+    kontext: 'Wien, 2024',
+    bild: STIMME.amina,
+  },
+  {
+    id: 'handwerk',
+    name: 'Tom Berger',
+    rolle: 'Handwerk',
+    zeile: 'Meister. Mitte dreißig.',
+    kontext: 'Südtirol, 2025',
+    bild: STIMME.tom,
+  },
+  {
+    id: 'it',
+    name: 'Julian Krüger',
+    rolle: 'IT',
+    zeile: 'Remote aus dem Ausland ist immer noch fort.',
+    kontext: 'Tallinn, 2024',
+    bild: STIMME.julian,
+  },
+  {
+    id: 'lehre',
+    name: 'Sibel Yılmaz',
+    rolle: 'Lehre',
+    zeile: 'Wer unterrichten kann, kann auch gehen.',
+    kontext: 'Amsterdam, 2025',
+    bild: STIMME.sibel,
+  },
+  {
+    id: 'labor',
+    name: 'Hannah Vogt',
+    rolle: 'Labor',
+    zeile: 'Die nächste Studie trägt eine andere Adresse.',
+    kontext: 'Basel, 2024',
+    bild: STIMME.hannah,
+  },
+  {
+    id: 'werk',
+    name: 'Piotr Kowalski',
+    rolle: 'Werk',
+    zeile: 'Heute Schicht. Die Investition geht ins Ausland.',
+    kontext: 'Breslau, 2025',
+    bild: STIMME.piotr,
+  },
+];
+
+/* ---------------------------------------------------------------------------
+ * Geschichte in der Menge — der einen Luecke nach
+ *
+ * Drei Szenen, die beim Scrollen aus der Menge wachsen: erst die benannte
+ * Stelle, dann wer ihre Last erbt, dann was sich stapelt, wenn das jedes
+ * Jahr passiert. Kein Lebenslauf, keine erfundenen Motive.
  * ------------------------------------------------------------------------- */
 
 export const SEQUENZ: readonly SequenzSchritt[] = [
   {
-    id: 'wer-geht',
-    ueberschrift: 'Wer geht, ist jung und gut ausgebildet',
-    text:
-      'Auswanderung trifft Deutschland nicht in der Breite, sondern an der Spitze. ' +
-      'Es gehen überdurchschnittlich viele Menschen mit Berufs- und Hochschulabschluss, ' +
-      'in der Mitte ihres Erwerbslebens — also genau die Jahrgänge, die ein Land trägt.',
+    id: 'die-eine',
+    kicker: FORTGEHENDE[0].rolle,
+    ueberschrift: FORTGEHENDE[0].zeile,
+    text: 'Eine aus dreihundert. Genau deshalb fällt es so leicht, sie zu übersehen.',
     bild: BILDER.sequenz1,
   },
   {
     id: 'wer-bleibt',
-    ueberschrift: 'Wer bleibt, zahlt mehr',
-    text:
-      'Jeder Fortzug verteilt die gleiche Last auf weniger Schultern. Steuern und ' +
-      'Sozialabgaben zusammen nehmen auf ein durchschnittliches Einkommen fast die ' +
-      'Hälfte. Das ist kein Naturgesetz, sondern eine politische Entscheidung.',
+    kicker: '299',
+    ueberschrift: 'Wer bleibt, zahlt deren Stelle',
+    text: 'Dieselbe Schicht, dieselbe Last, weniger Schultern. Kein Naturgesetz — eine Entscheidung.',
     bild: BILDER.sequenz2,
   },
   {
-    id: 'unternehmen',
-    ueberschrift: 'Und die Unternehmen gehen mit',
-    text:
-      'Nicht als Umzug, sondern als Entscheidung: Die nächste Fabrik, das nächste Labor, ' +
-      'die nächste Stelle entsteht woanders. Das fällt nicht auf, solange die alten ' +
-      'noch laufen. Es fällt auf, wenn sie es nicht mehr tun.',
+    id: 'woanders',
+    kicker: 'Jedes Jahr',
+    ueberschrift: 'Die nächste Entscheidung entsteht woanders',
+    text: 'Nicht als Umzug. Als Entscheidung. Es fällt erst auf, wenn die alten nicht mehr laufen.',
     bild: BILDER.sequenz3,
   },
 ];
+
+/* ---------------------------------------------------------------------------
+ * Ausbluten — Deutschland verliert Farbe, die Wege bleiben
+ *
+ * Auftakt der Zahlen: sobald die Karte im Blick ist, kriechen die
+ * Landesflächen mit der Zeit unregelmäßig aus, die Konturen bleiben. Pfeile
+ * und Zahlen stehen von Anfang an. Die Zielliste ist Platzhalter und vor
+ * Veroeffentlichung an die Wanderungsstatistik zu haengen.
+ * ------------------------------------------------------------------------- */
+
+/** Ein Zielland der Abwanderung (Pfeil auf der Karte). */
+export interface Fluchtziel {
+  readonly id: string;
+  readonly name: string;
+  /** Anzahl der Fortzüge. Platzhalter. */
+  readonly anzahl: number;
+}
+
+export const AUSBLUTEN = {
+  titelZeile1: 'Das Land',
+  titelZeile2Kursiv: 'blutet aus.',
+  ziele: [
+    { id: 'ch', name: 'Schweiz', anzahl: 22_700 },
+    { id: 'at', name: 'Österreich', anzahl: 13_500 },
+    { id: 'es', name: 'Spanien', anzahl: 9_700 },
+    { id: 'us', name: 'USA', anzahl: 8_900 },
+  ] as readonly Fluchtziel[],
+  ariaBeschreibung:
+    'Deutschlandkarte mit Bundesländern. Die Flächen bleichen mit der Zeit aus, ' +
+    'die Länderkonturen bleiben sichtbar. Pfeile zeigen von Deutschland in die ' +
+    'Schweiz, nach Österreich, nach Spanien und in die USA, jeweils mit der Zahl der Fortzüge 2025.',
+} as const;
+
+/* ---------------------------------------------------------------------------
+ * Kapital — nach den fehlenden Menschen das leere Buero
+ *
+ * Die Frage steht im Bild. Darunter die Folge, als Kette von Absenzen:
+ * was fehlt, wenn Köpfe, Firmen und Kapital mitgehen.
+ * ------------------------------------------------------------------------- */
+
+export const KAPITAL = {
+  frage: 'Und dann?',
+  voraussetzung: 'Ohne Unternehmen, ohne Köpfe, ohne Kapital gibt es',
+  folgen: [
+    'keinen technischen Fortschritt',
+    'keine medizinische Entwicklung',
+    'keinen Wohlstand',
+  ],
+  schluss: 'Irgendwann keine Perspektive mehr.',
+  bild: BILDER.buero,
+} as const;
 
 /* ---------------------------------------------------------------------------
  * Manifest — dunkle Display-Headline
@@ -361,36 +630,170 @@ export const FAHNE = {
 } as const;
 
 /* ---------------------------------------------------------------------------
- * Zahlen — Drei-Spalten-Raster mit kreisrunden Ausschnitten
+ * Zahlen — drei Behauptungen: Reihe, Wertschöpfer, Abgabenkeil
  * ------------------------------------------------------------------------- */
 
-export const ZAHLEN_SEKTION = {
-  labelLinks: 'DIE LAGE',
-  labelRechts: 'IN ZAHLEN',
-  titelZeile1: 'WAS DIE ZAHLEN',
-  titelZeile2: 'ZEIGEN',
-} as const;
-
+/**
+ * Die Qualifikation. Sie steht zwischen der Wanderungsreihe
+ * und dem Abgabenvergleich.
+ */
 export const VIGNETTEN: readonly Vignette[] = [
   {
-    id: 'fortzuege',
-    titel: 'Sie gehen',
-    kennzahl: KENNZAHLEN.fortzuege,
-    bild: BILDER.kreis2,
-  },
-  {
-    id: 'abgaben',
-    titel: 'Es wird teurer',
-    kennzahl: KENNZAHLEN.abgabenlast,
-    bild: BILDER.kreis3,
-  },
-  {
     id: 'qualifikation',
-    titel: 'Es trifft die Mitte',
+    titel: 'Es gehen die Wertschöpfer.',
     kennzahl: KENNZAHLEN.qualifikation,
-    bild: BILDER.kreis1,
+    bild: BILDER.buero,
   },
 ];
+
+/** Ein Jahr der Wanderungsreihe deutscher Staatsangehöriger. */
+export interface Wanderungsjahr {
+  readonly jahr: number;
+  readonly fortzuege: number;
+  /** Zuzüge minus Fortzüge. Negativ heißt: mehr gehen, als zurückkommen. */
+  readonly saldo: number;
+}
+
+/**
+ * Vergleichbare Reihe ab 2017. Destatis stuft die Ergebnisse ab 2016 wegen
+ * einer Methodenänderung nur bedingt mit den Vorjahren vergleichbar ein.
+ * Stand der Tabelle: 1. Juni 2026.
+ */
+export const WANDERUNG = {
+  titel: 'Die Fortzüge steigen.',
+  text:
+    'Fortzüge deutscher Staatsangehöriger, und darunter der Saldo, nachdem die Rückkehrer abgezogen sind. ' +
+    'Die Reihe beginnt 2017, nach der Methodenänderung von 2016. 2020 ist der Einbruch der Pandemie.',
+  stand: 'Stand 1. Juni 2026',
+  quelle: 'Statistisches Bundesamt, Wanderungsstatistik',
+  url: 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Wanderungen/Tabellen/wanderungen-zwischen-deutschland-und-dem-ausland-jahr-02.html',
+  geprueft: true,
+  jahre: [
+    { jahr: 2017, fortzuege: 249_181, saldo: -82_478 },
+    { jahr: 2018, fortzuege: 261_851, saldo: -60_320 },
+    { jahr: 2019, fortzuege: 270_294, saldo: -57_625 },
+    { jahr: 2020, fortzuege: 220_239, saldo: -28_356 },
+    { jahr: 2021, fortzuege: 247_829, saldo: -64_179 },
+    { jahr: 2022, fortzuege: 268_167, saldo: -83_414 },
+    { jahr: 2023, fortzuege: 265_035, saldo: -73_679 },
+    { jahr: 2024, fortzuege: 269_986, saldo: -80_879 },
+    { jahr: 2025, fortzuege: 288_579, saldo: -96_689 },
+  ] as readonly Wanderungsjahr[],
+} as const;
+
+/** Ein Land im Abgabenkeil-Vergleich. `promille` ist der Keil in Prozent. */
+export interface Abgabenland {
+  readonly id: string;
+  readonly name: string;
+  /** Abgabenkeil in Prozent der Arbeitskosten. */
+  readonly keil: number;
+  /** Deutschland, die Bezugsgröße der Balken. */
+  readonly hier?: boolean;
+}
+
+/**
+ * OECD Taxing Wages 2024, Tabelle 1.2, Berichtsjahr 2023.
+ * Ledige Person ohne Kinder, 100 % des Durchschnittslohns.
+ */
+export const ABGABEN_VERGLEICH = {
+  titel: 'Die Abgabenlast steigt.',
+  text:
+    'Ledige Person ohne Kinder, Durchschnittslohn. Anteil der Arbeitskosten, der nicht als Nettolohn ankommt. 2023.',
+  quelle: 'OECD, Taxing Wages 2024, Tabelle 1.2',
+  url: 'https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/04/taxing-wages-2024_f869da31/dbcbac85-en.pdf',
+  geprueft: true,
+  laender: [
+    { id: 'de', name: 'Deutschland', keil: 47.9, hier: true },
+    { id: 'at', name: 'Österreich', keil: 47.2 },
+    { id: 'es', name: 'Spanien', keil: 40.2 },
+    { id: 'nl', name: 'Niederlande', keil: 35.1 },
+    { id: 'us', name: 'USA', keil: 29.9 },
+    { id: 'ch', name: 'Schweiz', keil: 23.5 },
+  ] as readonly Abgabenland[],
+} as const;
+
+/** Ein externer Beleg. Der Satz ist eigen, der Link führt zum Herausgeber. */
+export interface Beitrag {
+  readonly id: string;
+  readonly medium: string;
+  readonly datum: string;
+  readonly zeile: string;
+  readonly url: string;
+}
+
+export const BEITRAEGE_SEKTION = {
+  titelZeile1: 'Aktuelle',
+  titelZeile2Kursiv: 'Entwicklungen.',
+  einleitung:
+    'Eigene Sätze, fremde Seiten. Die Links führen zu den Herausgebern. Es wird nichts von dort übernommen.',
+} as const;
+
+export const BEITRAEGE: readonly Beitrag[] = [
+  {
+    id: 'destatis-ziele',
+    medium: 'Statistisches Bundesamt',
+    datum: '9. Juni 2026',
+    zeile: '2025 zogen mehr Deutsche in die Schweiz, nach Österreich und nach Spanien als in die USA.',
+    url: 'https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_24_p002.html',
+  },
+  {
+    id: 'destatis-reihe',
+    medium: 'Statistisches Bundesamt',
+    datum: '1. Juni 2026',
+    zeile: 'Fortzüge und Saldo deutscher Staatsangehöriger, Jahr für Jahr, von 1950 bis 2025.',
+    url: 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Wanderungen/Tabellen/wanderungen-zwischen-deutschland-und-dem-ausland-jahr-02.html',
+  },
+  {
+    id: 'destatis-regionen',
+    medium: 'Statistisches Bundesamt',
+    datum: '2025',
+    zeile: 'Wohin deutsche Staatsangehörige fortziehen, nach Weltregionen, als amtliche Grafik.',
+    url: 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/_Grafik/_Interaktiv/fortzuege-ausland-deutsche-nach-zielgebiet.html',
+  },
+  {
+    id: 'oecd-keil',
+    medium: 'OECD',
+    datum: '2024',
+    zeile: 'Beim Abgabenkeil eines Durchschnittslohns lag Deutschland 2023 in der OECD hinter Belgien.',
+    url: 'https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/04/taxing-wages-2024_f869da31/dbcbac85-en.pdf',
+  },
+];
+
+/** So viele Belege stehen auf der Startseite. Die uebrigen warten auf der Seite. */
+export const BEITRAEGE_AUF_START = 3;
+
+/* ---------------------------------------------------------------------------
+ * Aktuelle Entwicklungen und Daten — die eigene Seite
+ *
+ * Die Startseite erzaehlt; sie zeigt jede Grafik einmal und nur die
+ * juengsten Belege. Wer nachrechnen will, kommt hierher: dieselben Daten,
+ * aber vollstaendig und jede mit ihrer Quelle darunter.
+ *
+ * Eigene Zahlen stehen hier bewusst nicht. Alles verweist auf die Bloecke,
+ * aus denen auch die Startseite schoepft — sonst laufen zwei Staende
+ * auseinander, sobald einer gepflegt wird.
+ * ------------------------------------------------------------------------- */
+
+export const ENTWICKLUNGEN = {
+  pfad: '/entwicklungen',
+  /** Eintrag in der Kapitelliste, ganz oben rechts. */
+  navLabel: 'Ausführliche Entwicklungen und Daten',
+  /** Im Hero, solange die Kapitelliste noch fehlt. */
+  startLabel: 'Aktuelle Daten und Entwicklungen',
+  /** Der Weg hierher — unter den Grafiken und unter den Belegen. */
+  weiterLabel: 'Weitere Daten & aktuelle Entwicklungen',
+  titelZeile1: 'Aktuelle Entwicklungen',
+  titelZeile2Kursiv: 'und Daten.',
+  einleitung:
+    'Die Grafiken der Startseite noch einmal in Ruhe, jede mit ihrer Quelle darunter. ' +
+    'Danach alle Belege, nicht nur die drei jüngsten.',
+  quelleLabel: 'Quelle',
+  reiheLabel: 'WANDERUNG',
+  keilLabel: 'ABGABEN',
+  auswertungLabel: 'AUSWERTUNG',
+  belegeLabel: 'BELEGE',
+  belegeTitel: 'Was anderswo steht.',
+} as const;
 
 /* ---------------------------------------------------------------------------
  * Forderungen
@@ -406,11 +809,10 @@ export const VIGNETTEN: readonly Vignette[] = [
  * ------------------------------------------------------------------------- */
 
 export const FORDERUNGEN_SEKTION = {
-  label: 'FORDERUNGEN',
-  titelZeile1: 'WAS SICH ÄNDERN',
-  titelZeile2Kursiv: 'muss',
+  titelZeile1: 'Es muss sich',
+  titelZeile2Kursiv: 'etwas ändern.',
   einleitung:
-    'Sechs Richtungsentscheidungen. Keine Maximalforderungen, keine Parteiprogramme — ' +
+    'Fünf Richtungsentscheidungen. Keine Maximalforderungen, keine Parteiprogramme — ' +
     'sondern das, worauf sich jeder einigen kann, der möchte, dass Bleiben wieder die ' +
     'naheliegendere Entscheidung ist als Gehen.',
 } as const;
@@ -423,6 +825,7 @@ export const FORDERUNGEN: readonly Forderung[] = [
       'Steuern und Abgaben auf Arbeit spürbar senken. Wer arbeitet, muss am Monatsende ' +
       'mehr behalten als heute — das ist die einfachste Antwort auf die Frage, warum ' +
       'jemand bleiben sollte.',
+    bild: FORDERUNGS_PORTRAET.eins,
   },
   {
     id: 'bauen',
@@ -430,6 +833,7 @@ export const FORDERUNGEN: readonly Forderung[] = [
     text:
       'Bauvorschriften radikal zusammenstreichen. Wohnraum entsteht nicht durch ' +
       'Förderprogramme, sondern dadurch, dass Bauen wieder erlaubt und bezahlbar ist.',
+    bild: FORDERUNGS_PORTRAET.zwei,
   },
   {
     id: 'vorsorgen',
@@ -438,6 +842,7 @@ export const FORDERUNGEN: readonly Forderung[] = [
       'Die Altersvorsorge schrittweise vom Umlageverfahren lösen und kapitalgedeckt ' +
       'aufbauen — ohne bestehende Ansprüche zu brechen. Wer jung ist, muss wissen, ' +
       'wofür er einzahlt.',
+    bild: FORDERUNGS_PORTRAET.drei,
   },
   {
     id: 'entfesseln',
@@ -446,6 +851,7 @@ export const FORDERUNGEN: readonly Forderung[] = [
       'Berichts-, Nachweis- und Dokumentationspflichten zusammenstreichen. Für jede ' +
       'neue Vorschrift müssen zwei alte fallen. Wer gründet, soll arbeiten dürfen ' +
       'statt Formulare auszufüllen.',
+    bild: FORDERUNGS_PORTRAET.vier,
   },
   {
     id: 'beschleunigen',
@@ -454,16 +860,29 @@ export const FORDERUNGEN: readonly Forderung[] = [
       'Genehmigungen mit verbindlichen Fristen versehen: Wer als Behörde nicht ' +
       'fristgerecht entscheidet, hat zugestimmt. Verwaltung muss vollständig digital ' +
       'laufen — ohne Papier, ohne Termin, ohne Amtsstube.',
-  },
-  {
-    id: 'zurueckholen',
-    titel: 'Zurückholen',
-    text:
-      'Rückkehr darf nicht bestraft werden. Ausländische Abschlüsse und ' +
-      'Versicherungszeiten müssen unbürokratisch anerkannt werden. Wer geht, soll ' +
-      'wiederkommen können, ohne von vorn anzufangen.',
+    bild: FORDERUNGS_PORTRAET.fuenf,
   },
 ];
+
+/* ---------------------------------------------------------------------------
+ * Papier — ausfuehrliche Gruende und Aenderungen, folgt
+ *
+ * Die fünf Forderungen sind die Kurzform. Das Papier soll Belege,
+ * Motive und das "wie" nachliefern. Solange `url` leer ist, bleibt
+ * die Sektion ein Platzhalter.
+ * ------------------------------------------------------------------------- */
+
+export const PAPIER = {
+  label: 'COMING SOON',
+  titelZeile1: 'Ein Papier',
+  titelZeile2Kursiv: 'folgt.',
+  text:
+    'Zu den Gründen, warum sie gehen — und zu dem, was sich ändern muss. ' +
+    'Genau, belegt, zum Weitergeben. Noch nicht da. Bald hier.',
+  cta: 'Mehr erfahren …',
+  /** Erst setzen, wenn das Papier erreichbar ist. Leer = Platzhalter. */
+  url: '',
+} as const;
 
 /* ---------------------------------------------------------------------------
  * Unterstuetzer
@@ -474,20 +893,47 @@ export const FORDERUNGEN: readonly Forderung[] = [
  * die Kampagne zu beschaedigen — und rechtlich angreifbar.
  * ------------------------------------------------------------------------- */
 
+/** Bekannte Person unter den Unterstützern. Erst nach schriftlicher Zusage eintragen. */
+export interface UnterstuetzerPerson {
+  name: string;
+  /** Funktion, zum Beispiel „Autorin“ oder „Musiker“. */
+  rolle: string;
+  /** Porträt, optional. Ohne Bild zeigt der Kreis die Initialen. */
+  bild?: string;
+}
+
 export const UNTERSTUETZER = {
   label: 'UNTERSTÜTZT VON',
   /*
-   * TODO vor Veroeffentlichung: `name` durch die tatsaechlichen
-   * Organisationsnamen ersetzen. Der Name ist der Alternativtext des Logos —
-   * ohne ihn ist die Reihe fuer Screenreader wertlos.
+   * `name` ist der Alternativtext des Logos. `url` oeffnet die Seite der
+   * Organisation in einem neuen Tab.
    */
   logos: [
-    { name: 'Unterstützer (Name eintragen)', pfad: '/bilder/unterstuetzer-1.webp' },
-    { name: 'Unterstützer (Name eintragen)', pfad: '/bilder/unterstuetzer-2.webp' },
+    {
+      name: 'jung.liberal.kapitalistisch.',
+      pfad: '/bilder/unterstuetzer-1.webp',
+      url: 'https://jlk-verband.de/',
+    },
+    {
+      name: 'Liberty Rising',
+      pfad: '/bilder/unterstuetzer-2.webp',
+      url: 'https://libertyrising.de/',
+    },
   ],
-  /** Freie Plaetze. Erst nach schriftlicher Zusage befuellen. */
+  /** Freie Logo-Plätze. Erst nach schriftlicher Zusage befüllen. */
   freieSlots: 4,
-  hinweis: 'Weitere Logos erst nach schriftlicher Zusage einsetzen.',
+  personenLabel: 'PERSONEN',
+  /*
+   * Bekannte Persönlichkeiten. Eintrag erst nach schriftlicher Zusage,
+   * sonst bleibt der Platz leer. Beispiel:
+   * { name: 'Vorname Nachname', rolle: 'Autorin', bild: '/bilder/unterstuetzer/name.webp' },
+   * Namen aus der Petition (Häkchen im Formular) kommen später dazu,
+   * sobald Unterschriften gespeichert werden. Ohne diese Freigabe nicht listen.
+   */
+  personen: [] as UnterstuetzerPerson[],
+  /** Porträtrahmen insgesamt. Gefüllte Personen zählen mit. */
+  personenPlaetze: 6,
+  hinweis: 'Logos und Namen erst nach ausdrücklicher Freigabe einsetzen.',
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -499,9 +945,81 @@ export const ABSCHLUSS = {
   zeile1Rest: 'MUSS SICH',
   zeile2: 'WIEDER LOHNEN',
   text:
-    'Diese Seite ist ein Mahnmal, kein Abgesang. Die Entwicklung lässt sich drehen — ' +
-    'aber nur, wenn genug Menschen sichtbar machen, dass sie sie sehen.',
+    'Diese Seite ist ein Mahnmal, kein Abgesang. Wir können die Entwicklung drehen. Dafür muss die Politik aber erkennen, wie groß das Problem ist.  Unterschreibe darum die Petition und veröffentliche deine eigene Geschichte, falls du ausgewandert bist. Lasst und das Problem gemeinsam sichtbar machen',
   cta: { label: 'Petition unterschreiben', pfad: '/petition' },
+} as const;
+
+/* ---------------------------------------------------------------------------
+ * Auswertung — Regionen und Gruende zur Petition
+ *
+ * ACHTUNG: ausschliesslich Beispieldaten.
+ * Der Zaehler der Petition steht auf null, solange nichts gespeichert wird.
+ * Diese Anteile duerfen vor dem Echtbetrieb nicht wie echte Stimmen wirken.
+ * Regionen folgen den Bundeslaendern (aus der Postleitzahl). Die Gruende
+ * sind dieselben Motive wie im Petitionsformular; Mehrfachnennung, keine 100-Summe.
+ * ------------------------------------------------------------------------- */
+
+export const AUSWERTUNG = {
+  label: 'AUSWERTUNG',
+  stempel: 'BEISPIELDATEN',
+  einleitung: 'Woher die Stimmen kommen — und was den Ausschlag gibt.',
+  /** Geschlossen unter der Petition; oeffnet Regionen und Gruende. */
+  aufklappen: 'Auswertung ansehen',
+  zuklappen: 'Auswertung schließen',
+  hinweis:
+    'Platzhalter. Es werden noch keine Unterschriften gezählt. Sobald welche ' +
+    'bestätigt sind, ersetzen die echten Anteile diese Verteilung.',
+  regionen: {
+    label: 'REGIONEN',
+    text: 'Anteil der Stimmen nach Bundesland, aus der angegebenen Postleitzahl.',
+    zeilen: [
+      { id: 'by', name: 'Bayern', anteil: 16 },
+      { id: 'bw', name: 'Baden-Württemberg', anteil: 14 },
+      { id: 'nw', name: 'Nordrhein-Westfalen', anteil: 13 },
+      { id: 'he', name: 'Hessen', anteil: 9 },
+      { id: 'be', name: 'Berlin', anteil: 8 },
+      { id: 'hh', name: 'Hamburg', anteil: 7 },
+      { id: 'ni', name: 'Niedersachsen', anteil: 6 },
+      { id: 'sn', name: 'Sachsen', anteil: 5 },
+      { id: 'rp', name: 'Rheinland-Pfalz', anteil: 4 },
+      { id: 'sh', name: 'Schleswig-Holstein', anteil: 4 },
+      { id: 'bb', name: 'Brandenburg', anteil: 3 },
+      { id: 'th', name: 'Thüringen', anteil: 3 },
+      { id: 'st', name: 'Sachsen-Anhalt', anteil: 2 },
+      { id: 'mv', name: 'Mecklenburg-Vorpommern', anteil: 2 },
+      { id: 'hb', name: 'Bremen', anteil: 2 },
+      { id: 'sl', name: 'Saarland', anteil: 2 },
+    ],
+  },
+  gruende: {
+    label: 'GRÜNDE',
+    text: 'Anteil der Nennungen. Mehrfachauswahl, die Summe ist nicht 100.',
+    zeilen: [
+      { id: 'steuern', name: 'Steuern und Abgaben', anteil: 72 },
+      { id: 'buerokratie', name: 'Bürokratie und Vorschriften', anteil: 61 },
+      { id: 'chancen', name: 'Beruf, Löhne, berufliche Chancen', anteil: 48 },
+      { id: 'wohnen', name: 'Wohnen und Lebenshaltungskosten', anteil: 37 },
+      { id: 'lebenseinstellung', name: 'Lebenseinstellung und persönliche Freiheit', anteil: 29 },
+      { id: 'migration', name: 'Migration und innere Sicherheit', anteil: 24 },
+    ],
+  },
+} as const;
+
+/* ---------------------------------------------------------------------------
+ * Atlas — Schlussbild ganz am Ende
+ *
+ * Das Zitat steht allein bei der Figur. Die Kugel muss lesbar bleiben,
+ * deshalb eigene Sektion statt Kulisse hinter einer anderen Gruppe.
+ * ------------------------------------------------------------------------- */
+
+export const ATLAS = {
+  zitat:
+    'Wenn du Atlas sehen würdest, den Riesen, der die Welt auf seinen Schultern trägt, ' +
+    'wenn du sehen würdest, wie er steht, Blut über seine Brust rinnend, seine Knie ' +
+    'einknickend, seine Arme zitternd, mit letzter Kraft die Welt emporhaltend, die je ' +
+    'mehr er sich anstrengt, desto schwerer auf seinen Schultern lastet —',
+  frage: 'was würdest du ihm raten?',
+  bild: BILDER.atlas,
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -518,15 +1036,17 @@ export const FOOTER = {
     { label: 'Datenschutz', pfad: '/datenschutz' },
   ],
   quellenHinweis:
-    'Alle Kennzahlen dieser Seite sind Platzhalter und vor Veröffentlichung zu belegen.',
+    'Qualifikation und Netto-Direktinvestitionen sind noch Platzhalter. Die übrigen Kennzahlen sind an der Quelle geprüft.',
   /* CC BY und CC BY-SA verlangen die Nennung von Urheber und Lizenz. Das
      ist keine Hoeflichkeit, sondern Bedingung der Nutzung — deshalb steht
      jeder Nachweis einzeln da und nicht als Sammelfloskel. */
   bildnachweisLabel: 'Bildnachweis',
   bildnachweisEinleitung:
     'Nachtaufnahmen von Frankfurt am Main und der Luminale, über Wikimedia Commons ' +
-    'unter freien Lizenzen. Die gemalten Eichenkronen im Kopf der Seite stammen aus ' +
-    'dem Open-Access-Bestand des Metropolitan Museum of Art.',
+    'unter freien Lizenzen. Die Porträts der Forderungs-Karten sind Stockfotos von Unsplash. ' +
+    'Die gemalten Eichenkronen im Kopf der Seite stammen aus dem Open-Access-Bestand ' +
+    'des Metropolitan Museum of Art. Das leerstehende Büro ist eine Illustration und ' +
+    'vor Veröffentlichung durch ein frei lizenziertes Foto zu ersetzen.',
   bildnachweisListe: [
     {
       werk: 'Frankfurt am Main city center from other side of the Main at night (2020)',
@@ -555,20 +1075,30 @@ export const FOOTER = {
       lizenz: 'CC BY-SA 3.0',
     },
     {
-      werk: 'Luminale 2012 – Resonate und Rententurm',
-      urheber: 'Thomas Wolf',
-      lizenz: 'CC BY-SA 3.0',
+      werk: 'Stockporträts der Forderungs-Karten',
+      urheber:
+        'Joseph Gonzalez, Štefan Štefančík, Prince Akachi, Jurica Koletić, Aiony Haust',
+      lizenz: 'Unsplash License',
     },
-    { werk: 'Frankfurt Skyline bei Nacht', urheber: 'Marvin Reuter', lizenz: 'CC BY-SA 4.0' },
     {
-      werk: 'Frankfurt Main and Skyline at night',
-      urheber: 'StapelChips',
-      lizenz: 'CC BY-SA 4.0',
+      werk: 'Germany, states (admin-1, 1:10m)',
+      urheber: 'Natural Earth',
+      lizenz: 'Public domain',
     },
     {
       werk: 'Fontainebleau: Oak Trees at Bas-Bréau (1832/33)',
       urheber: 'Camille Corot, The Metropolitan Museum of Art',
       lizenz: 'CC0',
+    },
+    {
+      werk: 'Leerstehendes Großraumbüro',
+      urheber: 'Illustration, KI-generiert',
+      lizenz: 'Platzhalter — vor Veröffentlichung ersetzen',
+    },
+    {
+      werk: 'Atlas',
+      urheber: 'Illustration, KI-generiert',
+      lizenz: 'Platzhalter — vor Veröffentlichung ersetzen',
     },
   ] as readonly Bildnachweis[],
   /* TODO vor Veroeffentlichung: je Bild den Link auf die Commons-Dateiseite
@@ -578,6 +1108,16 @@ export const FOOTER = {
 /* ---------------------------------------------------------------------------
  * Petitionsseite
  * ------------------------------------------------------------------------- */
+
+/** Freiwillige Motive im Formular. Dieselbe Liste wie in der Auswertung. */
+export const PETITION_MOTIVE: readonly Motiv[] = [
+  { id: 'steuern', label: 'Steuern und Abgaben' },
+  { id: 'buerokratie', label: 'Bürokratie und Vorschriften' },
+  { id: 'migration', label: 'Migration und innere Sicherheit' },
+  { id: 'lebenseinstellung', label: 'Lebenseinstellung und persönliche Freiheit' },
+  { id: 'chancen', label: 'Beruf, Löhne, berufliche Chancen' },
+  { id: 'wohnen', label: 'Wohnen und Lebenshaltungskosten' },
+];
 
 export const PETITION = {
   titelZeile1: 'JETZT',
@@ -645,7 +1185,9 @@ export const PETITION = {
         titel: 'Übergabe',
         text:
           'Nach Abschluss der Sammlung werden Anzahl, Postleitzahlengebiete und — ' +
-          'nur bei ausdrücklicher Freigabe — Namen und Begründungen übergeben.',
+          'nur bei ausdrücklicher Freigabe — Namen und Begründungen übergeben. ' +
+          'Wer es extra erlaubt, erscheint mit Vor- und Nachname bei den Unterstützern auf dieser Seite. ' +
+          'Ein Porträt nur, wenn eines mitgeschickt wird.',
       },
       {
         titel: 'Löschung',
@@ -657,8 +1199,15 @@ export const PETITION = {
   },
 
   formular: {
-    titel: 'Deine Unterschrift',
-    untertitel: 'Zwei Minuten. Mit * markierte Felder sind Pflicht.',
+    titelUnterschreiben: 'Deine Unterschrift',
+    titelGeschichte: 'Deine Geschichte',
+    titelBeides: 'Unterschrift und Geschichte',
+    abschnittWahl: 'WAS DU BEITRÄGST',
+    unterschreiben: 'Petition unterschreiben',
+    veroeffentlichen: 'Geschichte veröffentlichen',
+    veroeffentlichenHinweis:
+      'Name und Geschichte werden bei der Übergabe öffentlich genannt. ' +
+      'Ein Porträt kannst du dazulegen oder weglassen.',
     abschnittPerson: 'ZUR PERSON',
     abschnittMotiv: 'IHR MOTIV (FREIWILLIG)',
     abschnittEinwilligung: 'EINWILLIGUNG',
@@ -669,31 +1218,43 @@ export const PETITION = {
     emailHinweis: 'Für die Bestätigung. Wird nicht veröffentlicht.',
     plz: 'Postleitzahl',
     plzHinweis: 'Zeigt, aus welchen Regionen die Stimmen kommen.',
+    ort: 'Ort',
+    land: 'Land',
+    letztePlz: 'Letzte Postleitzahl in Deutschland',
+    letztePlzHinweis: 'Freiwillig. Ordnet die Geschichte einer Region zu.',
 
-    grundLabel: 'Was gibt bei dir den Ausschlag?',
-    grundHinweis: 'Mehrfachauswahl möglich.',
-    grundAusQuiz:
-      'Aus deinem Kurz-Check übernommen — übertragen wurde davon noch nichts. ' +
-      'Du kannst die Auswahl hier ändern.',
-
-    geschichte: 'Deine Begründung in eigenen Worten',
-    geschichteHinweis:
-      'Ein Satz genügt. Die stärksten Argumente in der Übergabe sind keine Zahlen, ' +
-      'sondern Sätze von Menschen.',
+    geschichte: 'Deine Geschichte',
+    geschichteHinweis: 'Ein Satz genügt. Pflicht, sobald du veröffentlichst.',
     geschichtePlatzhalter:
-      'Ich denke darüber nach zu gehen, weil …',
+      'Ich bin gegangen, weil …',
 
     einwilligung:
       'Ich bin damit einverstanden, dass meine Angaben zum Zweck dieser Petition ' +
       'verarbeitet und an die genannten Adressaten übergeben werden. Die Einwilligung ' +
       'kann ich jederzeit formlos widerrufen.',
+    einwilligungGeschichte:
+      'Ich bin damit einverstanden, dass Name und Geschichte veröffentlicht und ' +
+      'bei der Übergabe genannt werden. Die Einwilligung kann ich jederzeit formlos widerrufen.',
+    nameAuffuehren: 'Mein Name darf bei den Unterstützern aufgeführt werden.',
+    nameAuffuehrenHinweis:
+      'Vor- und Nachname auf dieser Seite. Ein Porträt kannst du dazulegen oder weglassen. ' +
+      'Geschichte und E-Mail bleiben ungenannt.',
+    bild: 'Porträt',
+    bildHinweis: 'Freiwillig. JPG, PNG oder WebP, höchstens 2 MB. Ohne Bild bleibt der Platz leer.',
+    bildWaehlen: 'Bild auswählen',
+    bildAendern: 'Anderes Bild',
+    bildEntfernen: 'Bild entfernen',
+    bildFehlerTyp: 'Bitte ein Bild im Format JPG, PNG oder WebP.',
+    bildFehlerGroesse: 'Das Bild darf höchstens 2 MB groß sein.',
     oeffentlich:
       'Mein Name und meine Begründung dürfen bei der Übergabe öffentlich genannt werden.',
     updates:
       'Sag mir Bescheid, wenn die Petition übergeben wird. Höchstens fünf E-Mails, ' +
       'Abmeldung mit einem Klick.',
 
-    absenden: 'Unterschreiben',
+    absendenUnterschreiben: 'Unterschreiben',
+    absendenVeroeffentlichen: 'Veröffentlichen',
+    absendenBeides: 'Unterschreiben und veröffentlichen',
     datenschutzHinweis:
       'Angaben zur Verarbeitung stehen in der Datenschutzerklärung. Es werden keine ' +
       'Tracker, keine Analyse-Dienste und keine externen Schriften geladen.',
@@ -727,140 +1288,6 @@ export const PETITION = {
     'Demo-Modus: Es wird nichts gespeichert und nichts versendet. Für den Echtbetrieb ' +
     'fehlen Backend, Double-Opt-In, Impressum und Datenschutzerklärung.',
 } as const;
-
-/* ---------------------------------------------------------------------------
- * Kurz-Check (Quiz)
- *
- * Vier Fragen, keine Anmeldung, keine Uebertragung. Der Check hat zwei
- * Aufgaben: er macht aus passivem Lesen eine eigene Aussage, und er liefert
- * der Petitionsseite bereits die Motive, damit dort weniger zu tippen ist.
- *
- * Die Antworten bleiben ausschliesslich im Arbeitsspeicher des Browsers.
- * Kein localStorage, kein Netzwerkaufruf — sonst waere die Zusage
- * "keine Anmeldung, nichts wird gespeichert" nicht wahr.
- * ------------------------------------------------------------------------- */
-
-export const QUIZ = {
-  label: 'KURZ-CHECK',
-  titelZeile1: 'GEHÖRST DU',
-  titelZeile2Kursiv: 'dazu?',
-  einleitung:
-    'Vier Fragen, etwa dreißig Sekunden. Keine Anmeldung, keine E-Mail, kein Konto. ' +
-    'Die Antworten bleiben in deinem Browser und werden nirgendwohin übertragen.',
-  starten: 'Check starten',
-  weiter: 'Weiter',
-  zurueck: 'Zurück',
-  auswerten: 'Auswertung ansehen',
-  neu: 'Antworten zurücksetzen',
-  fortschritt: 'Frage',
-  von: 'von',
-  ergebnisLabel: 'IHRE AUSWERTUNG',
-  ergebnisAlterLabel: 'Alter',
-  ergebnisMotivLabel: 'Motive',
-  ergebnisOhneMotiv: 'keine Angabe',
-  cta: { label: 'Petition unterschreiben', pfad: '/petition' },
-  datenschutz:
-    'Diese Auswertung entsteht in deinem Browser. Es wurde nichts gespeichert und ' +
-    'nichts gesendet.',
-} as const;
-
-export const QUIZ_FRAGEN: readonly QuizFrage[] = [
-  {
-    id: 'gedanke',
-    frage: 'Denkst du darüber nach, Deutschland zu verlassen?',
-    hinweis: 'Ehrlich, nicht diplomatisch — die Antwort sieht niemand außer dir.',
-    mehrfach: false,
-    optionen: [
-      { id: 'ja-konkret', label: 'Ja, und ich arbeite bereits daran', kurz: 'arbeitet daran' },
-      { id: 'ja-oft', label: 'Ja, immer wieder', kurz: 'denkt darüber nach' },
-      { id: 'nein-verstehe', label: 'Nein — aber ich verstehe jeden, der geht', kurz: 'bleibt, versteht es aber' },
-      { id: 'nein', label: 'Nein, für mich kommt das nicht infrage', kurz: 'bleibt' },
-    ],
-  },
-  {
-    id: 'stand',
-    frage: 'Wie weit ist die Sache?',
-    hinweis: 'Zwischen „mal gegoogelt“ und „Vertrag unterschrieben“ liegen Welten.',
-    mehrfach: false,
-    optionen: [
-      { id: 'nur-gedanke', label: 'Ein Gedanke, mehr nicht', kurz: 'Gedanke' },
-      { id: 'informiere', label: 'Ich informiere mich: Länder, Steuern, Papiere', kurz: 'in der Recherche' },
-      { id: 'plane', label: 'Ich plane konkret — Job, Visum oder Termin steht', kurz: 'konkrete Planung' },
-      { id: 'weg', label: 'Ich lebe bereits im Ausland', kurz: 'bereits ausgewandert' },
-    ],
-  },
-  {
-    id: 'alter',
-    frage: 'Wie alt bist du?',
-    hinweis:
-      'Wichtig, weil Abwanderung kein Querschnitt ist: Sie trifft die Jahrgänge, ' +
-      'die noch vier Jahrzehnte einzahlen würden.',
-    mehrfach: false,
-    optionen: [
-      { id: 'u30', label: 'Unter 30', kurz: 'unter 30' },
-      { id: '30-49', label: '30 bis 49', kurz: '30 bis 49' },
-      { id: 'ab50', label: '50 oder älter', kurz: '50 oder älter' },
-    ],
-  },
-  {
-    id: 'grund',
-    frage: 'Was gibt den Ausschlag?',
-    hinweis: 'Mehrfachauswahl möglich.',
-    mehrfach: true,
-    optionen: [
-      { id: 'steuern', label: 'Steuern und Abgaben', kurz: 'Steuern und Abgaben' },
-      { id: 'buerokratie', label: 'Bürokratie und Vorschriften', kurz: 'Bürokratie' },
-      { id: 'migration', label: 'Migration und innere Sicherheit', kurz: 'Migration und Sicherheit' },
-      { id: 'lebenseinstellung', label: 'Lebenseinstellung und persönliche Freiheit', kurz: 'Lebenseinstellung' },
-      { id: 'chancen', label: 'Beruf, Löhne, berufliche Chancen', kurz: 'berufliche Chancen' },
-      { id: 'wohnen', label: 'Wohnen und Lebenshaltungskosten', kurz: 'Wohnkosten' },
-    ],
-  },
-];
-
-/**
- * Auswertungstexte.
- *
- * Vier Profile, abgeleitet aus den ersten beiden Fragen. Die Texte werten
- * niemanden ab: wer bleibt, ist genauso Adressat der Kampagne wie der, der
- * schon Kisten packt.
- */
-export const QUIZ_ERGEBNISSE = {
-  entschlossen: {
-    titel: 'Du bist längst unterwegs.',
-    text:
-      'Wer Papiere sortiert oder schon weg ist, hat die Rechnung für sich fertig ' +
-      'gemacht. Genau diese Rechnung taucht in keiner Statistik auf — nur das ' +
-      'Ergebnis. Wenn du unterschreibst, wird aus deinem Fortgang ein Argument ' +
-      'statt einer Randnotiz.',
-  },
-  erwaegend: {
-    titel: 'Du rechnest. Und damit bist du nicht allein.',
-    text:
-      'Der Gedanke kommt selten aus dem Nichts. Er kommt am Monatsende, beim ' +
-      'Steuerbescheid, im Amt, bei der Wohnungssuche. Solange dieser Gedanke ' +
-      'privat bleibt, ändert er nichts — sichtbar gemacht, wird er zur Zahl.',
-  },
-  verstaendnis: {
-    titel: 'Du bleibst — und siehst trotzdem, was passiert.',
-    text:
-      'Man muss nicht selbst gehen wollen, um zu merken, dass zu viele gehen. ' +
-      'Wer bleibt, trägt die Folgen unmittelbar: die gleiche Last auf weniger ' +
-      'Schultern. Deine Unterschrift zählt genauso.',
-  },
-  bleibend: {
-    titel: 'Du bleibst. Sorg dafür, dass sich das lohnt.',
-    text:
-      'Diese Seite ist kein Aufruf zum Gehen — im Gegenteil. Sie ist der Versuch, ' +
-      'die Bedingungen so zu ändern, dass Bleiben die naheliegendere Entscheidung ' +
-      'bleibt. Dafür braucht es genau deine Stimme.',
-  },
-} as const;
-
-/** Zusatzzeile, wenn die Person unter 30 ist — die politisch relevanteste Gruppe. */
-export const QUIZ_HINWEIS_JUNG =
-  'Unter 30: Du gehörst zu der Gruppe, deren Fortzug am schwersten wiegt. Wer mit ' +
-  'Mitte zwanzig geht, fehlt vier Jahrzehnte lang.';
 
 /* ---------------------------------------------------------------------------
  * Rechtstexte
@@ -958,14 +1385,18 @@ export const DATENSCHUTZ = {
       titel: 'Petition: welche Daten und wozu',
       absaetze: [
         'Pflichtangaben sind Vorname, Nachname, E-Mail-Adresse und Postleitzahl. ' +
-          'Freiwillig sind die Auswahl der Motive und die Begründung in eigenen Worten.',
+          'Freiwillig sind die Auswahl der Motive, die Begründung in eigenen Worten und ' +
+          'ein Porträt — zur veröffentlichten Geschichte oder bei Freigabe des Namens.',
         'Zweck ist die Sammlung, Prüfung und Übergabe der Unterschriften. ' +
           'Rechtsgrundlage ist deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. ' +
           'Ohne diese Angaben kann die Unterschrift nicht gezählt werden.',
         'Namen und Begründungen werden nur dann öffentlich genannt oder übergeben, ' +
-          'wenn du das gesondert freigegeben hast. Ohne Freigabe fließen die ' +
-          'Angaben ausschließlich anonymisiert in die Gesamtzahl und die ' +
-          'Auswertung nach Postleitzahlgebieten ein.',
+          'wenn du das gesondert freigegeben hast. Wer zustimmt, bei den ' +
+          'Unterstützern genannt zu werden, erscheint dort mit Vor- und Nachname. ' +
+          'Wer eine Geschichte veröffentlicht, wird mit Name und Geschichte genannt. ' +
+          'Ein Porträt nur, wenn du eines hochlädst. Kontaktdaten bleiben ungenannt. ' +
+          'Ohne Freigabe fließen die Angaben ausschließlich anonymisiert in die ' +
+          'Gesamtzahl und die Auswertung nach Postleitzahlgebieten ein.',
       ],
     },
     {
@@ -994,16 +1425,6 @@ export const DATENSCHUTZ = {
         '[E-Mail-Versanddienstleister, falls eingesetzt.]',
         'Eine Weitergabe an Dritte zu Werbezwecken findet nicht statt. Die Daten ' +
           'werden nicht verkauft und nicht an Parteien übermittelt.',
-      ],
-    },
-    {
-      titel: 'Der Kurz-Check',
-      absaetze: [
-        'Die Antworten des Kurz-Checks werden ausschließlich im Arbeitsspeicher ' +
-          'deines Browsers gehalten. Sie werden nicht an den Server übertragen, nicht ' +
-          'dauerhaft gespeichert und sind nach dem Schließen des Tabs verschwunden. ' +
-          'Übernommen wird davon nur, was du im Petitionsformular stehen lässt und ' +
-          'selbst absendest.',
       ],
     },
     {

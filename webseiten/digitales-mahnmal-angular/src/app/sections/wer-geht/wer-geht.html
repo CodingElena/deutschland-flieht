@@ -1,0 +1,87 @@
+<section
+  class="wg surface-ink inset"
+  [class.wg--offen]="aktiv()"
+  aria-labelledby="wg-titel"
+>
+  <header class="wg__kopf">
+    <h2 id="wg-titel" class="wg__titel t-italic">{{ sektion.titel }}</h2>
+    <p class="wg__hinweis">
+      {{ sektion.hinweis }}
+      <a
+        class="wg__hinweis-link"
+        routerLink="/petition"
+        [queryParams]="{ teilnahme: 'geschichte' }"
+        fragment="formular"
+        >{{ sektion.hinweisLink }}</a
+      >.
+    </p>
+  </header>
+
+  <svg class="wg__defs" aria-hidden="true" focusable="false">
+    <symbol id="wg-luecke" viewBox="0 0 32 56">
+      <circle cx="16" cy="10" r="7" fill="none" />
+      <path d="M5 56c1.5-18 6-28 11-28s9.5 10 11 28" fill="none" />
+    </symbol>
+  </svg>
+
+  <div class="wg__menge" appReveal>
+    @for (f of figuren; track f.id) {
+      @if (f.geschichte; as g) {
+        <button
+          type="button"
+          class="wg__figur wg__figur--fehlt"
+          [class.wg__figur--aktiv]="aktiv()?.id === g.id"
+          [attr.aria-label]="sektion.oeffnenLabel + ': ' + (g.name ? g.name + ', ' : '') + g.rolle"
+          (click)="oeffnen(g, $event)"
+        >
+          <img class="wg__foto" [src]="g.bild.pfad" alt="" width="48" height="48" />
+          @if (g.name) {
+            <span class="wg__name" aria-hidden="true">{{ g.name }}</span>
+          }
+          <span class="wg__rolle" aria-hidden="true">{{ g.rolle }}</span>
+        </button>
+      } @else {
+        <span class="wg__figur" aria-hidden="true"></span>
+      }
+    }
+  </div>
+</section>
+
+@if (aktiv(); as g) {
+  <div class="wg__vorhang" (click)="schliessen()" aria-hidden="true"></div>
+
+  <article
+    class="wg__blatt"
+    #blatt
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    [attr.aria-labelledby]="'wg-blatt-titel'"
+  >
+    <img class="wg__blatt-foto" [src]="g.bild.pfad" [alt]="g.bild.alt" width="120" height="120" />
+    @if (g.name) {
+      <h3 id="wg-blatt-titel" class="wg__blatt-name">{{ g.name }}</h3>
+    }
+    <p class="wg__blatt-kicker t-micro">{{ g.rolle }}</p>
+    <p class="wg__blatt-zitat">{{ g.zeile }}</p>
+    @if (g.kontext) {
+      <p class="wg__blatt-kontext">{{ g.kontext }}</p>
+    }
+    @if (!g.echt) {
+      <p class="wg__blatt-platz t-micro">{{ sektion.platzhalter }}</p>
+    }
+
+    <div class="wg__blatt-fuss">
+      <a
+        class="pill pill--inverse"
+        routerLink="/petition"
+        [queryParams]="{ teilnahme: 'geschichte' }"
+        fragment="formular"
+        >{{ sektion.cta.label }}</a
+      >
+      <button type="button" class="wg__blatt-zu" (click)="schliessen()">
+        {{ sektion.schliessen }}
+      </button>
+    </div>
+  </article>
+}

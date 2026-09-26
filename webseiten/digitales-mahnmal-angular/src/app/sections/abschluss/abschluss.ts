@@ -4,15 +4,15 @@ import { RouterLink } from '@angular/router';
 import { ABSCHLUSS } from '../../core/content';
 
 /**
- * Heller Abschluss nach dem langen dunklen Block — der harte Flaechenwechsel
- * ist das Mittel, mit dem die Seite ihren Schluss markiert.
+ * Der Aufruf zur Petition, direkt hinter den Forderungen. Der harte
+ * Flaechenwechsel nach dem langen dunklen Block setzt ihn frei.
  */
 @Component({
   selector: 'app-abschluss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   template: `
-    <section class="ab surface-chalk inset" aria-labelledby="ab-titel">
+    <section id="abschluss" class="ab surface-chalk inset" aria-labelledby="ab-titel">
       <h2 id="ab-titel" class="ab__titel">
         <span class="ab__zeile">
           <span class="t-italic">{{ inhalt.zeile1Kursiv }}</span>
@@ -30,7 +30,7 @@ import { ABSCHLUSS } from '../../core/content';
     @use 'mixins' as *;
 
     .ab {
-      padding-block: var(--spacing-96);
+      padding-block: var(--spacing-96) var(--spacing-40);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -39,12 +39,8 @@ import { ABSCHLUSS } from '../../core/content';
     }
 
     .ab__titel {
+      @include serif-section;
       margin: 0;
-      font-family: var(--font-davinci);
-      font-weight: var(--font-weight-regular);
-      font-size: var(--text-section-fluid);
-      line-height: var(--leading-section);
-      letter-spacing: -0.009em;
       color: var(--color-ink);
       display: flex;
       flex-direction: column;

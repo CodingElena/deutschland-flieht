@@ -1,0 +1,342 @@
+@use 'mixins' as *;
+
+/*
+ * Papier statt Nacht: auf der Startseite sind die Grafiken Behauptungen im
+ * Dunkeln, hier sind sie Belege im Licht. Deshalb dieselben Formen, aber
+ * Ink auf Bone und jede Grafik mit ihrer Quelle darunter.
+ */
+
+.ew {
+  min-height: 70svh;
+  padding-block: var(--spacing-168) var(--spacing-96);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-96);
+}
+
+.ew__kopf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-20);
+}
+
+.ew__titel {
+  @include serif-section;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ew__titel-zeile {
+  display: block;
+}
+
+.ew__einleitung {
+  @include grotesk-body;
+  max-width: 54ch;
+  color: var(--color-graphite);
+}
+
+/* --- Ein Block je Grafik -------------------------------------------------- */
+
+.ew__block {
+  padding-top: var(--spacing-40);
+  border-top: 1px solid var(--color-vellum);
+
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .ew__block {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ew__label {
+  margin: 0;
+  color: var(--color-graphite);
+  letter-spacing: 0.16em;
+}
+
+/* Der Hinweis, dass die Auswertung noch Beispieldaten zeigt — er steht
+   in derselben Zeile wie das Label und wird nicht uebersehen. */
+.ew__stempel {
+  margin-left: 0.75em;
+  padding: 2px 8px;
+  border: 1px solid var(--color-vellum);
+  border-radius: var(--radius-links);
+}
+
+.ew__block-titel {
+  @include serif-heading-lg;
+  margin: var(--spacing-16) 0 0;
+  max-width: 28ch;
+  color: var(--color-ink);
+}
+
+.ew__block-text {
+  @include grotesk-body;
+  margin: var(--spacing-16) 0 0;
+  max-width: 62ch;
+  color: var(--color-graphite);
+}
+
+.ew__quelle {
+  margin: var(--spacing-32) 0 0;
+  max-width: 62ch;
+  color: var(--color-graphite);
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+}
+
+.ew__quelle-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- Reihe: Kurven und Tabelle -------------------------------------------- */
+
+.ew__kurven {
+  width: min(920px, 100%);
+  margin: var(--spacing-40) 0 0;
+}
+
+.ew__kurve-name {
+  margin: var(--spacing-20) 0 var(--spacing-4);
+  color: var(--color-graphite);
+  letter-spacing: 0.14em;
+}
+
+/* Hoehe aus dem viewBox statt fest: nur dann liegt die x-Achse der Kurve auf
+   derselben Breite wie die Jahresleiste darunter. */
+.ew__kurve {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  path {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+}
+
+.ew__jahre {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--spacing-4) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-graphite);
+  font-family: var(--font-helvetica-now);
+  font-size: var(--text-label);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Auf der Startseite liegt diese Tabelle nur fuer Screenreader bereit.
+   Hier ist sie der Punkt: wer nachrechnen will, liest die Jahreswerte. */
+.ew__tabelle {
+  width: min(560px, 100%);
+  margin: var(--spacing-52) 0 0;
+  border-collapse: collapse;
+  @include grotesk-label;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 10px 0;
+    text-align: right;
+    border-bottom: 1px solid var(--color-vellum);
+  }
+
+  thead th {
+    @include grotesk-micro;
+    color: var(--color-graphite);
+    letter-spacing: 0.12em;
+  }
+
+  th:first-child,
+  tbody th {
+    text-align: left;
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+/* --- Abgabenkeil ---------------------------------------------------------- */
+
+.ew__balken {
+  list-style: none;
+  margin: var(--spacing-40) 0 0;
+  padding: 0;
+  width: min(720px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.ew__balken-zeile {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr 4.5rem;
+  align-items: center;
+  gap: var(--spacing-16);
+  color: var(--color-graphite);
+  @include grotesk-label;
+}
+
+.ew__balken-zeile--hier {
+  color: var(--color-ink);
+}
+
+.ew__balken-spur {
+  display: block;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ew__balken-fill {
+  display: block;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.ew__balken-zeile--hier .ew__balken-fill {
+  height: 3px;
+  background: var(--color-ink);
+}
+
+.ew__balken-wert {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Auswertung: Regionen und Gruende ------------------------------------- */
+
+.ew__spalten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-96);
+  margin-top: var(--spacing-52);
+}
+
+.ew__spalte {
+  margin: 0;
+  min-width: 0;
+}
+
+.ew__spalte-kopf {
+  margin: 0;
+}
+
+.ew__anteile {
+  list-style: none;
+  margin: var(--spacing-32) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-20);
+}
+
+.ew__anteil {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--spacing-16);
+  row-gap: 6px;
+  align-items: baseline;
+}
+
+.ew__anteil-name {
+  @include grotesk-label;
+  color: var(--color-ink);
+}
+
+.ew__anteil-wert {
+  @include grotesk-label;
+  color: var(--color-graphite);
+  font-variant-numeric: tabular-nums;
+}
+
+.ew__spur {
+  grid-column: 1 / -1;
+  display: block;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ew__fill {
+  display: block;
+  height: 100%;
+  background: var(--color-ink);
+}
+
+/* --- Belege --------------------------------------------------------------- */
+
+.ew__belege {
+  list-style: none;
+  margin: var(--spacing-40) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ew__beleg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8, 8px);
+  padding-block: var(--spacing-20);
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+  color: var(--color-ink);
+  text-decoration: none;
+
+  &:hover .ew__beleg-zeile {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.ew__belege li:last-child .ew__beleg {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.ew__beleg-meta {
+  color: var(--color-graphite);
+  letter-spacing: 0.12em;
+}
+
+.ew__beleg-zeile {
+  @include grotesk-body;
+  max-width: 62ch;
+}
+
+@include tablet {
+  .ew {
+    padding-block: var(--spacing-96) var(--spacing-60);
+    gap: var(--spacing-60);
+  }
+
+  .ew__spalten {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-60);
+  }
+
+  .ew__balken-zeile {
+    grid-template-columns: 6.5rem 1fr 4.2rem;
+    gap: var(--spacing-8, 8px);
+  }
+
+  .ew__jahre {
+    font-size: var(--text-micro);
+  }
+}

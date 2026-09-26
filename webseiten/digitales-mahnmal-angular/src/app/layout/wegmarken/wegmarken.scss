@@ -1,0 +1,208 @@
+@use 'mixins' as *;
+
+/* Der Wirt selbst nimmt keinen Platz — der Strich haengt fest im Viewport. */
+:host {
+  display: contents;
+}
+
+.wm {
+  position: fixed;
+  top: 18px;
+  right: var(--page-inset);
+  z-index: 40;
+  color: var(--color-ink);
+
+  @include motion-safe {
+    transition: color var(--duration-base) var(--ease-gallery);
+  }
+}
+
+.wm--hell {
+  color: var(--color-paper);
+
+  .wm__liste {
+    background: var(--surface-ink-room);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* --- Griff ---------------------------------------------------------------
+   Nur der Strich ist sichtbar. Die Flaeche darum ist die Klickzone. */
+
+.wm__griff {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.wm__strich {
+  display: block;
+  width: 52px;
+  height: 1px;
+  background: currentColor;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+
+  @include motion-safe {
+    transition: width var(--duration-fast) var(--ease-gallery),
+      opacity var(--duration-base) var(--ease-gallery),
+      box-shadow var(--duration-base) var(--ease-gallery);
+  }
+}
+
+.wm--offen .wm__strich {
+  width: 22px;
+}
+
+/* Auf schmalen Displays waere der volle Strich ueber dem Hero zu laut.
+   Er bleibt auffindbar, tritt aber zurueck, bis der Auftakt verlassen ist. */
+@include mobile {
+  .wm--auftakt .wm__strich {
+    width: 30px;
+    opacity: 0.6;
+    box-shadow: none;
+  }
+
+  .wm--auftakt .wm__griff:focus-visible .wm__strich {
+    opacity: 1;
+  }
+}
+
+.wm__griff:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* --- Liste ---------------------------------------------------------------
+   Haengt unter dem Strich und liegt erst im offenen Zustand im Weg. */
+
+.wm__liste {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 0;
+  width: max-content;
+  min-width: 220px;
+  max-width: min(78vw, 280px);
+  max-height: min(70vh, 480px);
+  margin: 0;
+  padding: 8px 0;
+  overflow: auto;
+  list-style: none;
+  background: var(--color-chalk);
+  border: 1px solid var(--color-vellum);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-6px);
+
+  @include motion-safe {
+    transition: opacity var(--duration-base) var(--ease-gallery),
+      transform var(--duration-base) var(--ease-gallery),
+      visibility var(--duration-base) var(--ease-gallery);
+  }
+}
+
+.wm--offen .wm__liste {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}
+
+.wm__sprung {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wm__tick {
+  flex: none;
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.wm__eintrag--aktiv .wm__tick {
+  width: 22px;
+  opacity: 1;
+}
+
+.wm__nummer {
+  @include grotesk-micro;
+  opacity: 0.55;
+}
+
+.wm__name {
+  @include grotesk-label;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.88;
+}
+
+.wm__eintrag--aktiv .wm__name {
+  opacity: 1;
+}
+
+/* --- Der Eintrag, der die Seite verlaesst --------------------------------
+   Abgesetzt durch eine Linie: alles darueber springt, das hier navigiert.
+   Die Beschriftung ist laenger als ein Kapitelname und darf umbrechen. */
+
+.wm__eintrag--seite {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+
+  .wm__sprung {
+    align-items: start;
+  }
+
+  .wm__tick {
+    margin-top: 0.55em;
+  }
+
+  .wm__name {
+    white-space: normal;
+    opacity: 1;
+  }
+}
+
+.wm__pfeil {
+  @include grotesk-micro;
+  opacity: 0.55;
+  line-height: 1.25;
+}
+
+@media (hover: hover) {
+  .wm__sprung:hover .wm__pfeil {
+    opacity: 1;
+  }
+}
+
+@media (hover: hover) {
+  .wm__sprung:hover .wm__tick,
+  .wm__sprung:hover .wm__name {
+    opacity: 1;
+  }
+}
+
+.wm__sprung:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -2px;
+}

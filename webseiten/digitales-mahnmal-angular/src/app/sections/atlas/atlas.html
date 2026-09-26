@@ -1,0 +1,15 @@
+<section class="at surface-ink" aria-labelledby="at-frage">
+  <blockquote class="at__zitat inset" appReveal>
+    <p class="at__lauf t-italic">{{ sektion.zitat }}</p>
+    <h2 id="at-frage" class="at__frage t-italic">{{ sektion.frage }}</h2>
+  </blockquote>
+
+  <figure class="at__figur">
+    <img
+      [src]="sektion.bild.pfad"
+      [alt]="sektion.bild.alt"
+      loading="lazy"
+      decoding="async"
+    />
+  </figure>
+</section>

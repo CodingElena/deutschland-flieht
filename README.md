@@ -6,7 +6,7 @@ Dieses Repository enthält zwei eigenständige Entwürfe der Kampagne „Deutsch
 
 ### `webseiten/digitales-mahnmal-angular`
 
-Die umfangreichere Angular-Version mit Landingpage, Petition, Rechtstexten, Quiz,
+Die umfangreichere Angular-Version mit Landingpage, Petition, Rechtstexten,
 Bildmaterial und einer animierten 3D-Deutschlandfahne.
 
 ```powershell

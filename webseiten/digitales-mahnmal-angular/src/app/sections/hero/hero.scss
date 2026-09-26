@@ -3,12 +3,19 @@
 .hero {
   /* Hoehe des Gemaeldebands am unteren Rand. Die Wortmarke haengt an
      dieser Kante, deshalb steht der Wert an einer Stelle. */
-  --bild-hoehe: 42vh;
-  /* Wie weit die Wortmarke ueber der Bildkante steht. */
-  --marke-hebung: clamp(24px, 6vh, 84px);
+  --bild-hoehe: 58vh;
+  /* Zusaetzliche Hoehe nach oben: dort laeuft die Skyline in die dunkle
+     Flaeche aus, statt als Rechteckkante zu stehen. */
+  --bild-ueberhang: clamp(56px, 14vh, 160px);
+  /* Leicht in die Skyline gezogen: die Wortmarke steigt aus der Stadt
+     auf, statt im Zwischenraum unter dem Counter zu schweben. */
+  --marke-hebung: clamp(-36px, -3vh, -8px);
 
   position: relative;
   min-height: 100svh;
+  /* Etwas dunkler als die folgenden Ink-Sektionen: der erste Blick
+     soll enger, schwerer sein als der Rest der Seite. */
+  background: #12110f;
   display: grid;
   grid-template-rows: 1fr;
   /* Zwingend: die Wortmarke ist breiter als der Viewport. Ohne diese
@@ -40,6 +47,10 @@
   height: auto;
   pointer-events: none;
   user-select: none;
+  /* Sommergruen waere das falsche Register. Die Kronen bleiben als
+     dunkle Masse stehen, wie ein Blick durch den Wald bei Nacht. */
+  filter: grayscale(1) brightness(0.42) contrast(1.4);
+  opacity: 0.78;
 
   /* Unten und zur Bildmitte hin sind es gerade Schnitte aus dem Gemaelde.
      Beide werden ausgeblendet, sonst stehen dort sichtbare Rechteckkanten.
@@ -82,61 +93,96 @@
 
 .hero__cluster {
   position: relative;
-  z-index: 2;
+  /* Ueber Eichen, Wortmarke und Gemaelde: die Zahlen sind das Signal
+     und duerfen von den Kronen nicht verdeckt werden. */
+  z-index: 6;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--spacing-16);
   text-align: center;
-  /* Sitzt weit oben, damit der Blick zuerst auf die Behauptung faellt
+  /* Sitzt weit oben, damit der Blick zuerst auf die Zahlen faellt
      und darunter Raum fuer die angehobene Wortmarke bleibt. */
-  padding-top: 4.5vh;
+  padding-top: 6vh;
   padding-bottom: var(--spacing-40);
-  justify-content: flex-start;
 }
 
-.hero__claim {
-  /* Bewusst groesser als die Skala vorgibt: ohne Kopfzeile ist der
-     Claim das erste, was gelesen wird, und er hat oben Platz. */
-  font-family: var(--font-davinci);
-  font-weight: var(--font-weight-medium);
-  font-size: clamp(38px, 4.9vw, 80px);
-  line-height: 1.04;
-  letter-spacing: -0.009em;
-  display: flex;
-  flex-direction: column;
-  text-wrap: balance;
-}
-
-.hero__claim-zeile {
-  display: block;
-}
-
-/* --- Stat-Pair ------------------------------------------------------------ */
+/* --- Counter --------------------------------------------------------------
+   Eine Zahl, die hochzaehlt. Label darunter als leise Bildunterschrift. */
 
 .hero__stats {
   display: flex;
-  gap: var(--spacing-28);
+  justify-content: center;
   margin: 0;
 }
 
 .hero__stat {
   display: flex;
-  align-items: baseline;
+  flex-direction: column-reverse;
+  align-items: center;
   gap: var(--spacing-4);
 }
 
-.hero__stat-label,
 .hero__stat-wert {
-  @include grotesk-stat;
+  @include serif-kolossal;
   margin: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--color-bone);
+}
+
+/* Kein Button: ein unterstrichenes Wort stoert den Lichter-Effekt weniger
+   als eine gefuellte Flaeche unter der Zahl. */
+.hero__cta {
+  @include serif-subheading;
+  margin-top: var(--spacing-4);
+  color: rgba(231, 229, 228, 0.82);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+
+  &:hover {
+    color: var(--color-bone);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+}
+
+.hero__stat-label {
+  @include grotesk-label;
+  margin: 0;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(231, 229, 228, 0.48);
+}
+
+/* Leiser als die Petition: derselbe Weg wie unter den Grafiken,
+   nur schon auf der Startseite, wo die Kapitelliste noch fehlt. */
+.hero__daten {
+  color: rgba(231, 229, 228, 0.72);
+
+  &::after {
+    content: ' →';
+  }
+
+  &:hover {
+    color: var(--color-bone);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
 }
 
 /* --- Wortmarke -----------------------------------------------------------
-   Signaturelement. "Deutschland" ist deutlich laenger als das Wort der
-   Referenzvorlage, deshalb liegt die Groesse bei 20vw statt 23.375vw: der
-   Beschnitt an den Raendern bleibt erhalten, das Wort bleibt aber lesbar.  */
+   Signaturelement, Stufe S8 der Leiter. Beide Zeilen haengen an einer
+   Groesse: "Deutschland" nimmt sie ganz, "flieht." als festes Verhaeltnis
+   darunter. Wird die Marke fuer flache Fenster verkleinert, genuegt
+   deshalb --marke-skala, statt zwei Groessen nachzuziehen.               */
 
 .hero__marke {
   /* Absolut gesetzt und mit der Unterkante genau auf die Oberkante des
@@ -146,39 +192,37 @@
   position: absolute;
   left: 0;
   right: 0;
-  /* Sitzt nicht mehr direkt auf der Bildkante, sondern deutlich darueber:
-     die Wortmarke bekommt Luft und faellt frueher ins Auge. Beim Scrollen
-     legt sie dadurch eine laengere Strecke zurueck, bevor sie hinter dem
-     Bild verschwindet. */
+  /* Unterkante an der Bildkante, durch --marke-hebung leicht ins
+     Gemaelde gezogen. Beim Scrollen sinkt sie dahinter weg. */
   bottom: calc(var(--bild-hoehe) + var(--marke-hebung));
   z-index: 2;
   margin: 0;
   text-align: center;
   will-change: transform;
-  font-family: var(--font-davinci);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--leading-display);
-  color: var(--color-ink);
+  @include serif-display;
+  font-size: calc(var(--text-display-fluid) * var(--marke-skala, 1));
+  color: var(--color-bone);
 }
 
 .hero__wort {
   display: block;
   white-space: nowrap;
-  /* Bleibt auf jeder Breite vollstaendig lesbar. Die Vorgabe sieht ein an
-     den Viewportkanten beschnittenes Wort vor — bei elf Buchstaben waere
-     davon zu wenig uebrig, deshalb 11vw statt 23.375vw. */
-  font-size: clamp(48px, 11vw, 190px);
-  /* -3.37px bei 374px entspricht -0.009em und skaliert damit mit. */
-  letter-spacing: -0.009em;
 }
 
 .hero__verb {
   display: block;
-  font-size: clamp(22px, 4.2vw, 72px);
-  letter-spacing: -0.005em;
-  /* Zieht das Verb dicht unter das Substantiv, damit beide als ein
-     Titelblock gelesen werden. */
-  margin-top: -0.1em;
+  /* Aufrecht und im selben Gewicht wie "Deutschland": eine Feststellung,
+     kein lyrischer Nachsatz. Kursiv waere weicher als die Drohung. */
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  /* Zweite Zeile als Schlag, nicht als Bildunterschrift: knapp ueber der
+     halben Hoehe des Wortes darueber. */
+  font-size: 0.57em;
+  letter-spacing: -0.028em;
+  line-height: 0.9;
+  /* Kleiner Abstand, damit die zwei Zeilen als Urteil lesbar bleiben
+     und sich nicht ineinander schieben. */
+  margin-top: 0.08em;
 }
 
 /* --- Bildflaeche ---------------------------------------------------------
@@ -188,49 +232,144 @@
 .hero__bild {
   position: absolute;
   inset: auto 0 0 0;
-  height: var(--bild-hoehe);
+  /* Band plus Ueberhang: der Ueberhang liegt in der dunklen Flaeche und
+     traegt den Verlauf, das Band darunter bleibt die Stadt. */
+  height: calc(var(--bild-hoehe) + var(--bild-ueberhang));
   /* Liegt ueber der Wortmarke — nur so kann diese dahinter absinken. */
   z-index: 3;
   pointer-events: none;
 
+  @include nacht-kulisse;
+
+  /* Weicher Uebergang statt Rechteckkante. Der Verlauf ist lang, damit
+     die Lichter aus der Nacht auftauchen und nicht als Schnitt stehen. */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.18) 14%,
+    rgb(0 0 0 / 0.55) 32%,
+    rgb(0 0 0 / 0.88) 52%,
+    #000 68%,
+    #000 100%
+  );
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.18) 14%,
+    rgb(0 0 0 / 0.55) 32%,
+    rgb(0 0 0 / 0.88) 52%,
+    #000 68%,
+    #000 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+
   img {
     width: 100%;
     height: 100%;
-    /* Ausschnitt aus der unteren Bildhaelfte des Gemaeldes: dort liegt bei
-       Landschaften der Vordergrund, aus dem die Wortmarke aufsteigen soll. */
+    /* Ausschnitt aus der unteren Bildhaelfte: dort liegt der Vordergrund,
+       aus dem die Wortmarke aufsteigen soll. */
     object-fit: cover;
-    object-position: center 62%;
+    object-position: center 48%;
+  }
+
+  .hero__leinwand {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+  }
+
+  &:has(.hero__leinwand--aktiv) img {
+    opacity: 0;
+  }
+
+  .hero__leinwand--aktiv {
+    opacity: 1;
+  }
+
+  /* Farbgleicher Schleier: die Pixel der Aufnahme treffen #12110f nicht
+     von allein. Ohne diese Schicht bleibt am oberen Rand ein Tonbruch. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      #12110f 0%,
+      rgb(18 17 15 / 0.72) 28%,
+      rgb(18 17 15 / 0.28) 52%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  /* Die Overlay-Schicht aus nacht-kulisse bleibt hinter dem Verlauf. */
+  &::after {
+    z-index: 0;
   }
 }
 
-/* Flache Fenster (Laptops, gedrehte Tablets): Claim, Stat-Paar und Marke
+/* Flache Fenster (Laptops, gedrehte Tablets): Counter und Marke
    teilen sich dieselbe Hoehe. Wird die Wortmarke angehoben, ohne dass das
-   Bildband schrumpft, laeuft sie in die Schaltflaeche. Deshalb hier ein
-   schmaleres Band und ein hoeher stehender Textblock. */
+   Bildband schrumpft, laufen die Bloecke ineinander. Deshalb hier ein
+   schmaleres Band und ein kompakterer Counter. */
 @media (max-height: 860px) {
   .hero {
-    --bild-hoehe: 34vh;
-    --marke-hebung: clamp(14px, 3vh, 30px);
+    --bild-hoehe: 40vh;
+    --bild-ueberhang: clamp(36px, 8vh, 72px);
+    --marke-hebung: clamp(-28px, -5vh, -12px);
+    /* Nicht die naechste Stufe der Leiter, sondern dieselbe Stufe
+       gestaucht: die Wortmarke muss am Viewportrand beschnitten bleiben,
+       eine kleinere Stufe wuerde sie freistellen. */
+    --marke-skala: 0.74;
   }
 
   .hero__cluster {
-    padding-top: 3vh;
+    padding-top: 3.5vh;
+    gap: var(--spacing-4);
+  }
+
+  /* Eine Stufe herunter, damit Counter und Marke sich die flache
+     Fensterhoehe nicht streitig machen. */
+  .hero__stat-wert {
+    font-size: var(--text-monument-fluid);
   }
 }
 
 @include tablet {
   .hero__cluster {
-    padding-top: 18vh;
-  }
-
-  .hero__stats {
-    flex-direction: column;
-    gap: var(--spacing-4);
-    align-items: center;
+    padding-top: 5vh;
   }
 
   .hero {
-    --bild-hoehe: 30vh;
-    --marke-hebung: clamp(16px, 4vh, 40px);
+    --bild-hoehe: 38vh;
+    --bild-ueberhang: clamp(28px, 7vh, 56px);
+    --marke-hebung: clamp(-28px, -5vh, -12px);
+  }
+}
+
+/* Portrait-Telefone sind fast immer unter 860px hoch, die Stauchung
+   darueber gilt aber fuer flache, breite Fenster. Auf der schmalen
+   Breite liegt 11vw schon am Minimum und wuerde mit --marke-skala
+   nochmals auf rund 40px fallen — kleiner als der Counter darueber.
+   Hier zaehlt die Zeilenbreite: "Deutschland" soll sie fast fuellen. */
+@include mobile {
+  .hero {
+    --text-display-fluid: clamp(56px, 17vw, 92px);
+    --marke-skala: 1;
+  }
+}
+
+/* Querformat und sehr flache Fenster: der Counter faellt noch eine Stufe,
+   damit er nicht in die Wortmarke laeuft. */
+@media (max-height: 640px) {
+  .hero__stat-wert {
+    font-size: var(--text-section-fluid);
   }
 }

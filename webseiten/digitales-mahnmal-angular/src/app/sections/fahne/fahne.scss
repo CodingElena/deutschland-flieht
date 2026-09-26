@@ -35,6 +35,8 @@
   will-change: transform;
 }
 
+/* Die Lettern sind Kulisse, kein Text — ihre Groesse steht wie die
+   Beschriftungen im SVG ausserhalb der Typo-Leiter. */
 .fh__buchstabe {
   display: block;
   font-family: var(--font-davinci);

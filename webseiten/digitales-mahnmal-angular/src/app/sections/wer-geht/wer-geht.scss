@@ -1,0 +1,296 @@
+@use 'mixins' as *;
+
+.wg {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--spacing-60) var(--spacing-96);
+}
+
+.wg__kopf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-16);
+  margin-bottom: var(--spacing-40);
+}
+
+.wg__titel {
+  @include serif-section;
+  margin: 0;
+  color: var(--color-paper);
+}
+
+.wg__hinweis {
+  @include serif-subheading;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wg__hinweis-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+
+  &:hover {
+    color: var(--color-paper);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
+.wg__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.wg__menge {
+  --figur: 16px;
+  --figur-h: 28px;
+
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: end;
+  column-gap: 0.45rem;
+  row-gap: 0.7rem;
+  max-width: 640px;
+  margin-inline: auto;
+
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 800ms var(--ease-gallery),
+    transform 800ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .wg__menge {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.wg__figur {
+  display: block;
+  width: var(--figur);
+  height: var(--figur-h);
+  background: rgba(255, 255, 255, 0.26);
+  opacity: calc(var(--figur-op, 1) * var(--andere, 1));
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 56'%3E%3Ccircle cx='16' cy='10' r='7'/%3E%3Cpath d='M5 56c1.5-18 6-28 11-28s9.5 10 11 28'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 56'%3E%3Ccircle cx='16' cy='10' r='7'/%3E%3Cpath d='M5 56c1.5-18 6-28 11-28s9.5 10 11 28'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transition: opacity 420ms var(--ease-gallery);
+}
+
+.wg__figur:nth-child(3n) {
+  --figur-op: 0.72;
+}
+.wg__figur:nth-child(5n) {
+  --figur-op: 0.88;
+  transform: scale(0.9);
+  transform-origin: bottom center;
+}
+.wg__figur:nth-child(7n) {
+  --figur-op: 0.6;
+}
+.wg__figur:nth-child(11n) {
+  transform: scale(1.08);
+  transform-origin: bottom center;
+}
+
+.wg--offen {
+  --andere: 0.16;
+}
+
+.wg__figur--fehlt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 5.4rem;
+  height: auto;
+  min-height: 44px;
+  padding: 4px 4px 6px;
+  background: none;
+  mask: none;
+  -webkit-mask: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  opacity: 1;
+  z-index: 1;
+  transform: none;
+}
+
+.wg__figur--fehlt:hover,
+.wg__figur--fehlt:focus-visible,
+.wg__figur--aktiv {
+  z-index: 2;
+}
+
+.wg__figur--fehlt:hover .wg__foto,
+.wg__figur--fehlt:focus-visible .wg__foto,
+.wg__figur--aktiv .wg__foto {
+  outline: 1px solid var(--color-paper);
+  outline-offset: 2px;
+}
+
+.wg__foto {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1f1c19;
+}
+
+.wg__name {
+  font-family: var(--font-helvetica-now);
+  font-size: var(--text-micro);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--color-paper);
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wg__rolle {
+  @include grotesk-micro;
+  line-height: 1.15;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+/* --- Blatt ---------------------------------------------------------------- */
+
+.wg__vorhang {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(10, 9, 8, 0.62);
+}
+
+.wg__blatt {
+  position: fixed;
+  z-index: 41;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(34rem, calc(100vw - 2rem));
+  padding: var(--spacing-40) var(--spacing-32) var(--spacing-32);
+  background: var(--surface-ink-room);
+  color: var(--color-paper);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-16);
+  outline: none;
+}
+
+.wg__blatt-foto {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1f1c19;
+}
+
+.wg__blatt-kicker {
+  margin: 0;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.wg__blatt-name {
+  @include serif-heading-sm;
+  margin: 0;
+  color: var(--color-paper);
+}
+
+.wg__blatt-zitat {
+  @include serif-heading;
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.wg__blatt-kontext {
+  @include grotesk-label;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wg__blatt-platz {
+  margin: 0;
+  max-width: 42ch;
+  color: rgba(255, 255, 255, 0.42);
+  letter-spacing: 0.06em;
+}
+
+.wg__blatt-fuss {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-16);
+  margin-top: var(--spacing-16);
+}
+
+.wg__blatt-zu {
+  @include grotesk-micro;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  letter-spacing: 0.14em;
+}
+
+.wg__blatt-zu:hover,
+.wg__blatt-zu:focus-visible {
+  color: var(--color-paper);
+}
+
+@include tablet {
+  .wg {
+    padding-block: var(--spacing-52) var(--spacing-60);
+  }
+
+  .wg__kopf {
+    margin-bottom: var(--spacing-32);
+  }
+
+  .wg__menge {
+    --figur: 14px;
+    --figur-h: 24px;
+    max-width: none;
+  }
+
+  .wg__blatt {
+    padding: var(--spacing-32) var(--spacing-20);
+  }
+}

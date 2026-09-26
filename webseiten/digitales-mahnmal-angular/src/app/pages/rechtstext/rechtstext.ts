@@ -61,12 +61,8 @@ import { DATENSCHUTZ, IMPRESSUM, RECHTSTEXT_WARNUNG } from '../../core/content';
     }
 
     .rt__titel {
+      @include serif-section;
       margin: 0;
-      font-family: var(--font-davinci);
-      font-weight: var(--font-weight-regular);
-      font-size: var(--text-section-fluid);
-      line-height: var(--leading-section);
-      letter-spacing: -0.009em;
     }
 
     .rt__einleitung {

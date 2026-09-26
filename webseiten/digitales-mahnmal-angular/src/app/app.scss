@@ -8,3 +8,10 @@
 main:focus {
   outline: none;
 }
+
+main {
+  /* Die Fusszeile steht ausserhalb des Router-Outlets. Ohne reservierte Hoehe
+     rutscht sie waehrend des Seitenwechsels fuer einen Moment nach oben ins
+     Bild — der Platz bleibt deshalb immer stehen. */
+  min-height: 100svh;
+}

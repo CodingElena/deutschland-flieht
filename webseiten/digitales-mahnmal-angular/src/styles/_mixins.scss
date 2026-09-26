@@ -52,18 +52,72 @@ $bp-lg: 1200px;
   }
 }
 
-/* --- Typo-Rollen ---------------------------------------------------------- */
-/* Serif = "Momente". Nie unter 34px einsetzen (Vorgabe: Davinci ist
-   Display-only). Grotesk = "Systeme", Bereich 9-26px. */
+/* --- Nacht-Kulisse --------------------------------------------------------
+   Dieselbe kalte Grade fuer Hero-Skyline und Sequenz-Bilder, damit der
+   Ton nach dem ersten Blick nicht in die Postkarte zurueckkippt. */
+@mixin nacht-kulisse {
+  img,
+  canvas {
+    filter: grayscale(0.22) saturate(0.68) brightness(0.7) contrast(1.18);
+  }
 
-@mixin serif-display {
-  font-family: var(--font-davinci);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--text-display-fluid);
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #1c2836;
+    mix-blend-mode: multiply;
+    opacity: 0.28;
+    pointer-events: none;
+  }
 }
 
+/* --- Typo-Rollen ----------------------------------------------------------
+   Eine Stufe der Leiter aus _tokens.scss pro Mixin, und nur hier steht
+   `font-size`. Komponenten rufen den Mixin und passen bei Bedarf Farbe,
+   Gewicht oder Zeilenabstand an — aber nie die Groesse. So bleibt die
+   Anzahl der Schriftgroessen auf der Seite abzaehlbar.
+
+   Serif = "Momente" (Ueberschriften, Kennzahlen, Wortmarke).
+   Grotesk = "Systeme" (Labels, Fliesstext, Zahlenwerte). */
+
+/* Serif S1 — kleinste Serif-Rolle: Hinweiszeilen, textbasierte CTA. */
+@mixin serif-subheading {
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-subheading-fluid);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+}
+
+/* Serif S2 — Titel innerhalb einer Karte, eines Formulars, eines Blattes. */
+@mixin serif-heading-sm {
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-heading-sm-fluid);
+  line-height: var(--leading-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+}
+
+/* Serif S3 — Zitate und Nebentitel, die neben einem Sektionstitel stehen. */
+@mixin serif-heading {
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-heading-fluid);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+/* Serif S4 — Titel eines Blocks, der keine eigene Sektion ist. */
+@mixin serif-heading-lg {
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-heading-lg-fluid);
+  line-height: var(--leading-heading-lg);
+  letter-spacing: var(--tracking-heading-lg);
+}
+
+/* Serif S5 — Sektionstitel. Die haeufigste grosse Stufe der Seite. */
 @mixin serif-section {
   font-family: var(--font-davinci);
   font-weight: var(--font-weight-regular);
@@ -72,36 +126,35 @@ $bp-lg: 1200px;
   letter-spacing: var(--tracking-section);
 }
 
-@mixin serif-heading-lg {
+/* Serif S6 — die kursive Schlagzeile unter einem Sektionstitel und
+   einzelne Fragen, die eine Sektion alleine tragen. */
+@mixin serif-monument {
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-monument-fluid);
+  line-height: var(--leading-monument);
+  letter-spacing: var(--tracking-monument);
+}
+
+/* Serif S7 — der Counter im Hero. Groesste Stufe ausser der Wortmarke. */
+@mixin serif-kolossal {
   font-family: var(--font-davinci);
   font-weight: var(--font-weight-medium);
-  font-size: var(--text-heading-lg-fluid);
-  line-height: var(--leading-heading-lg);
-  letter-spacing: var(--tracking-heading-lg);
+  font-size: var(--text-kolossal-fluid);
+  line-height: var(--leading-kolossal);
+  letter-spacing: var(--tracking-kolossal);
 }
 
-@mixin serif-subheading {
+/* Serif S8 — Wortmarke. Genau ein Element auf der Seite. */
+@mixin serif-display {
   font-family: var(--font-davinci);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--text-subheading);
-  line-height: var(--leading-subheading);
-  letter-spacing: var(--tracking-subheading);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-display-fluid);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
 }
 
-@mixin grotesk-body {
-  font-family: var(--font-helvetica-now);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--text-body-sm);
-  line-height: var(--leading-body-sm);
-}
-
-@mixin grotesk-label {
-  font-family: var(--font-helvetica-now);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--text-label);
-  line-height: 1.25;
-}
-
+/* Grotesk G1 */
 @mixin grotesk-micro {
   font-family: var(--font-helvetica-now);
   font-weight: var(--font-weight-regular);
@@ -111,6 +164,23 @@ $bp-lg: 1200px;
   text-transform: uppercase;
 }
 
+/* Grotesk G2 */
+@mixin grotesk-label {
+  font-family: var(--font-helvetica-now);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-label);
+  line-height: 1.25;
+}
+
+/* Grotesk G3 */
+@mixin grotesk-body {
+  font-family: var(--font-helvetica-now);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-body-sm);
+}
+
+/* Grotesk G4 */
 @mixin grotesk-stat {
   font-family: var(--font-helvetica-now);
   font-weight: var(--font-weight-medium);

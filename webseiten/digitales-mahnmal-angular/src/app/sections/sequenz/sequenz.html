@@ -1,5 +1,5 @@
 <section class="seq" [style.height]="hoehe()" aria-labelledby="seq-titel">
-  <h2 id="seq-titel" class="sr-only">Wie die Abwanderung verläuft</h2>
+  <h2 id="seq-titel" class="sr-only">Was die eine Lücke hinterlässt</h2>
 
   <div class="seq__pin">
     <!-- Bildebene: alle Gemaelde liegen uebereinander und werden
@@ -34,6 +34,7 @@
     <article class="seq__form" appReveal>
       @for (schritt of schritte; track schritt.id; let i = $index) {
         <div class="seq__inhalt" [class.seq__inhalt--aktiv]="aktiv() === i" [attr.aria-hidden]="aktiv() !== i">
+          <p class="seq__kicker t-micro">{{ schritt.kicker }}</p>
           <h3 class="seq__ueberschrift">{{ schritt.ueberschrift }}</h3>
           <p class="seq__text">{{ schritt.text }}</p>
         </div>
