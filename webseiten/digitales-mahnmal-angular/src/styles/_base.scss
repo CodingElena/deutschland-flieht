@@ -34,31 +34,46 @@ body {
   color: var(--color-paper);
 }
 
-/* --- Typo-Hilfsklassen ---------------------------------------------------- */
+/* --- Typo-Hilfsklassen ---------------------------------------------------
+   Eine Klasse pro Stufe der Leiter, fuer den Einsatz direkt im Template.
+   Die Reihenfolge ist die der Leiter. */
 
-.t-display {
-  @include serif-display;
-}
-.t-section {
-  @include serif-section;
-}
-.t-heading-lg {
-  @include serif-heading-lg;
-}
-.t-subheading {
-  @include serif-subheading;
-}
-.t-body {
-  @include grotesk-body;
+.t-micro {
+  @include grotesk-micro;
 }
 .t-label {
   @include grotesk-label;
 }
-.t-micro {
-  @include grotesk-micro;
+.t-body {
+  @include grotesk-body;
 }
 .t-stat {
   @include grotesk-stat;
+}
+
+.t-subheading {
+  @include serif-subheading;
+}
+.t-heading-sm {
+  @include serif-heading-sm;
+}
+.t-heading {
+  @include serif-heading;
+}
+.t-heading-lg {
+  @include serif-heading-lg;
+}
+.t-section {
+  @include serif-section;
+}
+.t-monument {
+  @include serif-monument;
+}
+.t-kolossal {
+  @include serif-kolossal;
+}
+.t-display {
+  @include serif-display;
 }
 
 /* Kursive Zeile innerhalb einer Serif-Headline - das wiederkehrende

@@ -1,46 +1,93 @@
-<section class="zn surface-ink inset" aria-labelledby="zn-titel">
-  <!-- Kleine Labels in den gegenueberliegenden Ecken, wie Museums-Wandtexte. -->
-  <div class="zn__kopf">
-    <span class="zn__ecklabel t-micro">{{ sektion.labelLinks }}</span>
-    <span class="zn__ecklabel t-micro">{{ sektion.labelRechts }}</span>
-  </div>
+<section class="zn surface-ink inset" aria-label="Die Zahlen">
+  <figure class="zn__reihe" appReveal>
+    <figcaption class="zn__reihe-kopf">
+      <h2 class="zn__reihe-titel">{{ wanderung.titel }}</h2>
+    </figcaption>
 
-  <h2 id="zn-titel" class="zn__titel">
-    <span class="zn__titel-zeile">{{ sektion.titelZeile1 }}</span>
-    <span class="zn__titel-zeile">{{ sektion.titelZeile2 }}</span>
-  </h2>
+    <div class="zn__kurven" [attr.aria-label]="wanderung.titel">
+      <p class="zn__kurve-name t-micro">Fortzüge</p>
+      <svg class="zn__kurve" viewBox="0 0 720 110" aria-hidden="true">
+        <path [attr.d]="fortzugPfad" />
+      </svg>
+      <p class="zn__kurve-name t-micro">Netto, nach Rückkehr</p>
+      <svg class="zn__kurve zn__kurve--saldo" viewBox="0 0 720 110" aria-hidden="true">
+        <path [attr.d]="saldoPfad" />
+        <circle [attr.cx]="saldoEnde.x" [attr.cy]="saldoEnde.y" r="4" />
+      </svg>
+      <ol class="zn__jahre">
+        @for (j of jahre; track j.jahr) {
+          <li>{{ j.jahr }}</li>
+        }
+      </ol>
+      <a class="zn__fnref" href="#zn-fn-1" id="zn-ref-1"><sup>1</sup></a>
+    </div>
 
-  <ul class="zn__raster">
-    @for (v of vignetten; track v.id; let i = $index) {
-      <li class="zn__spalte" appReveal [appRevealDelay]="i * 150">
-        <h3 class="zn__spalte-titel">{{ v.titel }}</h3>
+    <table class="zn__tabelle sr-only">
+      <caption>
+        Fortzüge und Wanderungssaldo deutscher Staatsangehöriger, {{ jahre[0].jahr }} bis
+        {{ jahre[jahre.length - 1].jahr }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Jahr</th>
+          <th scope="col">Fortzüge</th>
+          <th scope="col">Saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (j of jahre; track j.jahr) {
+          <tr>
+            <th scope="row">{{ j.jahr }}</th>
+            <td>{{ betrag(j.fortzuege) }}</td>
+            <td>{{ j.saldo.toLocaleString('de-DE') }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </figure>
 
-        <!-- Kreisrunder Ausschnitt: nach der Vollflaeche die zweite
-             Bildform des Systems. -->
+  @for (v of vignetten; track v.id; let i = $index) {
+    <figure class="zn__vignette" appReveal [appRevealDelay]="i * 150">
+      <figcaption class="zn__reihe-kopf">
+        <h2 class="zn__reihe-titel">{{ v.titel }}</h2>
+      </figcaption>
+
+      <div class="zn__raster">
         <div class="zn__kreis">
           <img [src]="v.bild.pfad" [alt]="v.bild.alt" loading="lazy" decoding="async" />
+          <div class="zn__kreis-inhalt">
+            <p class="zn__wert"><app-zaehlwert [wert]="v.kennzahl.wert" /></p>
+            <p class="zn__label">{{ v.kennzahl.label }}</p>
+          </div>
         </div>
+      </div>
+    </figure>
+  }
 
-        <p class="zn__wert"><app-zaehlwert [wert]="v.kennzahl.wert" /></p>
-        <p class="zn__label">{{ v.kennzahl.label }}</p>
+  <figure class="zn__keil" appReveal>
+    <figcaption class="zn__reihe-kopf">
+      <h2 class="zn__reihe-titel">{{ vergleich.titel }}</h2>
+    </figcaption>
 
-        <!-- Beleg direkt an der Zahl. Solange nicht geprueft, sagt die Seite
-             das offen, statt eine Sicherheit vorzutaeuschen. -->
-        <p class="zn__quelle t-micro">
-          @if (v.kennzahl.geprueft) {
-            {{ v.kennzahl.quelle }}, {{ v.kennzahl.jahr }}
-          } @else {
-            Platzhalter — Quelle: {{ v.kennzahl.quelle }}
-          }
-        </p>
+    <div class="zn__keil-grafik">
+      <ul class="zn__balken">
+        @for (land of balken; track land.id) {
+          <li class="zn__balken-zeile" [class.zn__balken-zeile--hier]="land.hier">
+            <span class="zn__balken-name">{{ land.name }}</span>
+            <span class="zn__balken-spur">
+              <span class="zn__balken-fill" [style.width.%]="land.breite"></span>
+            </span>
+            <span class="zn__balken-wert">{{ land.wert }}</span>
+          </li>
+        }
+      </ul>
+      <a class="zn__fnref" href="#zn-fn-2" id="zn-ref-2"><sup>2</sup></a>
+    </div>
+  </figure>
 
-        <!-- Hexagon als Sekundaergeometrie des Systems -->
-        <svg class="zn__hex" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <polygon points="12,2 21,7 21,17 12,22 3,17 3,7" />
-          <line x1="12" y1="9" x2="12" y2="15" />
-          <line x1="9" y1="12" x2="15" y2="12" />
-        </svg>
-      </li>
-    }
-  </ul>
+  <!-- Die Reihe endet hier, nicht die Datenlage: der Rest steht auf einer
+       eigenen Seite, mit Quelle unter jeder Grafik. -->
+  <p class="zn__weiter" appReveal>
+    <a class="zn__weiter-link ghost-link" [routerLink]="weiter.pfad">{{ weiter.weiterLabel }}</a>
+  </p>
 </section>

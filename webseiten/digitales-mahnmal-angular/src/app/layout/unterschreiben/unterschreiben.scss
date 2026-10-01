@@ -1,0 +1,49 @@
+@use 'mixins' as *;
+
+/* Der Wirt selbst nimmt keinen Platz — der Knopf haengt fest im Viewport. */
+:host {
+  display: contents;
+}
+
+/* Papier auf Tinte und Tinte auf Papier gleichzeitig gibt es nicht: der Knopf
+   laeuft ueber helle und dunkle Flaechen. Deshalb bleibt er immer weiss, mit
+   feiner Kante und Schatten — auf Chalk hebt ihn die Kante, auf Ink die
+   Flaeche selbst. */
+.us {
+  position: fixed;
+  right: var(--page-inset);
+  bottom: var(--page-inset);
+  z-index: 30;
+  border-color: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(12px);
+
+  @include motion-safe {
+    transition: opacity var(--duration-base) var(--ease-gallery),
+      transform var(--duration-base) var(--ease-gallery),
+      visibility var(--duration-base) var(--ease-gallery),
+      background var(--duration-fast) var(--ease-gallery),
+      color var(--duration-fast) var(--ease-gallery);
+  }
+
+  &:hover {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+}
+
+.us--sichtbar {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}

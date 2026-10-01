@@ -1,0 +1,76 @@
+<section
+  class="ab"
+  [attr.aria-label]="sektion.ariaBeschreibung"
+>
+  <div class="ab__pin">
+    <header class="ab__kopf inset" appReveal>
+      <h2 class="ab__titel">
+        <span class="ab__titel-zeile">{{ sektion.titelZeile1 }}</span>
+        <span class="ab__titel-zeile t-italic">{{ sektion.titelZeile2Kursiv }}</span>
+      </h2>
+    </header>
+
+    <div class="ab__buehne" aria-hidden="true">
+      <svg class="ab__karte" viewBox="-80 0 860 860" role="presentation" focusable="false">
+        <g class="ab__laender" fill-rule="evenodd">
+          @for (land of laender; track land.id) {
+            <path
+              class="ab__land"
+              [attr.d]="land.path"
+              [attr.fill-opacity]="regionOpazitaet(land)"
+            />
+          }
+        </g>
+
+        <!-- Konturen bleiben durchgängig — auch wenn die Flächen auskriechen. -->
+        <g class="ab__raender" fill-rule="evenodd">
+          @for (land of laender; track land.id) {
+            <path class="ab__rand" [attr.d]="land.path" />
+          }
+        </g>
+
+        <defs>
+          <marker
+            id="ab-spitze"
+            markerUnits="userSpaceOnUse"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="11"
+            markerHeight="11"
+            orient="auto"
+          >
+            <path d="M 0 1.2 L 9 5 L 0 8.8 Z" fill="rgba(255,255,255,0.78)" />
+          </marker>
+        </defs>
+
+        <g class="ab__pfeile">
+          @for (ziel of ziele; track ziel.id) {
+            <path class="ab__pfeil" [attr.d]="ziel.layout.d" marker-end="url(#ab-spitze)" />
+          }
+        </g>
+
+        <g class="ab__labels">
+          @for (ziel of ziele; track ziel.id) {
+            <text
+              class="ab__ziel"
+              [attr.x]="ziel.layout.nameX"
+              [attr.y]="ziel.layout.nameY"
+              [attr.text-anchor]="ziel.layout.anchor"
+            >
+              {{ ziel.name }}
+            </text>
+            <text
+              class="ab__anteil"
+              [attr.x]="ziel.layout.anteilX"
+              [attr.y]="ziel.layout.anteilY"
+              [attr.text-anchor]="ziel.layout.anchor"
+            >
+              {{ anteilText(ziel.id) }}
+            </text>
+          }
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>

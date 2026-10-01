@@ -1,0 +1,158 @@
+@use 'mixins' as *;
+
+/* ==========================================================================
+   Ausbluten
+
+   Deutschland startet satt. Solange die Karte im Blick ist, kriechen die
+   Flächen mit der Zeit unregelmäßig aus — die Länderkonturen bleiben.
+   Pfeile und Anteile stehen von Anfang an. Kein Scroll-Verlauf.
+   ========================================================================== */
+
+.ab {
+  position: relative;
+  min-height: 100svh;
+  background: var(--surface-ink-room);
+  padding-block: var(--spacing-60) var(--spacing-96);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.ab__pin {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: var(--spacing-28);
+  width: 100%;
+}
+
+.ab__kopf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-12, 12px);
+
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 700ms var(--ease-gallery),
+    transform 700ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .ab__kopf {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Titel und kursive Zeile darunter stehen auf denselben zwei Stufen wie in
+   den Forderungen — die beiden Sektionen tragen dieselbe Kopfform. */
+.ab__titel {
+  @include serif-section;
+  margin: 0;
+  color: var(--color-paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ab__titel-zeile {
+  display: block;
+}
+
+.ab__titel-zeile.t-italic {
+  @include serif-monument;
+  margin-top: -0.06em;
+}
+
+.ab__einleitung {
+  @include grotesk-body;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 42ch;
+  margin: 0;
+}
+
+.ab__buehne {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--page-inset);
+}
+
+.ab__karte {
+  width: min(1100px, 96vw);
+  height: auto;
+  max-height: min(88svh, 1100px);
+}
+
+.ab__land {
+  fill: #b4232a;
+  stroke: none;
+}
+
+/* Konturen bleiben durchgängig — auch wenn die Flächen weg sind. */
+.ab__rand {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.42);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ab__pfeil {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.68);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Beschriftungen im SVG. Die Werte sind Einheiten des viewBox, keine
+   Bildschirmpixel — sie skalieren mit der Karte und gehoeren deshalb nicht
+   auf die Typo-Leiter. */
+.ab__ziel {
+  fill: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-helvetica-now);
+  font-size: 22px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ab__anteil {
+  fill: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-helvetica-now);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+@include tablet {
+  .ab {
+    padding-block: var(--spacing-40) var(--spacing-60);
+  }
+
+  .ab__karte {
+    width: min(720px, 96vw);
+    max-height: min(72svh, 720px);
+  }
+
+  .ab__einleitung {
+    max-width: 34ch;
+  }
+
+  .ab__ziel {
+    font-size: 18px;
+  }
+
+  .ab__anteil {
+    font-size: 14px;
+  }
+}

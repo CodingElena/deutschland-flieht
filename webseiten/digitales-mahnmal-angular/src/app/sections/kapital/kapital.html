@@ -1,0 +1,21 @@
+<section class="kt" [attr.aria-labelledby]="'kt-frage'">
+  <div class="kt__bild">
+    <img
+      [src]="sektion.bild.pfad"
+      [alt]="sektion.bild.alt"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+
+  <div class="kt__text" appReveal>
+    <h2 id="kt-frage" class="kt__frage t-italic">{{ sektion.frage }}</h2>
+    <p class="kt__voraussetzung">{{ sektion.voraussetzung }}</p>
+    <ul class="kt__folgen">
+      @for (folge of sektion.folgen; track folge) {
+        <li>{{ folge }}</li>
+      }
+    </ul>
+    <p class="kt__schluss t-italic">{{ sektion.schluss }}</p>
+  </div>
+</section>

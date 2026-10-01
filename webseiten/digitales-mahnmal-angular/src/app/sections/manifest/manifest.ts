@@ -47,16 +47,15 @@ import { MANIFEST } from '../../core/content';
     }
 
     .mf__zeile--gross {
-      font-weight: var(--font-weight-regular);
-      font-size: var(--text-section-fluid);
-      letter-spacing: -0.009em;
+      @include serif-section;
+      line-height: inherit;
     }
 
     /* Die kursive Zeile ist groesser und rueckt in die Nachbarzeilen hinein —
        dadurch verschraenken sich die drei Zeilen zu einem Block. */
     .mf__zeile--kursiv {
-      font-size: clamp(52px, 7vw, 112px);
-      letter-spacing: -0.012em;
+      @include serif-monument;
+      line-height: inherit;
       /* Verschraenkt die Zeilen, ohne dass die Unterlaenge des g in die
          Folgezeile schneidet — oben darf es enger sein als unten. */
       margin-top: -0.14em;

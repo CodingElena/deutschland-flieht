@@ -1,6 +1,5 @@
 <section class="fo surface-ink inset" aria-labelledby="fo-titel">
   <header class="fo__kopf">
-    <p class="fo__label t-micro">{{ sektion.label }}</p>
     <h2 id="fo-titel" class="fo__titel">
       <span class="fo__titel-zeile">{{ sektion.titelZeile1 }}</span>
       <span class="fo__titel-zeile t-italic">{{ sektion.titelZeile2Kursiv }}</span>
@@ -12,41 +11,19 @@
     @for (f of forderungen; track f.id; let i = $index) {
       <!-- Gestaffelt: die Karten treten nacheinander auf, nicht als Block. -->
       <li class="fo__karte" appReveal [appRevealDelay]="i * 110">
-        <!-- Bildvorrat. Alle Aufnahmen liegen uebereinander, sichtbar ist
-             immer genau eine; der Wechsel laeuft ueber die Deckkraft. -->
-        <div class="fo__bilder" aria-hidden="true">
-          @for (b of bilder; track b.pfad; let j = $index) {
-            <img
-              class="fo__bild"
-              [class.ist-oben]="istOben(i, j)"
-              [style.transition-delay]="i * 180 + 'ms'"
-              [src]="b.pfad"
-              alt=""
-              loading="lazy"
-              decoding="async"
-            />
-          }
+        <div class="fo__bildrahmen" aria-hidden="true">
+          <img
+            class="fo__bild"
+            [src]="f.bild.pfad"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
-        <!-- Schleier: nach unten hin dicht, damit der Text auf jedem Motiv
-             liest, oben offen, damit das Bild noch Bild bleibt. -->
+        <!-- Schleier: nach unten hin dicht, damit der Text auf dem Gesicht
+             liest, oben offen, damit das Porträt noch Porträt bleibt. -->
         <span class="fo__schleier" aria-hidden="true"></span>
-
-        <!-- Eckgeometrie: Chevron oben, Hexagon-Knoten auf der Querlinie.
-             Liegt jetzt ueber dem Bild und bindet es ins System ein. -->
-        <svg
-          class="fo__geometrie"
-          viewBox="0 0 400 200"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <g class="fo__linien">
-            <polyline points="0,0 200,120 400,0" />
-            <line x1="0" y1="100" x2="400" y2="100" />
-            <polyline points="120,100 200,152 280,100" />
-          </g>
-        </svg>
 
         <span class="fo__nummer" aria-hidden="true">{{ nummer(i) }}</span>
 

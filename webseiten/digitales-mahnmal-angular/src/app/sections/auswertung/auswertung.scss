@@ -1,0 +1,187 @@
+@use 'mixins' as *;
+
+.aw {
+  padding-block: 0 var(--spacing-40);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.aw--offen {
+  padding-bottom: var(--spacing-96);
+  align-items: stretch;
+}
+
+.aw__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8, 8px);
+  margin: 0;
+  padding: 9px 17px;
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  border-radius: var(--radius-buttons);
+  background: transparent;
+  color: var(--color-ink);
+  @include grotesk-label;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-gallery),
+    border-color var(--duration-fast) var(--ease-gallery);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--color-ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+}
+
+.aw__toggle-pfeil {
+  display: block;
+  width: 0.45em;
+  height: 0.45em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform var(--duration-fast) var(--ease-gallery);
+}
+
+.aw--offen .aw__toggle {
+  align-self: center;
+}
+
+.aw--offen .aw__toggle-pfeil {
+  transform: rotate(-135deg) translateY(-1px);
+}
+
+.aw__inhalt {
+  width: 100%;
+  margin-top: var(--spacing-40);
+}
+
+.aw__kopf {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-16);
+  padding-top: var(--spacing-40);
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.aw__label,
+.aw__stempel,
+.aw__spalte-label {
+  margin: 0;
+  color: var(--color-graphite);
+  letter-spacing: 0.16em;
+}
+
+.aw__einleitung {
+  @include grotesk-body;
+  margin: var(--spacing-28) 0 0;
+  max-width: 36ch;
+  color: var(--color-ink);
+}
+
+.aw__spalten {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-96);
+  margin-top: var(--spacing-52);
+}
+
+.aw__spalte {
+  margin: 0;
+  min-width: 0;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .aw__spalte {
+    opacity: 1;
+    transform: none;
+  }
+
+  .aw__toggle-pfeil {
+    transition: none;
+  }
+}
+
+.aw__spalte-text {
+  @include grotesk-body;
+  margin: var(--spacing-16) 0 0;
+  max-width: 38ch;
+  color: var(--color-graphite);
+}
+
+.aw__liste {
+  list-style: none;
+  margin: var(--spacing-32) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-20);
+}
+
+.aw__zeile {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--spacing-16);
+  row-gap: 6px;
+  align-items: baseline;
+}
+
+.aw__name {
+  @include grotesk-label;
+  color: var(--color-ink);
+}
+
+.aw__wert {
+  @include grotesk-label;
+  color: var(--color-graphite);
+  font-variant-numeric: tabular-nums;
+}
+
+.aw__spur {
+  grid-column: 1 / -1;
+  display: block;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.aw__fill {
+  display: block;
+  height: 100%;
+  background: var(--color-ink);
+}
+
+.aw__hinweis {
+  margin: var(--spacing-52) 0 0;
+  max-width: 62ch;
+  color: var(--color-graphite);
+  letter-spacing: 0.12em;
+}
+
+@include tablet {
+  .aw__spalten {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-60);
+  }
+
+  .aw--offen {
+    padding-bottom: var(--spacing-60);
+  }
+}

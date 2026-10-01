@@ -1,0 +1,140 @@
+@use 'mixins' as *;
+
+.at {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(1.5rem, 3vw, 3.5rem);
+  overflow: hidden;
+  min-height: 100svh;
+  padding-left: clamp(2.5rem, 8vw, 9rem);
+  padding-right: clamp(1rem, 3vw, 3rem);
+  background: #000;
+}
+
+/* Neben dem Text, gleiche Hoehe wie der Ausschnitt. 132 Prozent schneiden
+   unter den Haenden ab, die Figur bleibt gross. */
+.at__figur {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(48vw, 75svh);
+  height: 100svh;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+
+  img {
+    display: block;
+    width: auto;
+    height: 132%;
+    max-width: none;
+    margin-left: auto;
+    user-select: none;
+    filter: grayscale(0.06) contrast(1.18) brightness(1.42);
+  }
+}
+
+.at__zitat {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--spacing-28);
+  min-height: 100svh;
+  flex: 0 1 32rem;
+  /* Schmaler, damit der Satz wieder in mehr Zeilen faellt. Der Block
+     sitzt mit der Figur zusammen in der Mitte. */
+  max-width: min(32rem, 36vw);
+  margin: 0;
+  padding-block: var(--spacing-60);
+  color: var(--color-paper);
+
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 800ms var(--ease-gallery),
+    transform 800ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .at__zitat {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.at__lauf,
+.at__frage {
+  @include serif-heading-sm;
+  margin: 0;
+  text-wrap: pretty;
+  text-shadow: 0 0 18px #000, 0 0 36px #000;
+}
+
+.at__lauf {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.at__frage {
+  color: var(--color-paper);
+}
+
+/* Quellenzeile: klein und leise, damit die Frage die Pointe bleibt. */
+.at__herkunft {
+  @include grotesk-micro;
+  margin: calc(var(--spacing-16) - var(--spacing-28)) 0 0;
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.42);
+  text-shadow: 0 0 12px #000;
+}
+
+@include tablet {
+  .at {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    min-height: 0;
+    padding-inline: 0;
+  }
+
+  .at__zitat {
+    min-height: 0;
+    flex: none;
+    max-width: 36rem;
+    padding-block: var(--spacing-52) var(--spacing-20);
+    justify-content: flex-start;
+  }
+
+  /* Unter 900px untereinander: zuerst der Text, dann derselbe
+     Ausschnitt bis zu den Haenden. */
+  .at__figur {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: min(100%, 560px);
+    height: auto;
+    aspect-ratio: 75 / 78;
+    margin-inline: auto;
+    min-height: 0;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 100%;
+      height: auto;
+      transform: translateX(-50%);
+    }
+  }
+}

@@ -14,9 +14,10 @@ import { Reveal } from '../../shared/reveal';
 /**
  * Gepinnte Bildsequenz mit dunkler Karte in der Mitte.
  *
- * Die Sektion ist so hoch wie die Anzahl der Schritte mal Viewporthoehe.
- * Waehrend man durch sie hindurchscrollt, bleibt der Inhalt stehen und nur
- * Bild und Kartentext wechseln — der Effekt aus der Vorlage.
+ * Drei Szenen folgen der einen Luecke aus der Menge. Die Sektion ist so
+ * hoch wie die Anzahl der Schritte mal Viewporthoehe. Waehrend man durch
+ * sie hindurchscrollt, bleibt der Inhalt stehen und nur Bild und Kartentext
+ * wechseln — der Effekt aus der Vorlage.
  */
 @Component({
   selector: 'app-sequenz',
@@ -42,8 +43,10 @@ export class Sequenz {
 
   /* Beschleunigter Verlauf des Sogs: quadratisch, damit es zum Ende hin
      schneller geht, statt gleichmaessig durchzulaufen. */
+  /* Der Kreis bleibt in der ersten Szene geschlossen — die eine Luecke.
+     Ab Szene zwei reisst das Loch nach unten auf. */
   private readonly sog = computed(() => {
-    const t = rampe(this.fortschritt(), 0.24, 1);
+    const t = rampe(this.fortschritt(), 0.34, 1);
     return t * t;
   });
 

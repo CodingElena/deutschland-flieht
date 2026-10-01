@@ -3,10 +3,8 @@
 /* ==========================================================================
    Forderungen
 
-   Der lauteste Block der Seite. Sechs Karten, jede mit einer Nachtaufnahme,
-   die im Takt weiterwandert. Ueber dem Bild liegt dieselbe Liniengeometrie
-   wie zuvor — sie bindet die Fotografie ins System ein, statt sie daneben
-   zu stellen.
+   Fuenf Karten, jede mit einem festen Stockportraet. Kein Wechsel: das
+   Gesicht bleibt, der Text liegt im Schleier darunter.
    ========================================================================== */
 
 .fo {
@@ -24,19 +22,9 @@
   margin-bottom: var(--spacing-60);
 }
 
-.fo__label {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: 0.18em;
-}
-
 .fo__titel {
+  @include serif-section;
   margin: 0;
-  font-family: var(--font-davinci);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--text-section-fluid);
-  line-height: var(--leading-section);
-  letter-spacing: -0.009em;
   color: var(--color-paper);
   display: flex;
   flex-direction: column;
@@ -45,6 +33,11 @@
 
 .fo__titel-zeile {
   display: block;
+}
+
+.fo__titel-zeile.t-italic {
+  @include serif-monument;
+  margin-top: -0.1em;
 }
 
 .fo__einleitung {
@@ -78,8 +71,6 @@
   overflow: hidden;
   isolation: isolate;
 
-  /* Auftritt beim Hereinscrollen: von unten heraufsteigen und aufklaren.
-     Die Verzoegerung setzt die Reveal-Direktive je Karte. */
   opacity: 0;
   transform: translateY(30px);
   transition:
@@ -104,11 +95,9 @@
   }
 }
 
-/* --- Bildvorrat ------------------------------------------------------------
-   Alle Aufnahmen liegen uebereinander. Sichtbar ist genau eine; gewechselt
-   wird ueber die Deckkraft, damit nichts blinkt. */
+/* --- Portraet ------------------------------------------------------------- */
 
-.fo__bilder {
+.fo__bildrahmen {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -120,78 +109,36 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 18%;
 
-  opacity: 0;
-  /* Neon braucht Kontrast, sonst wird aus Licht Grau. Die Saettigung bleibt
-     moderat — die Seite kennt sonst keine bunten Flaechen. */
-  filter: contrast(1.16) saturate(1.22) brightness(0.82);
-  transform: scale(1.06);
-  transition:
-    opacity 1400ms var(--ease-gallery),
-    transform 6000ms linear;
-
-  &.ist-oben {
-    opacity: 1;
-    /* Langsame Fahrt ins Bild, solange die Aufnahme oben liegt. */
-    transform: scale(1.14);
-  }
+  /* Dieselbe kalte Grade wie Hero und Sequenz: Stockgesichter sollen
+     nicht als helle LinkedIn-Kacheln aus der Nacht fallen. */
+  filter: grayscale(0.16) saturate(0.78) brightness(0.86) contrast(1.08);
 }
 
-@include motion-reduce {
-  .fo__bild {
-    transition: none;
-    transform: none;
-
-    &.ist-oben {
-      transform: none;
-    }
-  }
-}
-
-/* Nach unten dicht, oben offen: der Text liest auf jedem Motiv, das Bild
-   bleibt trotzdem sichtbar. */
+/* Nach unten dicht, oben offen: der Text liest, das Gesicht bleibt. */
 .fo__schleier {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: linear-gradient(
     to bottom,
-    rgba(26, 24, 22, 0.32) 0%,
-    rgba(26, 24, 22, 0.58) 42%,
-    rgba(26, 24, 22, 0.93) 100%
+    rgba(26, 24, 22, 0.06) 0%,
+    rgba(26, 24, 22, 0.28) 38%,
+    rgba(26, 24, 22, 0.92) 100%
   );
-}
-
-/* Die Geometrie sitzt in der oberen Kartenhaelfte und laesst unten Raum
-   fuer den Text — genau die Aufteilung der Vorlage. */
-.fo__geometrie {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  width: 100%;
-  height: 52%;
-}
-
-.fo__linien {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.4);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
 }
 
 /* Laufende Nummer, Serif — dieselbe Rolle wie die Kennzahlen: ein Wert,
    kein Fliesstext. */
 .fo__nummer {
+  @include serif-heading;
   position: absolute;
   top: var(--spacing-20);
   right: var(--spacing-28);
   z-index: 3;
-  font-family: var(--font-davinci);
-  font-size: clamp(28px, 2.6vw, 42px);
   line-height: 1;
   color: rgba(255, 255, 255, 0.42);
-  letter-spacing: -0.01em;
 }
 
 .fo__inhalt {
@@ -203,12 +150,9 @@
 }
 
 .fo__karte-titel {
+  @include serif-heading;
   margin: 0;
-  font-family: var(--font-davinci);
-  font-weight: var(--font-weight-regular);
-  font-size: clamp(28px, 2.3vw, 38px);
   line-height: 1.05;
-  letter-spacing: -0.001em;
   color: var(--color-paper);
 }
 

@@ -14,6 +14,10 @@
   --color-graphite: #595855;
   --color-ash: #808080;
   --color-paper: #ffffff;
+  /* Rot der Bundesflagge. Nur die Markierung Deutschlands im Abgabenvergleich. */
+  --color-rot: #dd0000;
+  /* Gold des Fahnentuchs, nicht das Poster-Gelb. Die Zahl im Kreis und die Netto-Linie. */
+  --color-gold: #b8912f;
 
   /* --- Schriftfamilien ---------------------------------------------------
      Davinci -> Playfair Display (in der Vorgabe als Substitut genannt)
@@ -25,44 +29,62 @@
     'Helvetica Neue', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
     sans-serif;
 
-  /* --- Typo-Skala (Sollwerte der Vorgabe) -------------------------------- */
-  --text-body-sm: 15px;
+  /* =======================================================================
+     Typo-Leiter
+
+     Die Seite kennt genau vier Grotesk- und acht Serif-Stufen. Andere
+     Schriftgroessen gibt es nicht: Komponenten setzen `font-size` nicht
+     selbst, sondern rufen den passenden Mixin aus _mixins.scss. Wird eine
+     Groesse knapp, wird hier die Stufe nachgezogen — nie in der Komponente.
+
+     Die Grotesk-Stufen sind fest, die Serif-Stufen fluid. Die vw-Werte sind
+     auf 1600px Referenzbreite gerechnet, dort trifft jede Stufe ihren
+     Sollwert aus der Design-Vorgabe (94 / 1600 = 5.875vw usw.).
+     ======================================================================= */
+
+  /* --- Grotesk: "Systeme" (Labels, Fliesstext, Werte) -------------------- */
+  --text-micro: 9px; /* G1 — Labels, Kicker, Stempel */
+  --text-label: 12px; /* G2 — Navigation, Karten-Text, Fussnoten */
+  --text-body-sm: 15px; /* G3 — Fliesstext */
+  --text-body: 16px; /* G4 — Werte, Formular-Zwischentitel */
   --leading-body-sm: 1.5;
-  --text-subheading: 22px;
+
+  /* --- Serif: "Momente" (Ueberschriften, Kennzahlen, Wortmarke) ----------
+     Die Minima tragen die schmalen Viewports: dort greift kein vw-Wert
+     mehr, die Ueberschriften sollen aber ihre Wucht behalten. */
+  --text-subheading-fluid: clamp(18px, 1.5vw, 24px); /* S1 — Hinweise, CTA */
+  --text-heading-sm-fluid: clamp(24px, 2.125vw, 34px); /* S2 — Karten-, Formulartitel */
+  --text-heading-fluid: clamp(30px, 2.6875vw, 43px); /* S3 — Zitate, Nebentitel */
+  --text-heading-lg-fluid: clamp(34px, 3.25vw, 52px); /* S4 — Blocktitel */
+  --text-section-fluid: clamp(44px, 5.875vw, 94px); /* S5 — Sektionstitel */
+  --text-monument-fluid: clamp(52px, 7vw, 112px); /* S6 — kursive Schlagzeile */
+  --text-kolossal-fluid: clamp(64px, 9vw, 160px); /* S7 — Hero-Counter */
+  /* S8 — Wortmarke. Die Vorgabe sieht 23.375vw vor, damit das Wort an den
+     Viewportkanten beschnitten wird. Bei elf Buchstaben bliebe davon zu
+     wenig lesbar, deshalb 11vw. Das Minimum ist so gewaehlt, dass die Marke
+     auch mit --marke-skala auf flachen Telefonen noch 40px behaelt. */
+  --text-display-fluid: clamp(54px, 11vw, 190px);
+
+  /* Zeilenabstand und Laufweite je Stufe. Die Laufweite steht in em, nicht
+     in px: bei fluider Schriftgroesse muss sie mitskalieren. Die Vorgabe
+     nennt sie in px, umgerechnet auf den Sollwert der jeweiligen Stufe
+     (z.B. -0.85px bei 94px = -0.009em). */
   --leading-subheading: 1.33;
-  --tracking-subheading: -0.11px;
-  --text-heading-sm: 26px;
-  --leading-heading-sm: 1.33;
-  --tracking-heading-sm: -0.13px;
-  --text-heading: 43px;
-  --leading-heading: 1.1;
-  --tracking-heading: -0.215px;
-  --text-heading-lg: 52px;
-  --leading-heading-lg: 1;
-  --tracking-heading-lg: -0.47px;
-  --text-display: 374px;
-  --leading-display: 0.84;
-  --tracking-display: -3.37px;
-
-  /* Mikrotexte der Vorgabe (Labels, SCROLL-Marker, Nav) */
-  --text-micro: 9px;
-  --text-label: 12px;
-  --text-body: 16px;
-
-  /* --- Fluide Ableitungen (eigene Ergaenzung) ----------------------------
-     Die Referenz ist bei 1600px Breite aufgenommen. Die vw-Werte sind so
-     gewaehlt, dass bei exakt 1600px der Sollwert der Vorgabe herauskommt:
-     374 / 1600 = 23.375vw, 94 / 1600 = 5.875vw, 52 / 1600 = 3.25vw.
-     Dadurch bleibt die Wortmarke auf jeder Breite am Viewport beschnitten. */
-  --text-display-fluid: clamp(92px, 23.375vw, 374px);
-  --text-section-fluid: clamp(44px, 5.875vw, 94px);
-  --text-heading-lg-fluid: clamp(32px, 3.25vw, 52px);
-  --text-heading-fluid: clamp(28px, 2.6875vw, 43px);
-
-  /* Section-Headline der Vorgabe: 94px / 0.84 / -0.85px */
-  --text-section: 94px;
+  --tracking-subheading: -0.005em;
+  --leading-heading-sm: 1.2;
+  --tracking-heading-sm: -0.005em;
+  --leading-heading: 1.15;
+  --tracking-heading: -0.005em;
+  --leading-heading-lg: 1.1;
+  --tracking-heading-lg: -0.009em;
   --leading-section: 0.84;
-  --tracking-section: -0.85px;
+  --tracking-section: -0.009em;
+  --leading-monument: 0.92;
+  --tracking-monument: -0.012em;
+  --leading-kolossal: 1;
+  --tracking-kolossal: -0.03em;
+  --leading-display: 0.84;
+  --tracking-display: -0.009em;
 
   /* --- Schriftgewichte ---------------------------------------------------- */
   --font-weight-regular: 400;

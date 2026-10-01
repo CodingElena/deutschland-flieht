@@ -2,50 +2,18 @@
 
 .zn {
   padding-block: var(--spacing-40) var(--spacing-168);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.zn__kopf {
-  display: flex;
-  justify-content: space-between;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: 0.16em;
-}
+/* --- Drei Blöcke: Reihe, Vignette, Abgabenkeil ---------------------------- */
 
-.zn__titel {
-  margin: var(--spacing-60) 0 var(--spacing-96);
-  text-align: center;
-  font-family: var(--font-davinci);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--text-section-fluid);
-  line-height: var(--leading-section);
-  letter-spacing: -0.009em;
-  color: var(--color-paper);
-  display: flex;
-  flex-direction: column;
-}
-
-.zn__titel-zeile {
-  display: block;
-}
-
-/* --- Raster --------------------------------------------------------------- */
-
-.zn__raster {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-28);
+.zn__reihe,
+.zn__vignette,
+.zn__keil {
   margin: 0;
-}
 
-.zn__spalte {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--spacing-20);
-
-  /* Gestaffelter Auftritt; das Hochzaehlen der Kennzahl startet
-     unabhaengig davon, sobald die Zahl selbst im Bild steht. */
+  /* Gestaffelter Auftritt; das Hochzählen der Kennzahl startet
+     unabhängig davon, sobald die Zahl selbst im Bild steht. */
   opacity: 0;
   transform: translateY(28px);
   transition:
@@ -58,79 +26,273 @@
   }
 }
 
+/* Linie mittig im Abstand zwischen den drei Behauptungen. */
+.zn__vignette,
+.zn__keil {
+  margin-top: calc(var(--spacing-96) / 2);
+  padding-top: calc(var(--spacing-96) / 2);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
 @include motion-reduce {
-  .zn__spalte {
+  .zn__reihe,
+  .zn__vignette,
+  .zn__keil {
     opacity: 1;
     transform: none;
   }
 }
 
-.zn__spalte-titel {
-  @include serif-subheading;
-  margin: 0;
-  color: var(--color-paper);
-  font-size: clamp(18px, 1.5vw, 24px);
+.zn__reihe-kopf {
+  max-width: 38rem;
+  margin-inline: auto;
+  text-align: center;
 }
 
-/* Kreisrunder Ausschnitt — nach der Vollflaeche die zweite Bildform
-   des Systems. Ohne Rahmen, ohne Schatten. */
+.zn__reihe-titel {
+  @include serif-heading-lg;
+  margin: 0;
+  color: var(--color-paper);
+}
+
+.zn__fnref {
+  display: block;
+  width: fit-content;
+  margin: 0.55rem 0 0 auto;
+  color: rgba(255, 255, 255, 0.38);
+  font-family: var(--font-helvetica-now);
+  font-size: var(--text-micro);
+  line-height: 1;
+  letter-spacing: 0;
+  text-decoration: none;
+
+  sup {
+    font-size: 1em;
+    line-height: 0;
+  }
+}
+
+/* Kreisrunder Ausschnitt — Kennzahl und Label liegen im Bild.
+   Nacht-Kulisse und zusätzlicher Schleier halten den Text lesbar. */
+.zn__raster {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-40) 0 0;
+}
+
 .zn__kreis {
-  width: min(240px, 60%);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(420px, 100%);
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
+  isolation: isolate;
+  /* Die Kennzahl darin haengt am Durchmesser, nicht an der Leiter — siehe
+     .zn__wert. */
+  container-type: inline-size;
+
+  @include nacht-kulisse;
 
   img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: grayscale(0.35) saturate(0.45) brightness(0.55) contrast(1.15);
+  }
+
+  &::after {
+    z-index: 1;
+    background: #0c1016;
+    opacity: 0.32;
   }
 }
 
+.zn__kreis-inhalt {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-16);
+  width: 86%;
+  text-align: center;
+  text-shadow: 0 1px 18px rgb(0 0 0 / 0.55);
+}
+
+/* Die einzige Groesse der Seite, die nicht auf der Leiter steht: die Zahl
+   muss den Kreis fuellen, in dem sie liegt, und darf nicht an der
+   Viewportbreite haengen. Deshalb ein Anteil am Durchmesser statt einer
+   Stufe — wie eine Beschriftung im SVG. */
 .zn__wert {
+  margin: 0;
   font-family: var(--font-davinci);
   font-weight: var(--font-weight-medium);
-  font-size: clamp(34px, 3.25vw, 52px);
+  font-size: 27cqi;
   line-height: 1;
-  letter-spacing: -0.009em;
-  color: var(--color-paper);
-  margin: 0;
+  letter-spacing: var(--tracking-display);
+  color: var(--color-gold);
+  text-wrap: balance;
 }
 
 .zn__label {
-  @include grotesk-label;
+  @include grotesk-body;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0;
+  max-width: 22ch;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.zn__kurven {
+  width: min(920px, 100%);
+  margin: var(--spacing-40) auto 0;
+}
+
+.zn__kurve-name {
+  margin: var(--spacing-20) 0 var(--spacing-4);
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.14em;
+}
+
+.zn__kurve {
+  display: block;
+  width: 100%;
+  height: 88px;
+
+  path {
+    fill: none;
+    stroke: var(--color-paper);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  &--saldo path {
+    stroke: var(--color-gold);
+  }
+
+  circle {
+    fill: var(--color-gold);
+  }
+}
+
+.zn__jahre {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--spacing-4) 0 0;
+  padding: 0;
+  list-style: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-helvetica-now);
+  font-size: var(--text-label);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.zn__keil-grafik {
+  width: min(720px, 100%);
+  margin: var(--spacing-40) auto 0;
+}
+
+.zn__balken {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.zn__balken-zeile {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr 4.5rem;
+  align-items: center;
+  gap: var(--spacing-16);
   color: rgba(255, 255, 255, 0.72);
-  max-width: 26ch;
-  margin: 0;
+  @include grotesk-label;
 }
 
-.zn__quelle {
-  color: rgba(255, 255, 255, 0.42);
-  letter-spacing: 0.08em;
-  max-width: 30ch;
-  margin: 0;
+.zn__balken-zeile--hier {
+  color: var(--color-rot);
 }
 
-.zn__hex {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.55);
-  stroke-width: 1;
-  margin-top: var(--spacing-4);
+.zn__balken-spur {
+  display: block;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.zn__balken-fill {
+  display: block;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.zn__balken-zeile--hier .zn__balken-fill {
+  height: 3px;
+  background: var(--color-rot);
+}
+
+.zn__balken-wert {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Weg zu den vollstaendigen Daten -------------------------------------- */
+
+.zn__weiter {
+  margin: var(--spacing-52) 0 0;
+  text-align: center;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .zn__weiter {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Ein Pfeil statt eines zweiten Buttons — der gefuellte gehoert der Petition. */
+.zn__weiter-link {
+  color: rgba(255, 255, 255, 0.78);
+
+  &::after {
+    content: ' →';
+  }
+
+  &:hover {
+    color: var(--color-paper);
+  }
 }
 
 @include tablet {
-  .zn__raster {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-60);
-  }
-
-  .zn__titel {
-    margin-block: var(--spacing-40) var(--spacing-60);
-  }
-
   .zn {
     padding-bottom: var(--spacing-96);
+  }
+
+  .zn__balken-zeile {
+    grid-template-columns: 6.5rem 1fr 4.2rem;
+    gap: var(--spacing-8, 8px);
+  }
+
+  .zn__jahre {
+    font-size: var(--text-micro);
   }
 }

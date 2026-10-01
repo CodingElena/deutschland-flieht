@@ -31,7 +31,9 @@ import {
       /* Verhindert Zeilenumbrueche beim Hochzaehlen, wenn die Zahl
          zwischendurch kuerzer ist als am Ende. */
       white-space: nowrap;
-      font-variant-numeric: tabular-nums;
+      /* Versalziffern: Mediävalziffern lassen 5, 7 und 9 unter die
+         Grundlinie rutschen, die Zahl wirkt dann zerbrochen. */
+      font-variant-numeric: lining-nums tabular-nums;
     }
   `,
 })
@@ -57,7 +59,9 @@ export class Zaehlwert {
         return;
       }
 
-      this.anzeige.set(teile.vor + this.formatieren(0, teile.nachkomma) + teile.nach);
+      /* Knapp unter dem Ziel: ein kurzes Nachzaehlen, kein Hochrasen. */
+      const startwert = teile.zahl * 0.95;
+      this.anzeige.set(teile.vor + this.formatieren(startwert, teile.nachkomma) + teile.nach);
 
       const beobachter = new IntersectionObserver(
         ([eintrag]) => {
@@ -65,7 +69,7 @@ export class Zaehlwert {
             return;
           }
           beobachter.disconnect();
-          this.hochzaehlen(teile);
+          this.hochzaehlen(teile, startwert);
         },
         { threshold: 0.4 },
       );
@@ -104,21 +108,25 @@ export class Zaehlwert {
     });
   }
 
-  private hochzaehlen(teile: {
-    vor: string;
-    zahl: number;
-    nachkomma: number;
-    nach: string;
-  }): void {
+  private hochzaehlen(
+    teile: {
+      vor: string;
+      zahl: number;
+      nachkomma: number;
+      nach: string;
+    },
+    startwert: number,
+  ): void {
     const dauer = this.dauer();
     const start = performance.now();
+    const spanne = teile.zahl - startwert;
     let frame = 0;
 
     const schritt = (jetzt: number): void => {
       const t = Math.min(1, (jetzt - start) / dauer);
-      /* Sanftes Auslaufen: schnell anlaufen, ruhig ankommen. */
-      const e = 1 - Math.pow(1 - t, 3);
-      const wert = teile.zahl * e;
+      /* Sine ease-in-out: laeuft an und aus, ohne am Anfang zu rasen. */
+      const e = 0.5 - 0.5 * Math.cos(t * Math.PI);
+      const wert = startwert + spanne * e;
 
       this.anzeige.set(
         teile.vor + this.formatieren(wert, teile.nachkomma) + teile.nach,

@@ -11,6 +11,21 @@
 
   <hr class="hairline fuss__linie" />
 
+  <div class="fuss__bildnachweis">
+    <p class="fuss__mikro t-micro">Quellen</p>
+    <ol class="fuss__quellen">
+      <li id="zn-fn-1" class="fuss__mikro">
+        {{ wanderung.text }}
+        <a [href]="wanderung.url">{{ wanderung.quelle }}</a>
+        — {{ wanderung.stand }}
+      </li>
+      <li id="zn-fn-2" class="fuss__mikro">
+        {{ vergleich.text }}
+        <a [href]="vergleich.url">{{ vergleich.quelle }}</a>
+      </li>
+    </ol>
+  </div>
+
   <!-- CC BY und CC BY-SA verlangen Urheber und Lizenz je Bild. Deshalb eine
        Liste statt einer Sammelzeile. -->
   <div class="fuss__bildnachweis">
@@ -18,9 +33,22 @@
       {{ footer.bildnachweisLabel }} — {{ footer.bildnachweisEinleitung }}
     </p>
     <ul class="fuss__nachweise">
-      @for (n of footer.bildnachweisListe; track n.werk) {
+      @for (n of footer.bildnachweisListe; track n.urheber + n.werk) {
         <li class="fuss__mikro t-micro">
-          „{{ n.werk }}“ — {{ n.urheber }}, {{ n.lizenz }}
+          @if (n.quelle) {
+            „<a [href]="n.quelle">{{ n.werk }}</a>“
+          } @else {
+            „{{ n.werk }}“
+          }
+          — {{ n.urheber }},
+          @if (n.lizenzUrl) {
+            <a [href]="n.lizenzUrl" rel="license">{{ n.lizenz }}</a>
+          } @else {
+            {{ n.lizenz }}
+          }
+          @if (n.bearbeitung) {
+            ({{ n.bearbeitung }})
+          }
         </li>
       }
     </ul>

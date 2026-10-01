@@ -1,62 +1,81 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Abschluss } from '../../sections/abschluss/abschluss';
-import { Fahne } from '../../sections/fahne/fahne';
+import { Auswertung } from '../../sections/auswertung/auswertung';
+import { Beitraege } from '../../sections/beitraege/beitraege';
+import { Atlas } from '../../sections/atlas/atlas';
+import { Ausbluten } from '../../sections/ausbluten/ausbluten';
 import { Forderungen } from '../../sections/forderungen/forderungen';
 import { Hero } from '../../sections/hero/hero';
-import { Manifest } from '../../sections/manifest/manifest';
-import { Quiz } from '../../sections/quiz/quiz';
-import { Sequenz } from '../../sections/sequenz/sequenz';
+import { Kapital } from '../../sections/kapital/kapital';
+import { Kopffahne } from '../../layout/kopffahne/kopffahne';
+import { Unterschreiben } from '../../layout/unterschreiben/unterschreiben';
 import { Unterstuetzer } from '../../sections/unterstuetzer/unterstuetzer';
+import { Wegmarken } from '../../layout/wegmarken/wegmarken';
+import { WerGeht } from '../../sections/wer-geht/wer-geht';
 import { Zahlen } from '../../sections/zahlen/zahlen';
 
 /**
  * Startseite — das eigentliche Mahnmal.
  *
- * Der Rhythmus folgt der Vorlage: hell, dann ein langer dunkler Block, dann
- * wieder hell. Die Schnitte sind hart, ohne Verlauf dazwischen.
+ * Die Striche rechts oben oeffnen die Kapitel; die ids der Hosts
+ * sind ihre Ziele und stehen in KAPITEL (content.ts). Unten rechts laeuft
+ * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Am Kopf
+ * haengt eine lange Flagge. Sie steht ruhig an der Stelle der Kronen,
+ * durchscheinend, in einem Tuch.
  *
- *   Hero (Putty)      Behauptung und Wortmarke
- *   Sequenz (Ink)     drei Schritte, gepinnt
- *   Manifest (Ink)    Display-Headline
- *   Fahne (Ink)       3D-Fahne, sauber bis zerschlissen
- *   Unterstuetzer     Platzhalter
- *   Zahlen (Ink)      Kennzahlen mit Beleg
- *   Forderungen (Ink) was zu tun ist
- *   Quiz (Putty)      Kurz-Check — die erste Stelle, an der man selbst etwas tut
- *   Abschluss (Chalk) Aufruf
- *
- * Der Kurz-Check steht bewusst am Ende des dunklen Blocks: davor liest man
- * nur, danach fragt die Seite zurueck — und uebergibt direkt an die Petition.
+ *   Hero (Ink)        Startseite — Behauptung und Wortmarke
+ *   Wer geht (Ink)    Ihre Geschichten
+ *   Ausbluten (Ink)   Die Zahlen beginnen mit der Karte
+ *   Zahlen (Ink)      Reihe, Qualifikation, Abgabenkeil — haelt das Kapitel
+ *   Kapital (Ink)     Leeres Buero, Frage: Und dann?
+ *   Forderungen (Ink) Es muss sich etwas aendern
+ *   Abschluss (Chalk) Petition — direkt hinter den Forderungen
+ *   Auswertung (Chalk) Aufklappbar darunter, Regionen und Gruende
+ *   Entwicklungen (Bone) Eigene Saetze mit Quelle, Papier in der Nebenspalte
+ *   Unterstuetzer     Logos; der Atlas gehoert dazu
+ *   Atlas (Ink)       Zitat und Figur, ganz am Ende vor der Fusszeile
  */
 @Component({
   selector: 'app-landing',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    Wegmarken,
+    Unterschreiben,
+    Kopffahne,
     Hero,
-    Sequenz,
-    Manifest,
-    Fahne,
-    Unterstuetzer,
+    WerGeht,
     Zahlen,
+    Ausbluten,
+    Kapital,
     Forderungen,
-    Quiz,
     Abschluss,
+    Auswertung,
+    Beitraege,
+    Unterstuetzer,
+    Atlas,
   ],
   template: `
-    <app-hero />
-    <app-sequenz />
-    <app-manifest />
-    <app-fahne />
-    <app-unterstuetzer />
-    <app-zahlen />
-    <app-forderungen />
-    <app-quiz />
-    <app-abschluss />
+    <app-wegmarken />
+    <app-unterschreiben />
+    <app-kopffahne />
+
+    <app-hero id="auftakt" />
+    <app-wer-geht id="wer-geht" />
+    <app-ausbluten id="wohin" />
+    <app-zahlen id="zahlen" />
+    <app-kapital id="und-dann" />
+    <app-forderungen id="forderungen" />
+    <app-abschluss id="petition" />
+    <app-auswertung />
+    <app-beitraege id="belege" />
+    <app-unterstuetzer id="unterstuetzer" />
+    <app-atlas id="atlas" />
   `,
   styles: `
     :host {
       display: block;
+      position: relative;
     }
   `,
 })

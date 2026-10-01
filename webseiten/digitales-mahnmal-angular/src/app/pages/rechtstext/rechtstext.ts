@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import { DATENSCHUTZ, IMPRESSUM, RECHTSTEXT_WARNUNG } from '../../core/content';
+import { DATENSCHUTZ, FOOTER, IMPRESSUM, RECHTSTEXT_WARNUNG } from '../../core/content';
 
 /**
  * Impressum und Datenschutzerklaerung.
@@ -38,6 +38,28 @@ import { DATENSCHUTZ, IMPRESSUM, RECHTSTEXT_WARNUNG } from '../../core/content';
             @for (absatz of a.absaetze; track absatz) {
               <p class="rt__text">{{ absatz }}</p>
             }
+            @if (a.titel === 'Bildnachweis') {
+              <ul class="rt__nachweise">
+                @for (n of bildnachweis; track n.urheber + n.werk) {
+                  <li class="rt__text">
+                    @if (n.quelle) {
+                      „<a [href]="n.quelle">{{ n.werk }}</a>“
+                    } @else {
+                      „{{ n.werk }}“
+                    }
+                    — {{ n.urheber }},
+                    @if (n.lizenzUrl) {
+                      <a [href]="n.lizenzUrl" rel="license">{{ n.lizenz }}</a>
+                    } @else {
+                      {{ n.lizenz }}
+                    }
+                    @if (n.bearbeitung) {
+                      ({{ n.bearbeitung }})
+                    }
+                  </li>
+                }
+              </ul>
+            }
           </section>
         }
       </div>
@@ -61,12 +83,8 @@ import { DATENSCHUTZ, IMPRESSUM, RECHTSTEXT_WARNUNG } from '../../core/content';
     }
 
     .rt__titel {
+      @include serif-section;
       margin: 0;
-      font-family: var(--font-davinci);
-      font-weight: var(--font-weight-regular);
-      font-size: var(--text-section-fluid);
-      line-height: var(--leading-section);
-      letter-spacing: -0.009em;
     }
 
     .rt__einleitung {
@@ -116,6 +134,21 @@ import { DATENSCHUTZ, IMPRESSUM, RECHTSTEXT_WARNUNG } from '../../core/content';
       /* Anschriften stehen mehrzeilig im Inhalt; die Umbrueche gehoeren zum
          Text und duerfen nicht zusammenfallen. */
       white-space: pre-line;
+
+      a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+    }
+
+    .rt__nachweise {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-16);
     }
 
     @include tablet {
@@ -130,6 +163,7 @@ export class Rechtstext {
   private readonly daten = toSignal(this.route.data, { initialValue: {} as { art?: string } });
 
   protected readonly warnung = RECHTSTEXT_WARNUNG;
+  protected readonly bildnachweis = FOOTER.bildnachweisListe;
 
   protected readonly istImpressum = computed(() => this.daten().art === 'impressum');
 

@@ -1,0 +1,161 @@
+<section class="ew surface-bone inset" aria-labelledby="ew-titel">
+  <header class="ew__kopf">
+    <h1 id="ew-titel" class="ew__titel">
+      <span class="ew__titel-zeile">{{ inhalt.titelZeile1 }}</span>
+      <span class="ew__titel-zeile t-italic">{{ inhalt.titelZeile2Kursiv }}</span>
+    </h1>
+    <p class="ew__einleitung">{{ inhalt.einleitung }}</p>
+  </header>
+
+  <!-- --- Die Reihe: Kurven und, anders als auf der Startseite, die
+           Jahreswerte offen als Tabelle ------------------------------------ -->
+  <section class="ew__block" appReveal aria-labelledby="ew-reihe">
+    <p class="ew__label t-micro">{{ inhalt.reiheLabel }}</p>
+    <h2 id="ew-reihe" class="ew__block-titel">{{ wanderung.titel }}</h2>
+    <p class="ew__block-text">{{ wanderung.text }}</p>
+
+    <div class="ew__kurven">
+      <p class="ew__kurve-name t-micro">Fortzüge</p>
+      <svg class="ew__kurve" viewBox="0 0 720 110" aria-hidden="true">
+        <path [attr.d]="fortzugPfad" vector-effect="non-scaling-stroke" />
+      </svg>
+      <p class="ew__kurve-name t-micro">Netto, nach Rückkehr</p>
+      <svg class="ew__kurve ew__kurve--saldo" viewBox="0 0 720 110" aria-hidden="true">
+        <path [attr.d]="saldoPfad" vector-effect="non-scaling-stroke" />
+        <circle [attr.cx]="saldoEnde.x" [attr.cy]="saldoEnde.y" r="4" />
+      </svg>
+      <ol class="ew__jahre">
+        @for (j of jahre; track j.jahr) {
+          <li>{{ j.jahr }}</li>
+        }
+      </ol>
+    </div>
+
+    <table class="ew__tabelle">
+      <caption class="sr-only">
+        Fortzüge und Wanderungssaldo deutscher Staatsangehöriger, {{ jahre[0].jahr }} bis
+        {{ jahre[jahre.length - 1].jahr }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Jahr</th>
+          <th scope="col">Fortzüge</th>
+          <th scope="col">Saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (j of jahre; track j.jahr) {
+          <tr>
+            <th scope="row">{{ j.jahr }}</th>
+            <td>{{ betrag(j.fortzuege) }}</td>
+            <td>{{ j.saldo.toLocaleString('de-DE') }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <p class="ew__quelle t-micro">
+      {{ inhalt.quelleLabel }}:
+      <a class="ew__quelle-link" [href]="wanderung.url" target="_blank" rel="noopener noreferrer">
+        {{ wanderung.quelle }}
+      </a>
+      — {{ wanderung.stand }}
+    </p>
+  </section>
+
+  <!-- --- Der Abgabenkeil im Laendervergleich --------------------------- -->
+  <section class="ew__block" appReveal aria-labelledby="ew-keil">
+    <p class="ew__label t-micro">{{ inhalt.keilLabel }}</p>
+    <h2 id="ew-keil" class="ew__block-titel">{{ vergleich.titel }}</h2>
+    <p class="ew__block-text">{{ vergleich.text }}</p>
+
+    <ul class="ew__balken">
+      @for (land of balken; track land.id) {
+        <li class="ew__balken-zeile" [class.ew__balken-zeile--hier]="land.hier">
+          <span class="ew__balken-name">{{ land.name }}</span>
+          <span class="ew__balken-spur" aria-hidden="true">
+            <span class="ew__balken-fill" [style.width.%]="land.breite"></span>
+          </span>
+          <span class="ew__balken-wert">{{ land.wert }}</span>
+        </li>
+      }
+    </ul>
+
+    <p class="ew__quelle t-micro">
+      {{ inhalt.quelleLabel }}:
+      <a class="ew__quelle-link" [href]="vergleich.url" target="_blank" rel="noopener noreferrer">
+        {{ vergleich.quelle }}
+      </a>
+    </p>
+  </section>
+
+  <!-- --- Auswertung der Petition. Auf der Startseite zugeklappt, hier
+           offen — mit demselben Stempel, damit niemand die Beispieldaten
+           fuer gezaehlte Stimmen haelt. ------------------------------------ -->
+  <section class="ew__block" appReveal aria-labelledby="ew-auswertung">
+    <p class="ew__label t-micro">
+      {{ inhalt.auswertungLabel }} <span class="ew__stempel">{{ auswertung.stempel }}</span>
+    </p>
+    <h2 id="ew-auswertung" class="ew__block-titel">{{ auswertung.einleitung }}</h2>
+
+    <div class="ew__spalten">
+      <figure class="ew__spalte">
+        <figcaption class="ew__spalte-kopf">
+          <p class="ew__label t-micro">{{ auswertung.regionen.label }}</p>
+          <p class="ew__block-text">{{ auswertung.regionen.text }}</p>
+        </figcaption>
+
+        <ul class="ew__anteile">
+          @for (zeile of regionen; track zeile.id) {
+            <li class="ew__anteil">
+              <span class="ew__anteil-name">{{ zeile.name }}</span>
+              <span class="ew__anteil-wert">{{ anteilText(zeile.anteil) }}</span>
+              <span class="ew__spur" aria-hidden="true">
+                <span class="ew__fill" [style.width.%]="zeile.breite"></span>
+              </span>
+            </li>
+          }
+        </ul>
+      </figure>
+
+      <figure class="ew__spalte">
+        <figcaption class="ew__spalte-kopf">
+          <p class="ew__label t-micro">{{ auswertung.gruende.label }}</p>
+          <p class="ew__block-text">{{ auswertung.gruende.text }}</p>
+        </figcaption>
+
+        <ul class="ew__anteile">
+          @for (zeile of gruende; track zeile.id) {
+            <li class="ew__anteil">
+              <span class="ew__anteil-name">{{ zeile.name }}</span>
+              <span class="ew__anteil-wert">{{ anteilText(zeile.anteil) }}</span>
+              <span class="ew__spur" aria-hidden="true">
+                <span class="ew__fill" [style.width.%]="zeile.breite"></span>
+              </span>
+            </li>
+          }
+        </ul>
+      </figure>
+    </div>
+
+    <p class="ew__quelle t-micro">{{ auswertung.hinweis }}</p>
+  </section>
+
+  <!-- --- Alle Belege, nicht nur die drei von der Startseite ------------- -->
+  <section class="ew__block" appReveal aria-labelledby="ew-belege">
+    <p class="ew__label t-micro">{{ inhalt.belegeLabel }}</p>
+    <h2 id="ew-belege" class="ew__block-titel">{{ inhalt.belegeTitel }}</h2>
+    <p class="ew__block-text">{{ belegeText }}</p>
+
+    <ul class="ew__belege">
+      @for (beitrag of beitraege; track beitrag.id) {
+        <li>
+          <a class="ew__beleg" [href]="beitrag.url" target="_blank" rel="noopener noreferrer">
+            <span class="ew__beleg-meta t-micro">{{ beitrag.medium }} — {{ beitrag.datum }}</span>
+            <span class="ew__beleg-zeile">{{ beitrag.zeile }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+</section>

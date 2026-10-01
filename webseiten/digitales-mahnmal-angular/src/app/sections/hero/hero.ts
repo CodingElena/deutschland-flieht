@@ -1,28 +1,48 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 
-import { HERO, MARKE } from '../../core/content';
+import { RouterLink } from '@angular/router';
+
+import { ENTWICKLUNGEN, HERO, MARKE } from '../../core/content';
 import { fensterScroll } from '../../core/scroll-progress';
 import { Zaehlwert } from '../../shared/zaehlwert';
+import { planeLichtausfall } from './hero-lichter';
 
 /**
- * Hero — Putty-Canvas mit kleinem Typo-Cluster ueber monumentaler Wortmarke.
+ * Hero — dunkle Flaeche mit Counter und monumentaler Wortmarke.
  *
  * Die Wortmarke ist das Signaturelement: sie laeuft absichtlich ueber die
  * Viewportbreite hinaus und wird an beiden Raendern beschnitten.
  *
- * Bewusst ohne Schaltflaeche: der Hero behauptet nur. Der Weg zur Petition
- * beginnt weiter unten, nach dem Kurz-Check und im Abschluss.
+ * Unter der Zahl steht ein Weg: die Daten, solange die Kapitelliste auf
+ * der Startseite noch fehlt. Der Aufruf zur Petition kommt erst beim
+ * Scrollen, als Knopf in der unteren Ecke.
  */
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Zaehlwert],
+  imports: [RouterLink, Zaehlwert],
   templateUrl: './hero.html',
   styleUrl: './hero.scss',
 })
 export class Hero {
   protected readonly hero = HERO;
   protected readonly marke = MARKE;
+  protected readonly daten = ENTWICKLUNGEN;
+  protected readonly leinwandAktiv = signal(false);
+
+  private readonly aufnahme = viewChild<ElementRef<HTMLImageElement>>('aufnahme');
+  private readonly leinwand = viewChild<ElementRef<HTMLCanvasElement>>('leinwand');
+  private readonly bildflaeche = viewChild<ElementRef<HTMLElement>>('bildflaeche');
 
   private readonly scroll = fensterScroll();
 
@@ -34,4 +54,43 @@ export class Hero {
   protected readonly markeVersatz = computed(() =>
     Math.min(this.scroll() * 0.9, 420),
   );
+
+  constructor() {
+    const destroy = inject(DestroyRef);
+
+    afterNextRender(() => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+
+      const img = this.aufnahme()?.nativeElement;
+      const canvas = this.leinwand()?.nativeElement;
+      const box = this.bildflaeche()?.nativeElement;
+      if (!img || !canvas || !box) {
+        return;
+      }
+
+      const abort = new AbortController();
+      destroy.onDestroy(() => abort.abort());
+
+      const start = (): void => {
+        if (abort.signal.aborted || !img.naturalWidth) {
+          return;
+        }
+        const ok = planeLichtausfall({
+          canvas,
+          bild: img,
+          container: box,
+          signal: abort.signal,
+        });
+        this.leinwandAktiv.set(ok);
+      };
+
+      if (img.complete) {
+        start();
+      } else {
+        img.addEventListener('load', start, { once: true, signal: abort.signal });
+      }
+    });
+  }
 }

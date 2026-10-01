@@ -1,0 +1,30 @@
+<aside class="pp" aria-labelledby="pp-titel">
+  <div class="pp__stapel" appReveal>
+    <div class="pp__lage" aria-hidden="true"></div>
+
+    <article class="pp__blatt">
+      <p class="pp__stempel t-micro">{{ sektion.label }}</p>
+
+      <h2 id="pp-titel" class="pp__titel">
+        <span class="pp__titel-zeile">{{ sektion.titelZeile1 }}</span>
+        <span class="pp__titel-zeile t-italic">{{ sektion.titelZeile2Kursiv }}</span>
+      </h2>
+
+      <p class="pp__text">{{ sektion.text }}</p>
+
+      <div class="pp__satz" aria-hidden="true">
+        @for (breite of zeilen; track $index) {
+          <span class="pp__zeile" [style.width.%]="breite"></span>
+        }
+      </div>
+
+      @if (sektion.url) {
+        <a class="pill" [href]="sektion.url">{{ sektion.cta }}</a>
+      } @else {
+        <p class="pp__cta">
+          <span class="pill" aria-disabled="true">{{ sektion.cta }}</span>
+        </p>
+      }
+    </article>
+  </div>
+</aside>
