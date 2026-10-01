@@ -43,6 +43,12 @@
   gap: 2px;
   color: var(--color-ash);
   line-height: 1.6;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
 
 .fuss__quellen {
@@ -52,12 +58,6 @@
   font-size: var(--text-label);
   letter-spacing: 0.01em;
   text-transform: none;
-
-  a {
-    color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
 }
 
 /* Kein Rot — das System kennt keine gesaettigten Farben. Der Hinweis

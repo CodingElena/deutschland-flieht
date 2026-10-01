@@ -1,24 +1,6 @@
 <!-- Nacht statt Papier: der Hero oeffnet das Mahnmal, nicht eine Galerie.
      Dunkle Flaeche, helle Schrift, die Skyline als Kulisse darunter. -->
 <section class="hero surface-ink">
-  <!-- Eichenkronen in den oberen Ecken. Rein dekorativ, deshalb ohne
-       Alternativtext und fuer Screenreader ausgeblendet. Als Silhouette
-       rahmen sie den Blick, statt als Sommerlaub zu schmuecken. -->
-  <img
-    class="hero__eiche hero__eiche--links"
-    [src]="hero.eicheLinks.pfad"
-    alt=""
-    aria-hidden="true"
-    decoding="async"
-  />
-  <img
-    class="hero__eiche hero__eiche--rechts"
-    [src]="hero.eicheRechts.pfad"
-    alt=""
-    aria-hidden="true"
-    decoding="async"
-  />
-
   <div class="hero__cluster inset">
     <!-- Die Fortzuege sind das Signal des Heros: ein Counter, der hochzaehlt. -->
     <dl class="hero__stats">
@@ -29,7 +11,6 @@
         </div>
       }
     </dl>
-    <a class="hero__cta" [routerLink]="hero.cta.pfad">{{ hero.cta.label }}</a>
     <a class="hero__daten ghost-link" [routerLink]="daten.pfad">{{ daten.startLabel }}</a>
   </div>
 

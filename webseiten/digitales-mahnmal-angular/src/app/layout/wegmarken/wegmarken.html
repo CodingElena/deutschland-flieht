@@ -14,7 +14,11 @@
     [attr.aria-label]="offen() ? texte.griffZu : texte.griffAuf"
     (click)="umschalten()"
   >
-    <span class="wm__strich" aria-hidden="true"></span>
+    <span class="wm__striche" aria-hidden="true">
+      <span class="wm__strich"></span>
+      <span class="wm__strich"></span>
+      <span class="wm__strich"></span>
+    </span>
   </button>
 
   <ul

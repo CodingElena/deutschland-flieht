@@ -61,11 +61,23 @@ export interface Bild {
   readonly nachweis: string;
 }
 
-/** Ein vollstaendiger Bildnachweis fuer die Fusszeile. */
+/**
+ * Ein vollstaendiger Bildnachweis.
+ *
+ * CC BY und CC BY-SA verlangen Urheber, Lizenz und — soweit zumutbar —
+ * einen Link auf das Werk und auf den Lizenztext. `bearbeitung` nennt
+ * Abweichungen vom Original (Farbe, Ausschnitt, ausgeblendete Fenster).
+ */
 export interface Bildnachweis {
   readonly werk: string;
   readonly urheber: string;
   readonly lizenz: string;
+  /** Direktlink auf den Lizenztext. */
+  readonly lizenzUrl?: string;
+  /** Dateiseite des Werks (Commons, Unsplash, Museum, Datenquelle). */
+  readonly quelle?: string;
+  /** Was an der gezeigten Fassung gegenüber dem Original geändert ist. */
+  readonly bearbeitung?: string;
 }
 
 /** Ein Schritt der gepinnten Scroll-Sequenz. */
@@ -147,7 +159,7 @@ export const BILDER = {
     pfad: '/bilder/hero.jpg',
     alt: 'Frankfurt am Main bei Nacht, die beleuchtete Innenstadt vom anderen Mainufer aus',
     nachweis:
-      'Leonhard Lenz, „Frankfurt am Main city center from other side of the Main at night“, 2020 (CC0)',
+      'Leonhard Lenz, „Frankfurt am Main city center from other side of the Main at night“, 22. März 2020 (CC0)',
   },
   sequenz1: {
     pfad: '/bilder/seq-1.jpg',
@@ -178,22 +190,6 @@ export const BILDER = {
     pfad: '/bilder/kreis-3.jpg',
     alt: 'Das Gebäude der Frankfurter Börse in farbigem Licht während der Luminale',
     nachweis: 'Norbert Nagel, „Börse Frankfurt, Luminale 2014“ (CC BY-SA 3.0)',
-  },
-  /* Freigestellte Eichenkronen aus Corots Studie von Bas-Bréau. Sie rahmen
-     den Hero in den oberen Ecken, wie das Laub in der Vorlage. Der Himmel
-     wurde ueber Blaustich und Helligkeit herausgerechnet, die Blattkanten
-     sind dadurch unregelmaessig geblieben statt ausgestanzt zu wirken.
-     Gemalte Kronen ueber einer Nachtaufnahme sind ein bewusster Bruch:
-     das Alte rahmt das Neue ein. */
-  eicheLinks: {
-    pfad: '/bilder/eiche-links.webp',
-    alt: '',
-    nachweis: 'Camille Corot, „Fontainebleau: Oak Trees at Bas-Bréau“, 1832/33',
-  },
-  eicheRechts: {
-    pfad: '/bilder/eiche-rechts.webp',
-    alt: '',
-    nachweis: 'Camille Corot, „Fontainebleau: Oak Trees at Bas-Bréau“, 1832/33',
   },
   buero: {
     pfad: '/bilder/buero-leer.png',
@@ -409,16 +405,23 @@ export const KAPITEL_NAV = {
  * Hero
  * ------------------------------------------------------------------------- */
 
+/**
+ * Der Aufruf zur Petition als Knopf, der beim Scrollen in der unteren Ecke
+ * mitlaeuft. Im Auftakt selbst steht er nicht: dort tragen die Zahl und die
+ * Wortmarke das Bild allein.
+ */
+export const PETITION_CTA = {
+  label: 'Unterschreiben',
+  pfad: '/petition',
+  /** Im Knopf steht das Wort fuer sich, ohne Kontext ringsum. */
+  ariaLabel: 'Petition unterschreiben',
+} as const;
+
 export const HERO = {
   /** Eine Kennzahl — das Signal des Heros. Zaehlt als Counter hoch. */
   stats: [KENNZAHLEN.fortzuege],
-  /** Direkt zum Unterschreiben, ohne den Rest der Seite zu durchlaufen. */
-  cta: { label: 'Unterschreiben', pfad: '/petition' },
   /** Aufnahme, aus der die Wortmarke aufsteigt. */
   bild: BILDER.hero,
-  /** Eichenkronen, die den Hero oben links und rechts rahmen. */
-  eicheLinks: BILDER.eicheLinks,
-  eicheRechts: BILDER.eicheRechts,
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -1019,6 +1022,7 @@ export const ATLAS = {
     'einknickend, seine Arme zitternd, mit letzter Kraft die Welt emporhaltend, die je ' +
     'mehr er sich anstrengt, desto schwerer auf seinen Schultern lastet —',
   frage: 'was würdest du ihm raten?',
+  herkunft: 'Atlas Shrugged — Ayn Rand',
   bild: BILDER.atlas,
 } as const;
 
@@ -1037,58 +1041,133 @@ export const FOOTER = {
   ],
   quellenHinweis:
     'Qualifikation und Netto-Direktinvestitionen sind noch Platzhalter. Die übrigen Kennzahlen sind an der Quelle geprüft.',
-  /* CC BY und CC BY-SA verlangen die Nennung von Urheber und Lizenz. Das
-     ist keine Hoeflichkeit, sondern Bedingung der Nutzung — deshalb steht
-     jeder Nachweis einzeln da und nicht als Sammelfloskel. */
+  /* CC BY und CC BY-SA verlangen Urheber, Lizenz und einen Link auf Werk
+     und Lizenztext. Jeder Nachweis steht einzeln, mit Quelle. */
   bildnachweisLabel: 'Bildnachweis',
   bildnachweisEinleitung:
-    'Nachtaufnahmen von Frankfurt am Main und der Luminale, über Wikimedia Commons ' +
-    'unter freien Lizenzen. Die Porträts der Forderungs-Karten sind Stockfotos von Unsplash. ' +
-    'Die gemalten Eichenkronen im Kopf der Seite stammen aus dem Open-Access-Bestand ' +
-    'des Metropolitan Museum of Art. Das leerstehende Büro ist eine Illustration und ' +
-    'vor Veröffentlichung durch ein frei lizenziertes Foto zu ersetzen.',
+    'Nachtaufnahmen von Frankfurt am Main und der Luminale, Wikimedia Commons. ' +
+    'Die Aufnahmen sind farblich angepasst; die Skyline im Seitenkopf hat zusätzlich ' +
+    'ausgeblendete Fenster, die runden Ausschnitte sind beschnitten. Die Porträts der ' +
+    'Forderungs-Karten stehen unter der Unsplash License. Karte: Natural Earth, ' +
+    'gemeinfrei, als Vektorpfade vereinfacht. Die Eichenkronen sind ein Ausschnitt aus ' +
+    'einem Gemälde im Open-Access-Bestand des Metropolitan Museum of Art. ' +
+    'Büro und Atlas sind Illustrationen und vor Veröffentlichung zu ersetzen.',
   bildnachweisListe: [
     {
-      werk: 'Frankfurt am Main city center from other side of the Main at night (2020)',
+      werk: 'Frankfurt am Main city center from other side of the Main at night (22. März 2020)',
       urheber: 'Leonhard Lenz',
-      lizenz: 'CC0',
+      lizenz: 'CC0 1.0',
+      lizenzUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      quelle:
+        'https://commons.wikimedia.org/wiki/File:Frankfurt_am_Main_city_center_from_other_side_of_the_Main_at_night_2020-03-22_01.jpg',
+      bearbeitung: 'farblich angepasst, einzelne Fenster ausgeblendet',
     },
-    { werk: 'Skyline Frankfurt am Main bei Nacht', urheber: 'Ghorog', lizenz: 'CC BY-SA 4.0' },
     {
-      werk: 'Frankfurt skyline reflected at night',
+      werk: 'Skyline Frankfurt am Main bei Nacht (29. Mai 2022)',
+      urheber: 'Ghorog',
+      lizenz: 'CC BY-SA 4.0',
+      lizenzUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      quelle: 'https://commons.wikimedia.org/wiki/File:Skyline_Frankfurt_am_Main_bei_Nacht.jpg',
+      bearbeitung: 'farblich angepasst',
+    },
+    {
+      werk: 'Frankfurt skyline reflected at night (31. Oktober 2021)',
       urheber: 'Gerda Arendt',
       lizenz: 'CC BY-SA 4.0',
+      lizenzUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      quelle: 'https://commons.wikimedia.org/wiki/File:Frankfurt_skyline_reflected_at_night.jpg',
+      bearbeitung: 'farblich angepasst',
     },
     {
-      werk: 'Frankfurt Skyline bei Nacht (2022)',
+      werk: 'Frankfurt Skyline 2022 bei Nacht (15. Oktober 2022)',
       urheber: 'Jörg Braukmann',
       lizenz: 'CC BY-SA 4.0',
+      lizenzUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      quelle: 'https://commons.wikimedia.org/wiki/File:Frankfurt_Skyline_2022_bei_Nacht.jpg',
+      bearbeitung: 'farblich angepasst',
     },
     {
-      werk: 'Ignatz-Bubis-Brücke Frankfurt am Main bei Nacht',
+      werk: 'Ignatz Bubis Brücke Frankfurt am Main bei Nacht (2007)',
       urheber: 'rupp.de',
       lizenz: 'CC BY-SA 3.0',
+      lizenzUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      quelle:
+        'https://commons.wikimedia.org/wiki/File:Ignatz_Bubis_Bruecke_Frankfurt_am_Main_bei_Nacht.jpg',
+      bearbeitung: 'farblich angepasst, kreisförmig beschnitten',
     },
     {
-      werk: 'Hauptbahnhof Frankfurt und Börse Frankfurt, Luminale 2014',
-      urheber: 'Norbert Nagel',
+      werk: 'Central station Frankfurt, Luminale (3. April 2014)',
+      urheber: 'Norbert Nagel / Wikimedia Commons',
       lizenz: 'CC BY-SA 3.0',
+      lizenzUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      quelle:
+        'https://commons.wikimedia.org/wiki/File:Central_station_Frankfurt_-_Germany_-_Luminale_2014_-_April_3rd_2014_-_01.jpg',
+      bearbeitung: 'farblich angepasst, kreisförmig beschnitten',
     },
     {
-      werk: 'Stockporträts der Forderungs-Karten',
-      urheber:
-        'Joseph Gonzalez, Štefan Štefančík, Prince Akachi, Jurica Koletić, Aiony Haust',
+      werk: 'Börse Frankfurt stock exchange, Luminale (3. April 2014)',
+      urheber: 'Norbert Nagel / Wikimedia Commons',
+      lizenz: 'CC BY-SA 3.0',
+      lizenzUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      quelle:
+        'https://commons.wikimedia.org/wiki/File:B%C3%B6rse_Frankfurt_stock_exchange_-_Germany_-_Luminale_2014_-_April_3rd_2014_-_01.jpg',
+      bearbeitung: 'farblich angepasst, kreisförmig beschnitten',
+    },
+    {
+      werk: 'Porträt',
+      urheber: 'Joseph Gonzalez',
       lizenz: 'Unsplash License',
+      lizenzUrl: 'https://unsplash.com/license',
+      quelle: 'https://unsplash.com/photos/iFgRcqHznqg',
+      bearbeitung: 'farblich angepasst',
+    },
+    {
+      werk: 'Porträt',
+      urheber: 'Štefan Štefančík',
+      lizenz: 'Unsplash License',
+      lizenzUrl: 'https://unsplash.com/license',
+      quelle: 'https://unsplash.com/photos/QXevDflbl8A',
+      bearbeitung: 'farblich angepasst',
+    },
+    {
+      werk: 'Porträt',
+      urheber: 'Prince Akachi',
+      lizenz: 'Unsplash License',
+      lizenzUrl: 'https://unsplash.com/license',
+      quelle: 'https://unsplash.com/photos/J1OScm_uHUQ',
+      bearbeitung: 'farblich angepasst',
+    },
+    {
+      werk: 'Porträt',
+      urheber: 'Jurica Koletić',
+      lizenz: 'Unsplash License',
+      lizenzUrl: 'https://unsplash.com/license',
+      quelle: 'https://unsplash.com/photos/7YVZYZeITc8',
+      bearbeitung: 'farblich angepasst',
+    },
+    {
+      werk: 'Porträt',
+      urheber: 'Aiony Haust',
+      lizenz: 'Unsplash License',
+      lizenzUrl: 'https://unsplash.com/license',
+      quelle: 'https://unsplash.com/photos/3TLl_97HNJo',
+      bearbeitung: 'farblich angepasst',
     },
     {
       werk: 'Germany, states (admin-1, 1:10m)',
       urheber: 'Natural Earth',
-      lizenz: 'Public domain',
+      lizenz: 'Public Domain',
+      lizenzUrl: 'https://www.naturalearthdata.com/about/terms-of-use/',
+      quelle: 'https://www.naturalearthdata.com/downloads/10m-cultural-vectors/',
+      bearbeitung: 'als Vektorpfade vereinfacht',
     },
     {
       werk: 'Fontainebleau: Oak Trees at Bas-Bréau (1832/33)',
       urheber: 'Camille Corot, The Metropolitan Museum of Art',
-      lizenz: 'CC0',
+      lizenz: 'CC0 1.0',
+      lizenzUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      quelle: 'https://www.metmuseum.org/art/collection/search/435983',
+      bearbeitung: 'Ausschnitt',
     },
     {
       werk: 'Leerstehendes Großraumbüro',
@@ -1101,8 +1180,6 @@ export const FOOTER = {
       lizenz: 'Platzhalter — vor Veröffentlichung ersetzen',
     },
   ] as readonly Bildnachweis[],
-  /* TODO vor Veroeffentlichung: je Bild den Link auf die Commons-Dateiseite
-     ergaenzen. Bei CC BY-SA gehoert der Verweis auf Lizenz und Quelle dazu. */
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -1347,9 +1424,8 @@ export const IMPRESSUM = {
     {
       titel: 'Bildnachweis',
       absaetze: [
-        'Sämtliche Gemälde stammen aus dem Open-Access-Bestand des Metropolitan ' +
-          'Museum of Art, New York, und stehen unter CC0 (Public Domain). Eine ' +
-          'Namensnennung ist nicht erforderlich, erfolgt hier aber dennoch.',
+        'Urheber, Lizenz und Quelle jedes verwendeten Werks. Dieselbe Liste steht ' +
+          'in der Fußzeile jeder Seite. Lizenzname und Werktitel sind verlinkt.',
       ],
     },
   ] as readonly RechtsAbschnitt[],

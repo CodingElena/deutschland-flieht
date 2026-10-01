@@ -10,8 +10,9 @@
         <path [attr.d]="fortzugPfad" />
       </svg>
       <p class="zn__kurve-name t-micro">Netto, nach Rückkehr</p>
-      <svg class="zn__kurve" viewBox="0 0 720 110" aria-hidden="true">
+      <svg class="zn__kurve zn__kurve--saldo" viewBox="0 0 720 110" aria-hidden="true">
         <path [attr.d]="saldoPfad" />
+        <circle [attr.cx]="saldoEnde.x" [attr.cy]="saldoEnde.y" r="4" />
       </svg>
       <ol class="zn__jahre">
         @for (j of jahre; track j.jahr) {

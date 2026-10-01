@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { ABGABEN_VERGLEICH, ENTWICKLUNGEN, VIGNETTEN, WANDERUNG } from '../../core/content';
 import { keilBalken } from '../../shared/balken';
-import { kurvenPfad } from '../../shared/kurve';
+import { kurvenEnde, kurvenPfad } from '../../shared/kurve';
 import { Reveal } from '../../shared/reveal';
 import { Zaehlwert } from '../../shared/zaehlwert';
 
@@ -38,6 +38,14 @@ export class Zahlen {
   );
 
   protected readonly saldoPfad = kurvenPfad(
+    WANDERUNG.jahre.map((j) => -j.saldo),
+    0,
+    110_000,
+    8,
+    102,
+  );
+
+  protected readonly saldoEnde = kurvenEnde(
     WANDERUNG.jahre.map((j) => -j.saldo),
     0,
     110_000,

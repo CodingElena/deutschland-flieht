@@ -75,20 +75,27 @@
 
 .at__lauf,
 .at__frage {
+  @include serif-heading-sm;
   margin: 0;
   text-wrap: pretty;
   text-shadow: 0 0 18px #000, 0 0 36px #000;
 }
 
-/* Der Lauftext eine Stufe unter der Frage: die Frage ist die Pointe. */
 .at__lauf {
-  @include serif-heading-sm;
   color: rgba(255, 255, 255, 0.84);
 }
 
 .at__frage {
-  @include serif-heading;
   color: var(--color-paper);
+}
+
+/* Quellenzeile: klein und leise, damit die Frage die Pointe bleibt. */
+.at__herkunft {
+  @include grotesk-micro;
+  margin: calc(var(--spacing-16) - var(--spacing-28)) 0 0;
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.42);
+  text-shadow: 0 0 12px #000;
 }
 
 @include tablet {

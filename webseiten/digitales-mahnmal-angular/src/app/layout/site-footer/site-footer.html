@@ -33,9 +33,22 @@
       {{ footer.bildnachweisLabel }} — {{ footer.bildnachweisEinleitung }}
     </p>
     <ul class="fuss__nachweise">
-      @for (n of footer.bildnachweisListe; track n.werk) {
+      @for (n of footer.bildnachweisListe; track n.urheber + n.werk) {
         <li class="fuss__mikro t-micro">
-          „{{ n.werk }}“ — {{ n.urheber }}, {{ n.lizenz }}
+          @if (n.quelle) {
+            „<a [href]="n.quelle">{{ n.werk }}</a>“
+          } @else {
+            „{{ n.werk }}“
+          }
+          — {{ n.urheber }},
+          @if (n.lizenzUrl) {
+            <a [href]="n.lizenzUrl" rel="license">{{ n.lizenz }}</a>
+          } @else {
+            {{ n.lizenz }}
+          }
+          @if (n.bearbeitung) {
+            ({{ n.bearbeitung }})
+          }
         </li>
       }
     </ul>

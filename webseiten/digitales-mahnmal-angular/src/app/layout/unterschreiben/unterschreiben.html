@@ -1,0 +1,9 @@
+<a
+  class="us pill pill--inverse"
+  [class.us--sichtbar]="sichtbar()"
+  [attr.aria-label]="cta.ariaLabel"
+  [attr.aria-hidden]="sichtbar() ? null : 'true'"
+  [attr.inert]="sichtbar() ? null : ''"
+  [routerLink]="cta.pfad"
+  >{{ cta.label }}</a
+>

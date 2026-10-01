@@ -23,8 +23,9 @@ import { planeLichtausfall } from './hero-lichter';
  * Die Wortmarke ist das Signaturelement: sie laeuft absichtlich ueber die
  * Viewportbreite hinaus und wird an beiden Raendern beschnitten.
  *
- * Unter der Zahl zwei Wege: die Petition, und die Daten, solange
- * die Kapitelliste auf der Startseite noch fehlt.
+ * Unter der Zahl steht ein Weg: die Daten, solange die Kapitelliste auf
+ * der Startseite noch fehlt. Der Aufruf zur Petition kommt erst beim
+ * Scrollen, als Knopf in der unteren Ecke.
  */
 @Component({
   selector: 'app-hero',

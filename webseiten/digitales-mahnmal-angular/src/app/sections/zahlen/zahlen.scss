@@ -135,7 +135,7 @@
   font-size: 27cqi;
   line-height: 1;
   letter-spacing: var(--tracking-display);
-  color: var(--color-paper);
+  color: var(--color-gold);
   text-wrap: balance;
 }
 
@@ -170,6 +170,14 @@
     stroke-width: 1.6;
     stroke-linejoin: round;
     stroke-linecap: round;
+  }
+
+  &--saldo path {
+    stroke: var(--color-gold);
+  }
+
+  circle {
+    fill: var(--color-gold);
   }
 }
 
@@ -211,7 +219,7 @@
 }
 
 .zn__balken-zeile--hier {
-  color: var(--color-paper);
+  color: var(--color-rot);
 }
 
 .zn__balken-spur {
@@ -228,7 +236,7 @@
 
 .zn__balken-zeile--hier .zn__balken-fill {
   height: 3px;
-  background: var(--color-paper);
+  background: var(--color-rot);
 }
 
 .zn__balken-wert {

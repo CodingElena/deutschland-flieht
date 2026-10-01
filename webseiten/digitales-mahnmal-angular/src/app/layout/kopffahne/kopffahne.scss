@@ -1,0 +1,20 @@
+/* Der Wirt selbst nimmt keinen Platz — die Leinwand liegt ueber dem Auftakt. */
+:host {
+  display: contents;
+}
+
+.kf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Oben im Auftakt. Die Flaeche selbst ist durchsichtig; das Tuch haengt
+     nur im oberen Band. */
+  height: 100svh;
+  /* Hinter Wortmarke und Skyline, unter der Zahl und den Wegmarken. Die
+     Flagge bleibt Kulisse, die Zahl lesbar, die Kapitel erreichbar. */
+  z-index: 1;
+  /* Weit zurueckgenommen: das Tuch bleibt Kulisse hinter Zahl und Wortmarke. */
+  opacity: 0.46;
+  pointer-events: none;
+}

@@ -20,8 +20,9 @@
         <path [attr.d]="fortzugPfad" vector-effect="non-scaling-stroke" />
       </svg>
       <p class="ew__kurve-name t-micro">Netto, nach Rückkehr</p>
-      <svg class="ew__kurve" viewBox="0 0 720 110" aria-hidden="true">
+      <svg class="ew__kurve ew__kurve--saldo" viewBox="0 0 720 110" aria-hidden="true">
         <path [attr.d]="saldoPfad" vector-effect="non-scaling-stroke" />
+        <circle [attr.cx]="saldoEnde.x" [attr.cy]="saldoEnde.y" r="4" />
       </svg>
       <ol class="ew__jahre">
         @for (j of jahre; track j.jahr) {

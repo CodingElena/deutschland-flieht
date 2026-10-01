@@ -9,7 +9,7 @@ import {
   WANDERUNG,
 } from '../../core/content';
 import { anteilBalken, keilBalken } from '../../shared/balken';
-import { kurvenPfad } from '../../shared/kurve';
+import { kurvenEnde, kurvenPfad } from '../../shared/kurve';
 import { Reveal } from '../../shared/reveal';
 
 /**
@@ -54,6 +54,14 @@ export class EntwicklungenPage {
   );
 
   protected readonly saldoPfad = kurvenPfad(
+    WANDERUNG.jahre.map((j) => -j.saldo),
+    0,
+    110_000,
+    8,
+    102,
+  );
+
+  protected readonly saldoEnde = kurvenEnde(
     WANDERUNG.jahre.map((j) => -j.saldo),
     0,
     110_000,

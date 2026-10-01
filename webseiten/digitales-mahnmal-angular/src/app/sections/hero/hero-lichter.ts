@@ -12,7 +12,7 @@
 const ZELLE = 6;
 const HELLIGKEIT = 96;
 const ANTEIL_AUS = 0.88;
-const DAUER_MS = 14000;
+const DAUER_MS = 7000;
 
 interface Licht {
   x: number;

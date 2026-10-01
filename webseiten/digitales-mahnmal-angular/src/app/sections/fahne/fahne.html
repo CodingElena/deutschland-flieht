@@ -67,7 +67,11 @@
 
     <!-- Ebene 4: die Fahne -->
     <div class="fh__canvas">
-      <app-fahnen-canvas [fortschritt]="fortschritt()" [beschreibung]="inhalt.ariaBeschreibung" />
+      <app-fahnen-canvas
+        [schnitt]="schnitt"
+        [zustand]="zustand()"
+        [beschreibung]="inhalt.ariaBeschreibung"
+      />
     </div>
 
     <!-- Bewusst ohne sichtbare Bildunterschrift: das Bild traegt die Aussage

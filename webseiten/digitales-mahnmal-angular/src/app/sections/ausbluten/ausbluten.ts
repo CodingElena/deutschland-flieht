@@ -19,22 +19,22 @@ import { LAENDER_PFADE, type LandPfad } from './laender-pfade';
  * andere später, mit unterschiedlicher Dauer.
  */
 const AUSBLEICH: Readonly<Record<string, { readonly von: number; readonly bis: number }>> = {
-  DESH: { von: 0.18, bis: 0.52 },
-  DEHH: { von: 0.41, bis: 0.58 },
-  DEMV: { von: 0.08, bis: 0.61 },
-  DEHB: { von: 0.55, bis: 0.72 },
-  DENI: { von: 0.22, bis: 0.68 },
-  DEBE: { von: 0.48, bis: 0.63 },
-  DEBB: { von: 0.12, bis: 0.55 },
-  DENW: { von: 0.28, bis: 0.78 },
-  DEST: { von: 0.35, bis: 0.49 },
-  DESN: { von: 0.58, bis: 0.82 },
-  DEHE: { von: 0.15, bis: 0.71 },
-  DETH: { von: 0.44, bis: 0.66 },
-  DERP: { von: 0.31, bis: 0.54 },
-  DESL: { von: 0.62, bis: 0.76 },
-  DEBY: { von: 0.2, bis: 0.85 },
-  DEBW: { von: 0.5, bis: 0.74 },
+  DESH: { von: 0, bis: 0.44 },
+  DEHH: { von: 0.16, bis: 0.5 },
+  DEMV: { von: 0, bis: 0.53 },
+  DEHB: { von: 0.3, bis: 0.64 },
+  DENI: { von: 0, bis: 0.6 },
+  DEBE: { von: 0.23, bis: 0.55 },
+  DEBB: { von: 0, bis: 0.47 },
+  DENW: { von: 0.03, bis: 0.7 },
+  DEST: { von: 0.1, bis: 0.41 },
+  DESN: { von: 0.33, bis: 0.74 },
+  DEHE: { von: 0, bis: 0.63 },
+  DETH: { von: 0.19, bis: 0.58 },
+  DERP: { von: 0.06, bis: 0.46 },
+  DESL: { von: 0.37, bis: 0.68 },
+  DEBY: { von: 0, bis: 0.77 },
+  DEBW: { von: 0.25, bis: 0.66 },
 };
 
 /** Wie lange das Ausbleichen dauert, solange die Karte im Blick ist. */

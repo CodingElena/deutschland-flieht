@@ -10,34 +10,49 @@ import {
   viewChild,
 } from '@angular/core';
 import {
+  BufferGeometry,
   Color,
   DoubleSide,
   Mesh,
+  MathUtils,
   PerspectiveCamera,
-  PlaneGeometry,
   Scene,
   ShaderMaterial,
+  Vector2,
   WebGLRenderer,
 } from 'three';
 
+import { bandGeometrie } from './band-geometrie';
+import { BANNER_SEKTION, Fahnenschnitt, Fahnenzustand } from './fahne-schnitt';
 import { FRAGMENT_SHADER, VERTEX_SHADER } from './fahne-shader';
+
+/** Oeffnungswinkel der Kamera. Steht hier, weil der Abstand daraus folgt. */
+const BLICKWINKEL = 42;
 
 /**
  * WebGL-Leinwand mit der wehenden Deutschlandfahne.
  *
- * Der Zustand wird ausschliesslich ueber `fortschritt` (0 bis 1) gesteuert:
- * daraus ergeben sich Verschmutzung, Loecher und die Flugbahn durch das Bild.
+ * Die Komponente rendert nur. Was das Tuch ist, steht in `schnitt`; wie es
+ * gerade aussieht, in `zustand` — beides rechnet die Sektion oder der
+ * Seitenkopf aus ihrem eigenen Scroll-Fortschritt.
  *
  * Ruecksichten, die hier eingebaut sind:
- *   - Die Renderschleife laeuft nur, solange die Sektion sichtbar ist.
- *   - Bei prefers-reduced-motion steht die Zeit still; die Fahne bleibt in
- *     einer ruhigen Pose und reagiert nur noch auf den Scroll-Fortschritt.
+ *   - Die Renderschleife laeuft nur, solange die Leinwand sichtbar ist,
+ *     das Tuch wehen soll und vom Tuch noch etwas uebrig ist.
+ *   - Bei prefers-reduced-motion oder einem stillen Schnitt steht die Zeit
+ *     still; die Fahne bleibt in einer ruhigen Pose.
  *   - Alle GPU-Ressourcen werden beim Zerstoeren wieder freigegeben.
  */
 @Component({
   selector: 'app-fahnen-canvas',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<canvas #leinwand class="leinwand" [attr.aria-label]="beschreibung()" role="img"></canvas>`,
+  template: `<canvas
+    #leinwand
+    class="leinwand"
+    [attr.role]="beschreibung() ? 'img' : null"
+    [attr.aria-label]="beschreibung() || null"
+    [attr.aria-hidden]="beschreibung() ? null : 'true'"
+  ></canvas>`,
   styles: `
     :host {
       display: block;
@@ -52,10 +67,12 @@ import { FRAGMENT_SHADER, VERTEX_SHADER } from './fahne-shader';
   `,
 })
 export class FahnenCanvas {
-  /** Scroll-Fortschritt der Sektion, 0 bis 1. */
-  readonly fortschritt = input.required<number>();
-  /** Beschreibung fuer Screenreader. */
-  readonly beschreibung = input('Wehende Deutschlandfahne');
+  /** Schnitt des Tuchs. Wird beim Aufbau einmal gelesen. */
+  readonly schnitt = input<Fahnenschnitt>(BANNER_SEKTION);
+  /** Verschleiss, Bruch und Lage — folgt dem Scrollen. */
+  readonly zustand = input.required<Fahnenzustand>();
+  /** Beschreibung fuer Screenreader. Leer = reine Kulisse. */
+  readonly beschreibung = input('');
 
   private readonly leinwand = viewChild.required<ElementRef<HTMLCanvasElement>>('leinwand');
   private readonly host = inject(ElementRef<HTMLElement>);
@@ -64,28 +81,30 @@ export class FahnenCanvas {
   private renderer?: WebGLRenderer;
   private szene?: Scene;
   private kamera?: PerspectiveCamera;
-  private mesh?: Mesh<PlaneGeometry, ShaderMaterial>;
+  private mesh?: Mesh<BufferGeometry, ShaderMaterial>;
   private laeuft = false;
   private frame = 0;
   private startzeit = 0;
   private ruhig = false;
+  /** Ob die Leinwand im Bild steht. Aus dem IntersectionObserver. */
+  private imBild = false;
+  /** Versatz der Tuchmitte, der aus `kopfabstand` und Bildhoehe folgt. */
+  private rahmenversatz = 0;
 
   constructor() {
     afterNextRender(() => this.aufbauen());
 
-    /* Der Scroll-Fortschritt wirkt direkt auf Uniforms und Flugbahn.
-       Bei reduzierter Bewegung ist das der einzige Ausloeser fuers Rendern. */
+    /* Der Zustand wirkt direkt auf Uniforms und Lage. Bei reduzierter
+       Bewegung ist er der einzige Ausloeser fuers Rendern. */
     effect(() => {
-      const p = this.fortschritt();
-      this.zustandSetzen(p);
-      if (this.ruhig) {
-        this.einmalRendern();
-      }
+      this.zustandSetzen(this.zustand());
+      this.laufZustandPruefen();
     });
   }
 
   private aufbauen(): void {
     const canvas = this.leinwand().nativeElement;
+    const schnitt = this.schnitt();
 
     this.ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -93,7 +112,7 @@ export class FahnenCanvas {
     try {
       renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true });
     } catch {
-      /* Ohne WebGL bleibt die Sektion einfach ohne Fahne — Text und
+      /* Ohne WebGL bleibt die Stelle einfach ohne Fahne — Text und
          Typografie tragen die Aussage weiterhin. */
       return;
     }
@@ -104,22 +123,11 @@ export class FahnenCanvas {
 
     this.szene = new Scene();
 
-    this.kamera = new PerspectiveCamera(42, 1, 0.1, 100);
-    this.kamera.position.set(0, 0, 6.8);
+    this.kamera = new PerspectiveCamera(BLICKWINKEL, 1, 0.1, 100);
 
-    /* Das Band ist deutlich laenger als der sichtbare Bildausschnitt
-       (rund 5 Einheiten breit), damit es an beiden Raendern herauslaeuft
-       statt im Bild zu enden. Die tatsaechliche Form entsteht im
-       Vertexshader; die Geometrie liefert nur das uv-Raster.
-       Laengs hoch aufgeloest, quer genuegen wenige Segmente. */
-    /* Die Laenge ist bewusst weit ueberdimensioniert. Das Band liegt
-       schraeg im Bild; bei rund 23 Grad Neigung wandern die Enden eines
-       kurzen Bandes vertikal in den sichtbaren Bereich und werden sichtbar.
-       Bei dieser Laenge verlassen sie den Ausschnitt in jeder Lage. */
-    const laenge = 26.0;
-    const breite = 2.05;
-
-    const geometrie = new PlaneGeometry(1, 1, 420, 28);
+    /* Die tatsaechliche Form entsteht im Vertexshader; die Geometrie liefert
+       nur das uv-Raster und die Zuordnung zu den Bruchstuecken. */
+    const geometrie = bandGeometrie(schnitt.segmente, schnitt.bruchstuecke);
 
     const material = new ShaderMaterial({
       vertexShader: VERTEX_SHADER,
@@ -132,8 +140,18 @@ export class FahnenCanvas {
       uniforms: {
         uTime: { value: 0 },
         uDirty: { value: 0 },
-        uLength: { value: laenge },
-        uWidth: { value: breite },
+        uBruch: { value: 0 },
+        uLength: { value: schnitt.laenge },
+        uWidth: { value: schnitt.breite },
+        uSchwung: { value: schnitt.schwung },
+        uDrehung: { value: schnitt.drehung },
+        uRiss: { value: schnitt.riss },
+        uLoecher: { value: schnitt.loecher },
+        uGlanz: { value: schnitt.glanz },
+        uSaum: { value: schnitt.saum },
+        uRaster: {
+          value: new Vector2(schnitt.bruchstuecke?.[0] ?? 1, schnitt.bruchstuecke?.[1] ?? 1),
+        },
         /* Gedaempftes Schwarz-Rot-Gold: eine voll gesaettigte Fahne wuerde
            gegen die Putty-Ink-Palette der Seite anschreien. Der Ton ist der
            einer echten, gealterten Fahne.
@@ -149,7 +167,7 @@ export class FahnenCanvas {
     this.szene.add(this.mesh);
 
     this.groesseAnpassen();
-    this.zustandSetzen(this.fortschritt());
+    this.zustandSetzen(this.zustand());
 
     const resize = (): void => {
       this.groesseAnpassen();
@@ -157,17 +175,11 @@ export class FahnenCanvas {
     };
     window.addEventListener('resize', resize, { passive: true });
 
-    /* Rechenzeit nur ausgeben, solange die Sektion wirklich zu sehen ist. */
+    /* Rechenzeit nur ausgeben, solange die Leinwand wirklich zu sehen ist. */
     const beobachter = new IntersectionObserver(
       ([eintrag]) => {
-        if (eintrag.isIntersecting && !this.ruhig) {
-          this.starten();
-        } else {
-          this.stoppen();
-          if (eintrag.isIntersecting) {
-            this.einmalRendern();
-          }
-        }
+        this.imBild = eintrag.isIntersecting;
+        this.laufZustandPruefen();
       },
       { rootMargin: '10% 0px' },
     );
@@ -185,29 +197,20 @@ export class FahnenCanvas {
     });
   }
 
-  /** Uebersetzt den Scroll-Fortschritt in Verschleiss und Flugbahn. */
-  private zustandSetzen(p: number): void {
+  /** Uebertraegt Verschleiss, Bruch und Lage auf Uniforms und Mesh. */
+  private zustandSetzen(zustand: Fahnenzustand): void {
     const mesh = this.mesh;
     if (!mesh) {
       return;
     }
 
-    /* Verschleiss setzt bewusst erst nach einem Viertel der Strecke ein:
-       zuerst sieht man eine intakte Fahne, dann beginnt der Zerfall.
-       Der Endwert liegt unter 1, damit die Fahne am Ende verdreckt und
-       loechrig, aber intakt genug ist, um noch Fahne zu sein. */
-    const dreck = Math.min(1, Math.max(0, (p - 0.22) / 0.72)) * 0.8;
-    mesh.material.uniforms['uDirty'].value = dreck;
+    mesh.material.uniforms['uDirty'].value = zustand.verschleiss;
+    mesh.material.uniforms['uBruch'].value = zustand.bruch;
 
-    /* Das Band zieht diagonal ueber die volle Breite und laeuft an beiden
-       Raendern aus dem Bild. Es wandert deshalb nur langsam durchs Bild —
-       ein weiter Weg wuerde es aus dem Ausschnitt schieben, statt den
-       Verschleiss zu zeigen. Die Schraeglage oeffnet sich beim Scrollen
-       leicht, dadurch wirkt die Bewegung getragen statt statisch. */
-    mesh.position.x = -0.55 + p * 1.1;
-    mesh.position.y = 0.55 - p * 1.15;
-    mesh.rotation.z = -0.40 + p * 0.17;
-    mesh.rotation.x = 0.16 - p * 0.26;
+    mesh.position.x = zustand.x;
+    mesh.position.y = zustand.y + this.rahmenversatz;
+    mesh.rotation.z = zustand.neigung;
+    mesh.rotation.x = zustand.kippung;
   }
 
   private groesseAnpassen(): void {
@@ -223,10 +226,41 @@ export class FahnenCanvas {
     renderer.setSize(b, h, false);
     kamera.aspect = b / h;
 
-    /* Bei schmalen Viewports weiter weggehen, damit vom Band mehr als nur
-       ein Streifen im Bild steht. */
-    kamera.position.z = b / h < 1 ? 10.5 : 7.5;
+    /* Der Abstand folgt aus dem gewuenschten Hoehenanteil des Tuchs: so
+       bleibt es in jedem Fenster gleich gross im Bild, statt mit der
+       Leinwand zu wachsen. */
+    const schnitt = this.schnitt();
+    const anteil = schnitt.hoehenanteil[b / h < 1 ? 0 : 1];
+    const bildhoehe = schnitt.breite / anteil;
+    kamera.position.z =
+      bildhoehe / (2 * Math.tan(MathUtils.degToRad(BLICKWINKEL) / 2));
     kamera.updateProjectionMatrix();
+
+    /* Der Kopfabstand ist in Bildhoehen angegeben und wird hier zu einem
+       Versatz in Welteinheiten. */
+    this.rahmenversatz = bildhoehe * (0.5 - schnitt.kopfabstand);
+    this.zustandSetzen(this.zustand());
+  }
+
+  /**
+   * Entscheidet, ob die Schleife laufen muss.
+   *
+   * Sie laeuft nur im Bild, nur wenn das Tuch wehen soll, und nur solange
+   * vom Tuch etwas uebrig ist — eine stille Flagge waere sonst dauerhaft
+   * am Rechnen.
+   */
+  private laufZustandPruefen(): void {
+    const noetig = this.imBild && !this.ruhig && this.schnitt().wehen && this.zustand().bruch < 1;
+
+    if (noetig) {
+      this.starten();
+      return;
+    }
+
+    this.stoppen();
+    if (this.imBild) {
+      this.einmalRendern();
+    }
   }
 
   private starten(): void {

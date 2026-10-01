@@ -13,16 +13,16 @@ import { RouterLink } from '@angular/router';
 import { ENTWICKLUNGEN, KAPITEL, KAPITEL_NAV } from '../../core/content';
 
 /**
- * Wegmarken — ein einzelner Strich rechts oben.
+ * Wegmarken — drei Striche rechts oben.
  *
- * Er liegt von der Startseite an in der Ecke.
- * Geschlossen ist nur der Strich sichtbar. Ein Klick klappt die Kapitel
+ * Sie liegen von der Startseite an in der Ecke.
+ * Geschlossen sind nur die Striche sichtbar. Ein Klick klappt die Kapitel
  * darunter auf; ein weiterer Klick, Escape oder ein Tippen ausserhalb
  * schliesst sie wieder.
  *
  * Das laufende Kapitel ergibt sich aus dem Schnittpunkt mit der Mitte des
  * Viewports (IntersectionObserver mit halbierten Raendern), nicht aus einem
- * Scroll-Handler. Es faerbt den Strich und markiert den offenen Eintrag.
+ * Scroll-Handler. Es faerbt die Striche und markiert den offenen Eintrag.
  *
  * Unter den Kapiteln, durch eine Linie abgesetzt, steht der einzige Eintrag,
  * der die Seite verlaesst: die Daten. Er springt nicht, er navigiert.
@@ -44,14 +44,14 @@ export class Wegmarken {
 
   /** Laufendes Kapitel. Markiert den offenen Eintrag. */
   private readonly aktiv = signal(KAPITEL[0].id);
-  /** Ob die Flaeche unter dem Strich dunkel ist — auch bei mitlaufenden Sektionen. */
+  /** Ob die Flaeche unter den Strichen dunkel ist — auch bei mitlaufenden Sektionen. */
   private readonly flaecheDunkel = signal(KAPITEL[0].dunkel);
   protected readonly offen = signal(false);
 
-  /** Auf dunkler Flaeche schreibt der Strich hell, sonst dunkel. */
+  /** Auf dunkler Flaeche schreiben die Striche hell, sonst dunkel. */
   protected readonly aufDunkel = this.flaecheDunkel.asReadonly();
 
-  /** Im Auftakt tritt der Strich zurueck, damit der Hero allein steht. */
+  /** Im Auftakt treten die Striche zurueck, damit der Hero allein steht. */
   protected readonly imAuftakt = computed(
     () => this.aktiv() === KAPITEL[0].id && !this.offen(),
   );

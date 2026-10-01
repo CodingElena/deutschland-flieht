@@ -8,6 +8,8 @@ import { Ausbluten } from '../../sections/ausbluten/ausbluten';
 import { Forderungen } from '../../sections/forderungen/forderungen';
 import { Hero } from '../../sections/hero/hero';
 import { Kapital } from '../../sections/kapital/kapital';
+import { Kopffahne } from '../../layout/kopffahne/kopffahne';
+import { Unterschreiben } from '../../layout/unterschreiben/unterschreiben';
 import { Unterstuetzer } from '../../sections/unterstuetzer/unterstuetzer';
 import { Wegmarken } from '../../layout/wegmarken/wegmarken';
 import { WerGeht } from '../../sections/wer-geht/wer-geht';
@@ -16,8 +18,11 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
 /**
  * Startseite — das eigentliche Mahnmal.
  *
- * Der Strich rechts oben oeffnet die Kapitel; die ids der Hosts
- * sind ihre Ziele und stehen in KAPITEL (content.ts).
+ * Die Striche rechts oben oeffnen die Kapitel; die ids der Hosts
+ * sind ihre Ziele und stehen in KAPITEL (content.ts). Unten rechts laeuft
+ * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Am Kopf
+ * haengt eine lange Flagge. Sie steht ruhig an der Stelle der Kronen,
+ * durchscheinend, in einem Tuch.
  *
  *   Hero (Ink)        Startseite — Behauptung und Wortmarke
  *   Wer geht (Ink)    Ihre Geschichten
@@ -36,6 +41,8 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     Wegmarken,
+    Unterschreiben,
+    Kopffahne,
     Hero,
     WerGeht,
     Zahlen,
@@ -50,6 +57,8 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
   ],
   template: `
     <app-wegmarken />
+    <app-unterschreiben />
+    <app-kopffahne />
 
     <app-hero id="auftakt" />
     <app-wer-geht id="wer-geht" />
@@ -66,6 +75,7 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
   styles: `
     :host {
       display: block;
+      position: relative;
     }
   `,
 })

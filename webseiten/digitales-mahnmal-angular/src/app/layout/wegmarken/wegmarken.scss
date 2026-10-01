@@ -1,6 +1,6 @@
 @use 'mixins' as *;
 
-/* Der Wirt selbst nimmt keinen Platz — der Strich haengt fest im Viewport. */
+/* Der Wirt selbst nimmt keinen Platz — der Griff haengt fest im Viewport. */
 :host {
   display: contents;
 }
@@ -28,7 +28,8 @@
 }
 
 /* --- Griff ---------------------------------------------------------------
-   Nur der Strich ist sichtbar. Die Flaeche darum ist die Klickzone. */
+   Drei Striche, wie man sie erwartet. Die Flaeche darum ist die Klickzone.
+   Offen legen sich der erste und der letzte zum Kreuz, der mittlere geht. */
 
 .wm__griff {
   display: grid;
@@ -42,34 +43,70 @@
   cursor: pointer;
 }
 
-.wm__strich {
+.wm__striche {
+  position: relative;
   display: block;
-  width: 52px;
+  width: 30px;
+  height: 13px;
+
+  @include motion-safe {
+    transition: opacity var(--duration-base) var(--ease-gallery);
+  }
+}
+
+.wm__strich {
+  position: absolute;
+  left: 0;
+  width: 100%;
   height: 1px;
   background: currentColor;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
 
   @include motion-safe {
-    transition: width var(--duration-fast) var(--ease-gallery),
-      opacity var(--duration-base) var(--ease-gallery),
+    transition: transform var(--duration-fast) var(--ease-gallery),
+      opacity var(--duration-fast) var(--ease-gallery),
       box-shadow var(--duration-base) var(--ease-gallery);
+  }
+
+  &:nth-child(1) {
+    top: 0;
+  }
+
+  &:nth-child(2) {
+    top: 6px;
+  }
+
+  &:nth-child(3) {
+    top: 12px;
   }
 }
 
 .wm--offen .wm__strich {
-  width: 22px;
+  &:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  &:nth-child(2) {
+    opacity: 0;
+  }
+
+  &:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
 }
 
-/* Auf schmalen Displays waere der volle Strich ueber dem Hero zu laut.
-   Er bleibt auffindbar, tritt aber zurueck, bis der Auftakt verlassen ist. */
+/* Auf schmalen Displays waeren die Striche ueber dem Hero zu laut.
+   Sie bleiben auffindbar, treten aber zurueck, bis der Auftakt verlassen ist. */
 @include mobile {
-  .wm--auftakt .wm__strich {
-    width: 30px;
+  .wm--auftakt .wm__striche {
     opacity: 0.6;
+  }
+
+  .wm--auftakt .wm__strich {
     box-shadow: none;
   }
 
-  .wm--auftakt .wm__griff:focus-visible .wm__strich {
+  .wm--auftakt .wm__griff:focus-visible .wm__striche {
     opacity: 1;
   }
 }
@@ -80,7 +117,7 @@
 }
 
 /* --- Liste ---------------------------------------------------------------
-   Haengt unter dem Strich und liegt erst im offenen Zustand im Weg. */
+   Haengt unter dem Griff und liegt erst im offenen Zustand im Weg. */
 
 .wm__liste {
   position: absolute;

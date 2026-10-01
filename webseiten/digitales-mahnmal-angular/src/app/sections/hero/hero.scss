@@ -5,8 +5,10 @@
      dieser Kante, deshalb steht der Wert an einer Stelle. */
   --bild-hoehe: 58vh;
   /* Zusaetzliche Hoehe nach oben: dort laeuft die Skyline in die dunkle
-     Flaeche aus, statt als Rechteckkante zu stehen. */
-  --bild-ueberhang: clamp(56px, 14vh, 160px);
+     Flaeche aus, statt als Rechteckkante zu stehen. Der Ueberhang ist
+     lang, damit der Verlauf nicht auf eine kurze Kante zusammengedrueckt
+     wird. */
+  --bild-ueberhang: clamp(72px, 16vh, 190px);
   /* Leicht in die Skyline gezogen: die Wortmarke steigt aus der Stadt
      auf, statt im Zwischenraum unter dem Counter zu schweben. */
   --marke-hebung: clamp(-36px, -3vh, -8px);
@@ -28,73 +30,12 @@
   overflow: hidden;
 }
 
-/* --- Eichen ---------------------------------------------------------------
-   Rahmen den Blick aus den oberen Ecken, wie das Laub in der Vorlage.
-   Sie sitzen etwas ueber der Oberkante, damit sie angeschnitten wirken und
-   nicht wie aufgeklebte Objekte. */
-
-.hero__eiche {
-  position: absolute;
-  /* Oben angeschnitten, wie in der Vorlage. Ohne Kopfzeile muss dort
-     nichts mehr freigehalten werden. */
-  top: -3%;
-  /* Ueber der Wortmarke: der Schriftzug soll hinter den Kronen
-     verschwinden, so wie in der Vorlage. */
-  z-index: 5;
-  /* Gross genug, um links und rechts aus dem Bild herauszuragen und nur
-     eine Oeffnung in der Mitte zu lassen. */
-  width: clamp(300px, 50vw, 880px);
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  /* Sommergruen waere das falsche Register. Die Kronen bleiben als
-     dunkle Masse stehen, wie ein Blick durch den Wald bei Nacht. */
-  filter: grayscale(1) brightness(0.42) contrast(1.4);
-  opacity: 0.78;
-
-  /* Unten und zur Bildmitte hin sind es gerade Schnitte aus dem Gemaelde.
-     Beide werden ausgeblendet, sonst stehen dort sichtbare Rechteckkanten.
-     Die beiden Verlaeufe werden verschnitten, nicht uebereinandergelegt. */
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
-}
-
-/* Weit genug nach aussen versetzt, dass in der Mitte Platz fuer den
-   Textblock bleibt und die Kronen an den Raendern angeschnitten sind. */
-.hero__eiche--links {
-  left: -16%;
-  mask-image:
-    linear-gradient(to bottom, #000 80%, transparent 99%),
-    linear-gradient(to right, #000 72%, transparent 100%);
-}
-
-.hero__eiche--rechts {
-  right: -16%;
-  mask-image:
-    linear-gradient(to bottom, #000 80%, transparent 99%),
-    linear-gradient(to left, #000 72%, transparent 100%);
-}
-
-@include tablet {
-  .hero__eiche {
-    width: clamp(190px, 52vw, 320px);
-    top: -3%;
-  }
-
-  .hero__eiche--links {
-    left: -18%;
-  }
-  .hero__eiche--rechts {
-    right: -18%;
-  }
-}
-
 /* --- Typo-Cluster --------------------------------------------------------- */
 
 .hero__cluster {
   position: relative;
-  /* Ueber Eichen, Wortmarke und Gemaelde: die Zahlen sind das Signal
-     und duerfen von den Kronen nicht verdeckt werden. */
+  /* Ueber Wortmarke, Skyline und der Flagge darueber: die Zahl ist das
+     Signal und bleibt lesbar, auch wo das Tuch durch die Mitte zieht. */
   z-index: 6;
   display: flex;
   flex-direction: column;
@@ -102,9 +43,9 @@
   justify-content: flex-start;
   gap: var(--spacing-16);
   text-align: center;
-  /* Sitzt weit oben, damit der Blick zuerst auf die Zahlen faellt
-     und darunter Raum fuer die angehobene Wortmarke bleibt. */
-  padding-top: 6vh;
+  /* Oben, aber nicht am Rand: die Zahl haengt mit Abstand unter der
+     Oberkante, darunter bleibt Raum fuer die angehobene Wortmarke. */
+  padding-top: 18vh;
   padding-bottom: var(--spacing-40);
 }
 
@@ -129,26 +70,6 @@
   margin: 0;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--color-bone);
-}
-
-/* Kein Button: ein unterstrichenes Wort stoert den Lichter-Effekt weniger
-   als eine gefuellte Flaeche unter der Zahl. */
-.hero__cta {
-  @include serif-subheading;
-  margin-top: var(--spacing-4);
-  color: rgba(231, 229, 228, 0.82);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-  text-decoration-thickness: 1px;
-
-  &:hover {
-    color: var(--color-bone);
-  }
-
-  &:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
-  }
 }
 
 .hero__stat-label {
@@ -241,28 +162,27 @@
 
   @include nacht-kulisse;
 
-  /* Weicher Uebergang statt Rechteckkante. Der Verlauf ist lang, damit
-     die Lichter aus der Nacht auftauchen und nicht als Schnitt stehen. */
-  mask-image: linear-gradient(
+  /* Weicher Uebergang statt Rechteckkante. Der Himmel der Aufnahme ist
+     oben schon schwarz; die Tuerme setzen ungefaehr im oberen Viertel ein.
+     Der Verlauf legt dort erst wenig frei und wird erst im Vordergrund
+     dicht, damit die Lichter nicht an einer Schwelle anspringen. */
+  --skyline-maske: linear-gradient(
     to bottom,
     transparent 0%,
-    rgb(0 0 0 / 0.18) 14%,
-    rgb(0 0 0 / 0.55) 32%,
-    rgb(0 0 0 / 0.88) 52%,
-    #000 68%,
+    rgb(0 0 0 / 0.08) 10%,
+    rgb(0 0 0 / 0.2) 18%,
+    rgb(0 0 0 / 0.36) 28%,
+    rgb(0 0 0 / 0.52) 40%,
+    rgb(0 0 0 / 0.68) 52%,
+    rgb(0 0 0 / 0.82) 64%,
+    rgb(0 0 0 / 0.93) 76%,
+    #000 86%,
     #000 100%
   );
+  mask-image: var(--skyline-maske);
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 0.18) 14%,
-    rgb(0 0 0 / 0.55) 32%,
-    rgb(0 0 0 / 0.88) 52%,
-    #000 68%,
-    #000 100%
-  );
+  -webkit-mask-image: var(--skyline-maske);
   -webkit-mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
 
@@ -302,9 +222,10 @@
     background: linear-gradient(
       to bottom,
       #12110f 0%,
-      rgb(18 17 15 / 0.72) 28%,
-      rgb(18 17 15 / 0.28) 52%,
-      transparent 70%
+      rgb(18 17 15 / 0.7) 12%,
+      rgb(18 17 15 / 0.32) 24%,
+      rgb(18 17 15 / 0.08) 36%,
+      transparent 46%
     );
     pointer-events: none;
   }
@@ -322,7 +243,7 @@
 @media (max-height: 860px) {
   .hero {
     --bild-hoehe: 40vh;
-    --bild-ueberhang: clamp(36px, 8vh, 72px);
+    --bild-ueberhang: clamp(44px, 10vh, 88px);
     --marke-hebung: clamp(-28px, -5vh, -12px);
     /* Nicht die naechste Stufe der Leiter, sondern dieselbe Stufe
        gestaucht: die Wortmarke muss am Viewportrand beschnitten bleiben,
@@ -331,7 +252,7 @@
   }
 
   .hero__cluster {
-    padding-top: 3.5vh;
+    padding-top: 9vh;
     gap: var(--spacing-4);
   }
 
@@ -344,12 +265,12 @@
 
 @include tablet {
   .hero__cluster {
-    padding-top: 5vh;
+    padding-top: 15vh;
   }
 
   .hero {
     --bild-hoehe: 38vh;
-    --bild-ueberhang: clamp(28px, 7vh, 56px);
+    --bild-ueberhang: clamp(36px, 9vh, 72px);
     --marke-hebung: clamp(-28px, -5vh, -12px);
   }
 }
