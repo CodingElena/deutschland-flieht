@@ -81,6 +81,13 @@
       }
     </ul>
 
+    <p class="ew__block-text">
+      Neueste Ausgabe: {{ neuesteKeil.label }} — {{ neuesteKeil.wert }}.
+      <a class="ew__quelle-link" [href]="neuesteKeil.url" target="_blank" rel="noopener noreferrer"
+        >{{ neuesteKeil.quelle }}</a
+      >. Der Ländervergleich oben bleibt bei 2023, weil nur dafür alle Länder belegt sind.
+    </p>
+
     <p class="ew__quelle t-micro">
       {{ inhalt.quelleLabel }}:
       <a class="ew__quelle-link" [href]="vergleich.url" target="_blank" rel="noopener noreferrer">
@@ -141,21 +148,106 @@
     <p class="ew__quelle t-micro">{{ auswertung.hinweis }}</p>
   </section>
 
-  <!-- --- Alle Belege, nicht nur die drei von der Startseite ------------- -->
+  <!-- --- Alle Belege: filterbar, nach Monaten, mit Kernzahl --------------- -->
   <section class="ew__block" appReveal aria-labelledby="ew-belege">
     <p class="ew__label t-micro">{{ inhalt.belegeLabel }}</p>
     <h2 id="ew-belege" class="ew__block-titel">{{ inhalt.belegeTitel }}</h2>
     <p class="ew__block-text">{{ belegeText }}</p>
+    <p class="ew__quelle t-micro">
+      Stand der Prüfung: {{ stand.text }} · {{ beitraege.length }} Einträge
+    </p>
 
-    <ul class="ew__belege">
-      @for (beitrag of beitraege; track beitrag.id) {
-        <li>
-          <a class="ew__beleg" [href]="beitrag.url" target="_blank" rel="noopener noreferrer">
-            <span class="ew__beleg-meta t-micro">{{ beitrag.medium }} — {{ beitrag.datum }}</span>
-            <span class="ew__beleg-zeile">{{ beitrag.zeile }}</span>
-          </a>
-        </li>
+    <div class="ew__filter" role="group" aria-label="Nach Thema filtern">
+      <button
+        type="button"
+        class="ew__chip"
+        [class.ist-aktiv]="filter() === null"
+        [attr.aria-pressed]="filter() === null"
+        (click)="waehlen(null)"
+      >
+        Alle
+      </button>
+      @for (t of themen; track t) {
+        <button
+          type="button"
+          class="ew__chip"
+          [class.ist-aktiv]="filter() === t"
+          [attr.aria-pressed]="filter() === t"
+          (click)="waehlen(t)"
+        >
+          {{ t }}
+        </button>
       }
-    </ul>
+    </div>
+
+    <div class="ew__ticker" aria-live="polite">
+      @for (g of gruppen(); track g.label) {
+        <section class="ew__monat" [attr.aria-label]="g.label">
+          <h3 class="ew__monat-titel t-micro">{{ g.label }}</h3>
+          <ul class="ew__eintraege">
+            @for (e of g.eintraege; track e.id) {
+              <li class="ew__eintrag">
+                <div class="ew__meta t-micro">
+                  <span>{{ datum(e) }}</span>
+                  <span>{{ typLabel[e.typ] }}</span>
+                  @if (neu(e)) {
+                    <span class="ew__neu">Neu</span>
+                  }
+                </div>
+
+                <div class="ew__haupt">
+                  <h4 class="ew__eintrag-titel">{{ e.titel }}</h4>
+                  <p class="ew__beleg-zeile">{{ e.text }}</p>
+                  <a class="ew__quelle-link" [href]="e.url" target="_blank" rel="noopener noreferrer"
+                    >Quelle: {{ e.medium }} ↗</a
+                  >
+                </div>
+
+                @if (e.zahl) {
+                  <p class="ew__zahl">
+                    <span class="ew__zahl-wert">{{ e.zahl.wert }}</span>
+                    <span class="ew__zahl-label t-micro">{{ e.zahl.label }}</span>
+                  </p>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      } @empty {
+        <p class="ew__block-text">Zu diesem Thema gibt es derzeit keinen Eintrag.</p>
+      }
+    </div>
+  </section>
+
+  <!-- --- Alle Kennzahlen der Seite, mit Beleg ---------------------------- -->
+  <section id="belege" class="ew__block" appReveal aria-labelledby="ew-zahlen">
+    <p class="ew__label t-micro">KENNZAHLEN</p>
+    <h2 id="ew-zahlen" class="ew__block-titel">Alle Zahlen mit Beleg.</h2>
+    <div class="ew__tabelle-huelle">
+      <table class="ew__belegtabelle">
+        <thead>
+          <tr>
+            <th scope="col">Kennzahl</th>
+            <th scope="col">Wert</th>
+            <th scope="col">Bezug</th>
+            <th scope="col">Quelle</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (k of belege; track k.kurzLabel) {
+            <tr>
+              <th scope="row">{{ k.kurzLabel }}</th>
+              <td>{{ k.wert }}</td>
+              <td>{{ k.jahr }}</td>
+              <td>
+                <a class="ew__quelle-link" [href]="k.url" target="_blank" rel="noopener noreferrer"
+                  >{{ k.quelle }} ↗</a
+                >
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </section>
 </section>

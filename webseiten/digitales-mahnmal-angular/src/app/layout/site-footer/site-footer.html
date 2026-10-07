@@ -23,6 +23,15 @@
         {{ vergleich.text }}
         <a [href]="vergleich.url">{{ vergleich.quelle }}</a>
       </li>
+      <li id="zn-fn-3" class="fuss__mikro">
+        {{ qualifikation.label }}
+        <a [href]="qualifikation.url">{{ qualifikation.quelle }}</a>
+        — {{ qualifikation.jahr }}
+      </li>
+      <li id="zn-fn-4" class="fuss__mikro">
+        Fortzüge deutscher Staatsangehöriger 2025 nach Zielland (Karte).
+        <a [href]="ausbluten.url">{{ ausbluten.quelle }}</a>
+      </li>
     </ol>
   </div>
 
@@ -61,7 +70,12 @@
       <a class="ghost-link" routerLink="/">{{ marke.name }}</a> — {{ jahr }}
     </p>
 
-    @if (!zahlenGeprueft) {
+    @if (zahlenGeprueft) {
+      <p class="fuss__mikro t-micro">
+        {{ footer.quellenHinweis }}
+        <a class="ghost-link" routerLink="/entwicklungen" fragment="belege">Zu den Belegen</a>
+      </p>
+    } @else {
       <!-- Der Hinweis verschwindet automatisch, sobald in content.ts alle
            Kennzahlen auf geprueft: true stehen. -->
       <p class="fuss__mikro fuss__mikro--warnung t-micro">

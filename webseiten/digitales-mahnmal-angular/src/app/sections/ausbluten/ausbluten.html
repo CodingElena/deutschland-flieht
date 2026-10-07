@@ -8,6 +8,11 @@
         <span class="ab__titel-zeile">{{ sektion.titelZeile1 }}</span>
         <span class="ab__titel-zeile t-italic">{{ sektion.titelZeile2Kursiv }}</span>
       </h2>
+      <p class="ab__quelle t-micro">
+        Fortzüge deutscher Staatsangehöriger 2025 ·
+        <a [href]="sektion.url" target="_blank" rel="noopener noreferrer">{{ sektion.quelle }}</a>
+        <a class="ab__fn" href="#zn-fn-4"><sup>4</sup></a>
+      </p>
     </header>
 
     <div class="ab__buehne" aria-hidden="true">

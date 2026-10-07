@@ -12,6 +12,21 @@
   /* Leicht in die Skyline gezogen: die Wortmarke steigt aus der Stadt
      auf, statt im Zwischenraum unter dem Counter zu schweben. */
   --marke-hebung: clamp(-36px, -3vh, -8px);
+  /* Platzbudget Hoehe: Abstand oben und Counter-Groesse stehen als Variablen,
+     damit die Wortmarke weiss, wie viel Raum ihr bleibt (siehe --marke-max). */
+  --pad-oben: 18vh;
+  --zaehler-fs: var(--text-kolossal-fluid);
+  /* Counter-Block: Label, Link und Abstaende unter der Zahl. */
+  --zaehler-rest: 72px;
+  /* Luft zwischen Counter-Block und Wortmarke. */
+  --marke-luft: 24px;
+  /* Groesste Schrift, die die Wortmarke (zwei Zeilen, ca. 1,45 Zeilenhoehen)
+     zwischen Counter und Bildband hat. Verhindert, dass sich beide auf hohen
+     oder flachen Fenstern ueberlagern. */
+  --marke-max: calc(
+    (100svh - var(--bild-hoehe) - var(--marke-hebung) - var(--pad-oben) - var(--zaehler-fs) -
+        var(--zaehler-rest) - var(--marke-luft)) / 1.5
+  );
 
   position: relative;
   min-height: 100svh;
@@ -45,7 +60,7 @@
   text-align: center;
   /* Oben, aber nicht am Rand: die Zahl haengt mit Abstand unter der
      Oberkante, darunter bleibt Raum fuer die angehobene Wortmarke. */
-  padding-top: 18vh;
+  padding-top: var(--pad-oben);
   padding-bottom: var(--spacing-40);
 }
 
@@ -67,6 +82,7 @@
 
 .hero__stat-wert {
   @include serif-kolossal;
+  font-size: var(--zaehler-fs);
   margin: 0;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--color-bone);
@@ -121,7 +137,7 @@
   text-align: center;
   will-change: transform;
   @include serif-display;
-  font-size: calc(var(--text-display-fluid) * var(--marke-skala, 1));
+  font-size: max(36px, min(calc(var(--text-display-fluid) * var(--marke-skala, 1)), var(--marke-max)));
   color: var(--color-bone);
 }
 
@@ -249,26 +265,31 @@
        gestaucht: die Wortmarke muss am Viewportrand beschnitten bleiben,
        eine kleinere Stufe wuerde sie freistellen. */
     --marke-skala: 0.74;
+    --pad-oben: 9vh;
+    /* Eine Stufe herunter, damit Counter und Marke sich die flache
+       Fensterhoehe nicht streitig machen. */
+    --zaehler-fs: var(--text-monument-fluid);
   }
 
   .hero__cluster {
-    padding-top: 9vh;
     gap: var(--spacing-4);
   }
+}
 
-  /* Eine Stufe herunter, damit Counter und Marke sich die flache
-     Fensterhoehe nicht streitig machen. */
-  .hero__stat-wert {
-    font-size: var(--text-monument-fluid);
+/* Hohe Fenster (grosse Monitore): das Bildband bleibt schmaler und der
+   Counter kleiner, sonst schiebt das 58-vh-Band die Wortmarke bis in den
+   Counter hinauf. */
+@media (min-height: 861px) {
+  .hero {
+    --bild-hoehe: 46vh;
+    --pad-oben: 9vh;
+    --zaehler-fs: min(var(--text-kolossal-fluid), 14svh);
   }
 }
 
 @include tablet {
-  .hero__cluster {
-    padding-top: 15vh;
-  }
-
   .hero {
+    --pad-oben: 15vh;
     --bild-hoehe: 38vh;
     --bild-ueberhang: clamp(36px, 9vh, 72px);
     --marke-hebung: clamp(-28px, -5vh, -12px);
@@ -290,7 +311,7 @@
 /* Querformat und sehr flache Fenster: der Counter faellt noch eine Stufe,
    damit er nicht in die Wortmarke laeuft. */
 @media (max-height: 640px) {
-  .hero__stat-wert {
-    font-size: var(--text-section-fluid);
+  .hero {
+    --zaehler-fs: var(--text-section-fluid);
   }
 }

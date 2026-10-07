@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 
 import {
   ABGABEN_VERGLEICH,
@@ -6,8 +6,18 @@ import {
   BEITRAEGE,
   BEITRAEGE_SEKTION,
   ENTWICKLUNGEN,
+  KENNZAHLEN,
   WANDERUNG,
 } from '../../core/content';
+import {
+  type Eintrag,
+  STAND,
+  THEMEN,
+  type Thema,
+  TYP_LABEL,
+  datumAnzeige,
+  istNeu,
+} from '../../core/entwicklungen';
 import { anteilBalken, keilBalken } from '../../shared/balken';
 import { kurvenEnde, kurvenPfad } from '../../shared/kurve';
 import { Reveal } from '../../shared/reveal';
@@ -36,6 +46,40 @@ export class EntwicklungenPage {
   protected readonly vergleich = ABGABEN_VERGLEICH;
   protected readonly auswertung = AUSWERTUNG;
   protected readonly beitraege = BEITRAEGE;
+  protected readonly stand = STAND;
+  protected readonly themen = THEMEN;
+  protected readonly typLabel = TYP_LABEL;
+  protected readonly datum = datumAnzeige;
+  protected readonly neu = istNeu;
+  protected readonly neuesteKeil = KENNZAHLEN.abgabenlast2025;
+  protected readonly belege = Object.values(KENNZAHLEN);
+
+  protected readonly filter = signal<Thema | null>(null);
+
+  protected readonly gefiltert = computed(() => {
+    const f = this.filter();
+    return f ? this.beitraege.filter((e) => e.themen.includes(f)) : this.beitraege;
+  });
+
+  /** Nach Monat gruppiert, neueste zuerst. */
+  protected readonly gruppen = computed<readonly { label: string; eintraege: readonly Eintrag[] }[]>(() => {
+    const karte = new Map<string, Eintrag[]>();
+    for (const e of this.gefiltert()) {
+      const label = new Date(`${e.datum}T12:00:00Z`).toLocaleDateString('de-DE', {
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+      });
+      const liste = karte.get(label) ?? [];
+      liste.push(e);
+      karte.set(label, liste);
+    }
+    return [...karte].map(([label, eintraege]) => ({ label, eintraege }));
+  });
+
+  protected waehlen(t: Thema | null): void {
+    this.filter.set(this.filter() === t ? null : t);
+  }
   /** Derselbe Satz wie auf der Startseite: eigene Sätze, fremde Seiten. */
   protected readonly belegeText = BEITRAEGE_SEKTION.einleitung;
 

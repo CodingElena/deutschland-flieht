@@ -7,9 +7,11 @@
  * -------------------------------------------------------------------------
  * WICHTIG — ZAHLEN VOR VEROEFFENTLICHUNG PRUEFEN
  * -------------------------------------------------------------------------
- * Jede Kennzahl hat ein Feld `geprueft`. Fortzüge 2025 und der Abgabenkeil
- * 2023 sind an Destatis bzw. OECD geprüft. Qualifikation und Investitionen
- * sind weiter Platzhalter.
+ * Jede Kennzahl hat ein Feld `geprueft`. Alle Kennzahlen sind an der Quelle
+ * geprüft (Stand 4. Oktober 2026): Fortzüge 2025 (Destatis), Abgabenkeil 2023
+ * (OECD), Qualifikation (BiB, GERPS-Studie). Die früher vorgesehene Kennzahl
+ * „Netto-Direktinvestitionen“ ist entfallen, weil die Bundesbank-Daten die
+ * These nicht eindeutig stützen.
  * Die gesamte Kampagne haengt an der Belastbarkeit dieser Zahlen: eine
  * einzige angreifbare Ziffer kostet die Glaubwuerdigkeit der Seite.
  *
@@ -20,8 +22,7 @@
  * Empfohlene Primaerquellen:
  *   - Fortzuege / Wanderungssaldo ... Destatis, Wanderungsstatistik (Fachserie 1 R 1.2)
  *   - Abgabenlast ................... OECD, Taxing Wages (Tax Wedge, Single 100% AW)
- *   - Qualifikationsstruktur ........ OECD International Migration Outlook / IAB
- *   - Direktinvestitionen ........... Deutsche Bundesbank, Zahlungsbilanzstatistik
+ *   - Qualifikationsstruktur ........ BiB, GERPS-Studie (Aus- und Rückwanderer 2017/18)
  * ========================================================================= */
 
 /** Eine belegpflichtige Kennzahl. */
@@ -310,21 +311,28 @@ export const KENNZAHLEN = {
     url: 'https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/04/taxing-wages-2024_f869da31/dbcbac85-en.pdf',
     geprueft: true,
   },
+  /* Befund der GERPS-Studie (Befragung von Aus- und Rückwanderern, Juli 2017 bis
+     Juni 2018). Belegt ist der Hochschulabschluss, nicht „Berufs- oder Hochschulabschluss“. */
   qualifikation: {
     wert: '3 von 4',
-    label: 'Auswanderern haben einen Berufs- oder Hochschulabschluss',
-    kurzLabel: 'Qualifiziert',
-    quelle: 'OECD / IAB',
-    jahr: 'PLATZHALTER',
-    geprueft: false,
+    label:
+      'der befragten deutschen Aus- und Rückwanderer haben einen Hochschulabschluss. In der Bevölkerung ist es gut jeder Vierte.',
+    kurzLabel: 'Hochschulabschluss',
+    quelle: 'Bundesinstitut für Bevölkerungsforschung, GERPS-Studie',
+    jahr: '2017/18',
+    url: 'https://www.bib.bund.de/DE/Presse/Pressegespraeche/2019-12-04-Gewinner-der-Globalisierung.html',
+    geprueft: true,
   },
-  investitionen: {
-    wert: 'PLATZHALTER',
-    label: 'Netto-Direktinvestitionen ins Ausland',
-    kurzLabel: 'Investitionen',
-    quelle: 'Deutsche Bundesbank, Zahlungsbilanzstatistik',
-    jahr: 'PLATZHALTER',
-    geprueft: false,
+  /* Neueste OECD-Ausgabe (steht auf /entwicklungen). Der Länderrahmen bleibt bei
+     Taxing Wages 2024, weil für NL und CH 2025 kein belegter Wert vorliegt. */
+  abgabenlast2025: {
+    wert: '49,3 %',
+    label: 'Abgabenkeil in Deutschland 2025 (OECD-Durchschnitt: 35,1 %)',
+    kurzLabel: 'Abgabenlast 2025',
+    quelle: 'OECD, Taxing Wages 2026',
+    jahr: '2025',
+    url: 'https://www.oecd.org/en/publications/2026/04/taxing-wages-2026_d1f39986.html',
+    geprueft: true,
   },
 } as const satisfies Record<string, Kennzahl>;
 
@@ -556,19 +564,21 @@ export const SEQUENZ: readonly SequenzSchritt[] = [
  *
  * Auftakt der Zahlen: sobald die Karte im Blick ist, kriechen die
  * Landesflächen mit der Zeit unregelmäßig aus, die Konturen bleiben. Pfeile
- * und Zahlen stehen von Anfang an. Die Zielliste ist Platzhalter und vor
- * Veroeffentlichung an die Wanderungsstatistik zu haengen.
+ * und Zahlen stehen von Anfang an. Die Zielliste ist belegt: Destatis,
+ * „Zahl der Woche“ vom 9. Juni 2026 (Fortzüge deutscher Staatsangehöriger 2025).
  * ------------------------------------------------------------------------- */
 
 /** Ein Zielland der Abwanderung (Pfeil auf der Karte). */
 export interface Fluchtziel {
   readonly id: string;
   readonly name: string;
-  /** Anzahl der Fortzüge. Platzhalter. */
+  /** Anzahl der Fortzüge 2025 (Destatis, gerundet). */
   readonly anzahl: number;
 }
 
 export const AUSBLUTEN = {
+  quelle: 'Statistisches Bundesamt, Zahl der Woche 24/2026',
+  url: 'https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_24_p002.html',
   titelZeile1: 'Das Land',
   titelZeile2Kursiv: 'blutet aus.',
   ziele: [
@@ -715,14 +725,10 @@ export const ABGABEN_VERGLEICH = {
   ] as readonly Abgabenland[],
 } as const;
 
-/** Ein externer Beleg. Der Satz ist eigen, der Link führt zum Herausgeber. */
-export interface Beitrag {
-  readonly id: string;
-  readonly medium: string;
-  readonly datum: string;
-  readonly zeile: string;
-  readonly url: string;
-}
+/* Die Belege stehen in core/entwicklungen.ts — die EINE Pflegestelle. Die
+   Startseite zeigt davon die jüngsten, die Seite /entwicklungen alle. */
+export { BEITRAEGE_ALLE as BEITRAEGE } from './entwicklungen';
+export type { Eintrag as Beitrag } from './entwicklungen';
 
 export const BEITRAEGE_SEKTION = {
   titelZeile1: 'Aktuelle',
@@ -730,37 +736,6 @@ export const BEITRAEGE_SEKTION = {
   einleitung:
     'Eigene Sätze, fremde Seiten. Die Links führen zu den Herausgebern. Es wird nichts von dort übernommen.',
 } as const;
-
-export const BEITRAEGE: readonly Beitrag[] = [
-  {
-    id: 'destatis-ziele',
-    medium: 'Statistisches Bundesamt',
-    datum: '9. Juni 2026',
-    zeile: '2025 zogen mehr Deutsche in die Schweiz, nach Österreich und nach Spanien als in die USA.',
-    url: 'https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_24_p002.html',
-  },
-  {
-    id: 'destatis-reihe',
-    medium: 'Statistisches Bundesamt',
-    datum: '1. Juni 2026',
-    zeile: 'Fortzüge und Saldo deutscher Staatsangehöriger, Jahr für Jahr, von 1950 bis 2025.',
-    url: 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Wanderungen/Tabellen/wanderungen-zwischen-deutschland-und-dem-ausland-jahr-02.html',
-  },
-  {
-    id: 'destatis-regionen',
-    medium: 'Statistisches Bundesamt',
-    datum: '2025',
-    zeile: 'Wohin deutsche Staatsangehörige fortziehen, nach Weltregionen, als amtliche Grafik.',
-    url: 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/_Grafik/_Interaktiv/fortzuege-ausland-deutsche-nach-zielgebiet.html',
-  },
-  {
-    id: 'oecd-keil',
-    medium: 'OECD',
-    datum: '2024',
-    zeile: 'Beim Abgabenkeil eines Durchschnittslohns lag Deutschland 2023 in der OECD hinter Belgien.',
-    url: 'https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/04/taxing-wages-2024_f869da31/dbcbac85-en.pdf',
-  },
-];
 
 /** So viele Belege stehen auf der Startseite. Die uebrigen warten auf der Seite. */
 export const BEITRAEGE_AUF_START = 3;
@@ -1036,11 +1011,12 @@ export const FOOTER = {
      sammlung Pflicht, nicht Kür. Die Seiten müssen vor dem Livegang stehen. */
   links: [
     { label: 'Petition', pfad: '/petition' },
+    { label: 'Aktuelle Entwicklungen', pfad: '/entwicklungen' },
     { label: 'Impressum', pfad: '/impressum' },
     { label: 'Datenschutz', pfad: '/datenschutz' },
   ],
   quellenHinweis:
-    'Qualifikation und Netto-Direktinvestitionen sind noch Platzhalter. Die übrigen Kennzahlen sind an der Quelle geprüft.',
+    'Alle Kennzahlen dieser Seite sind an der Quelle geprüft. Die Belege stehen oben unter „Quellen“ und gesammelt auf der Seite „Aktuelle Entwicklungen“.',
   /* CC BY und CC BY-SA verlangen Urheber, Lizenz und einen Link auf Werk
      und Lizenztext. Jeder Nachweis steht einzeln, mit Quelle. */
   bildnachweisLabel: 'Bildnachweis',

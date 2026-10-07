@@ -348,3 +348,169 @@
     font-size: var(--text-micro);
   }
 }
+
+/* --- Ticker: Filter, Monatsgruppen, Einträge ------------------------------ */
+
+.ew__filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-16);
+  margin: var(--spacing-32) 0 var(--spacing-40);
+}
+
+.ew__chip {
+  @include grotesk-label;
+  padding: 8px 15px;
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-buttons);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-gallery),
+    color var(--duration-fast) var(--ease-gallery);
+
+  &:hover,
+  &.ist-aktiv {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+}
+
+.ew__monat {
+  margin-bottom: var(--spacing-60);
+}
+
+.ew__monat-titel {
+  margin: 0 0 var(--spacing-20);
+  padding-bottom: var(--spacing-16);
+  border-bottom: 1px solid var(--color-ink);
+  letter-spacing: 0.16em;
+}
+
+.ew__eintraege {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ew__eintrag {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 220px;
+  gap: var(--spacing-32);
+  padding-block: var(--spacing-32);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.ew__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  color: var(--color-graphite);
+  letter-spacing: 0.1em;
+}
+
+.ew__neu {
+  align-self: flex-start;
+  margin-top: var(--spacing-4);
+  padding: 2px 8px;
+  border-radius: var(--radius-buttons);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.ew__haupt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-16);
+}
+
+.ew__eintrag-titel {
+  margin: 0;
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.ew__zahl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-4);
+  text-align: right;
+}
+
+.ew__zahl-wert {
+  font-family: var(--font-davinci);
+  font-weight: var(--font-weight-medium);
+  font-size: clamp(30px, 2.8vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.009em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ew__zahl-label {
+  max-width: 22ch;
+  color: var(--color-graphite);
+}
+
+.ew__tabelle-huelle {
+  overflow-x: auto;
+  margin-top: var(--spacing-32);
+}
+
+.ew__belegtabelle {
+  width: 100%;
+  border-collapse: collapse;
+  @include grotesk-label;
+
+  th,
+  td {
+    padding: 14px 12px 14px 0;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+  }
+
+  thead th {
+    @include grotesk-micro;
+    color: var(--color-graphite);
+    letter-spacing: 0.12em;
+    border-bottom-color: var(--color-ink);
+  }
+
+  tbody th {
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+@include tablet {
+  .ew__eintrag {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-16);
+  }
+
+  .ew__meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-4) var(--spacing-16);
+  }
+
+  .ew__zahl {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

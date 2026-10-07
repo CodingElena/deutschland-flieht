@@ -156,3 +156,25 @@
     font-size: 14px;
   }
 }
+
+/* Quellenzeile unter der Überschrift */
+.ab__quelle {
+  margin: var(--spacing-16, 16px) 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.08em;
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--color-paper, #fff);
+  }
+}
+
+.ab__fn {
+  text-decoration: none !important;
+  margin-left: 4px;
+}

@@ -7,6 +7,7 @@ import {
   BEITRAEGE_SEKTION,
   ENTWICKLUNGEN,
 } from '../../core/content';
+import { datumAnzeige } from '../../core/entwicklungen';
 import { Papier } from '../papier/papier';
 import { Reveal } from '../../shared/reveal';
 
@@ -30,4 +31,5 @@ export class Beitraege {
   protected readonly sektion = BEITRAEGE_SEKTION;
   protected readonly beitraege = BEITRAEGE.slice(0, BEITRAEGE_AUF_START);
   protected readonly weiter = ENTWICKLUNGEN;
+  protected readonly datum = datumAnzeige;
 }
