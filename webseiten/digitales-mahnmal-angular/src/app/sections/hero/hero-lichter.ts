@@ -12,7 +12,11 @@
 const ZELLE = 6;
 const HELLIGKEIT = 96;
 const ANTEIL_AUS = 0.88;
-const DAUER_MS = 7000;
+/** Die Fenster gehen aus, dann kommt die Wortmarke. */
+const DAUER_MS = 3100;
+
+/** Dauer des Lichtausfalls. Die Wortmarke wartet darauf. */
+export const LICHT_DAUER_MS = DAUER_MS;
 
 interface Licht {
   x: number;
@@ -28,8 +32,13 @@ export function planeLichtausfall(opts: {
   bild: HTMLImageElement;
   container: HTMLElement;
   signal: AbortSignal;
+  /** 0 beginnt bei vollen Fenstern, 1 zeigt den schon leeren Zustand. */
+  anfang?: number;
+  /** Einmal, wenn der Endzustand gezeichnet ist. */
+  onFertig?: () => void;
 }): boolean {
-  const { canvas, bild, container, signal } = opts;
+  const { canvas, bild, container, signal, onFertig } = opts;
+  const anfang = Math.min(1, Math.max(0, opts.anfang ?? 0));
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) {
     return false;
@@ -40,6 +49,15 @@ export function planeLichtausfall(opts: {
   let bilddaten: ImageData | null = null;
   let erloschen = 0;
   let frame = 0;
+  let fertigGemeldet = false;
+
+  const meldeFertig = (): void => {
+    if (fertigGemeldet || signal.aborted) {
+      return;
+    }
+    fertigGemeldet = true;
+    onFertig?.();
+  };
 
   const messen = (): { breite: number; hoehe: number } => {
     const box = container.getBoundingClientRect();
@@ -93,10 +111,12 @@ export function planeLichtausfall(opts: {
 
     if (t < 1) {
       frame = requestAnimationFrame(tick);
+      return;
     }
+    meldeFertig();
   };
 
-  if (!aufbauen(0)) {
+  if (!aufbauen(anfang)) {
     return false;
   }
 
@@ -109,7 +129,11 @@ export function planeLichtausfall(opts: {
   });
   beobachter.observe(container);
 
-  frame = requestAnimationFrame(tick);
+  if (anfang >= 1) {
+    start = performance.now() - DAUER_MS;
+  } else {
+    frame = requestAnimationFrame(tick);
+  }
   signal.addEventListener(
     'abort',
     () => {

@@ -45,12 +45,64 @@
   overflow: hidden;
 }
 
+/* --- Gesicht ----------------------------------------------------------------
+   Spricht vor der Wortmarke. Der schwarze Grund der Aufnahme laeuft ueber
+   die Maske in die Nacht, die Skyline bleibt darunter sichtbar. */
+
+.hero__auftritt {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8vh;
+  pointer-events: none;
+}
+
+.hero__gesicht {
+  width: min(58vw, 520px);
+  height: min(52vh, 520px);
+  object-fit: cover;
+  object-position: center 18%;
+  /* Weich in die Nacht: das Gesicht steht frei, die Stadt bleibt
+     darunter als Grund. */
+  --gesicht-maske: radial-gradient(
+    ellipse 70% 72% at 50% 42%,
+    #000 28%,
+    rgb(0 0 0 / 0.55) 58%,
+    transparent 78%
+  );
+  mask-image: var(--gesicht-maske);
+  mask-repeat: no-repeat;
+  -webkit-mask-image: var(--gesicht-maske);
+  -webkit-mask-repeat: no-repeat;
+}
+
+.hero__spruch {
+  position: relative;
+  z-index: 1;
+  width: min(52rem, calc(100% - 2 * var(--page-inset)));
+  margin: clamp(28px, 7vh, 80px) 0 0;
+  text-align: center;
+  color: var(--color-bone);
+  @include serif-heading;
+}
+
+.hero__satz {
+  display: block;
+
+  & + & {
+    margin-top: 0.55em;
+  }
+}
+
 /* --- Typo-Cluster --------------------------------------------------------- */
 
 .hero__cluster {
   position: relative;
-  /* Ueber Wortmarke, Skyline und der Flagge darueber: die Zahl ist das
-     Signal und bleibt lesbar, auch wo das Tuch durch die Mitte zieht. */
+  /* Ueber Wortmarke und Skyline: die Zahl bleibt lesbar, sobald sie kommt. */
   z-index: 6;
   display: flex;
   flex-direction: column;
@@ -84,6 +136,8 @@
   @include serif-kolossal;
   font-size: var(--zaehler-fs);
   margin: 0;
+  /* Haelt die Hoehe, bevor die Zahl eingesetzt wird. */
+  min-height: 1em;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--color-bone);
 }
@@ -138,7 +192,7 @@
   will-change: transform;
   @include serif-display;
   font-size: max(36px, min(calc(var(--text-display-fluid) * var(--marke-skala, 1)), var(--marke-max)));
-  color: var(--color-bone);
+  color: var(--color-rot);
 }
 
 .hero__wort {
@@ -313,5 +367,136 @@
 @media (max-height: 640px) {
   .hero {
     --zaehler-fs: var(--text-section-fluid);
+  }
+}
+
+/* --- Auftakt --------------------------------------------------------------
+   Mit Bewegung: Gesicht und Saetze, dann die Fenster, dann die Zahl,
+   ganz am Ende die Wortmarke.
+   Ohne Bewegung: alles auf einmal, das Gesicht klein ueber den Saetzen,
+   die Fenster bereits dunkel. */
+
+@include motion-safe {
+  .hero__gesicht {
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-gallery);
+  }
+
+  .hero[data-akt='liebe'] .hero__gesicht,
+  .hero[data-akt='fehlen'] .hero__gesicht {
+    opacity: 1;
+  }
+
+  .hero__auftritt {
+    transition: opacity 0.35s var(--ease-gallery);
+  }
+
+  .hero[data-akt='zahl'] .hero__auftritt,
+  .hero[data-akt='marke'] .hero__auftritt {
+    opacity: 0;
+  }
+
+  .hero__satz {
+    opacity: 0;
+    transform: translateY(0.35em);
+    transition:
+      opacity 0.35s var(--ease-gallery),
+      transform 0.35s var(--ease-gallery);
+  }
+
+  .hero[data-akt='liebe'] .hero__satz--liebe,
+  .hero[data-akt='fehlen'] .hero__satz--liebe {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.2s;
+  }
+
+  .hero[data-akt='fehlen'] .hero__satz--verlassen {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.05s;
+  }
+
+  .hero__cluster,
+  .hero__marke {
+    opacity: 0;
+  }
+
+  .hero:not([data-akt='zahl']):not([data-akt='marke']) .hero__cluster {
+    pointer-events: none;
+  }
+
+  .hero[data-akt='zahl'] .hero__cluster,
+  .hero[data-akt='marke'] .hero__cluster {
+    opacity: 1;
+    transition: opacity 0.4s var(--ease-gallery) 60ms;
+  }
+
+  .hero[data-akt='marke'] .hero__marke {
+    opacity: 1;
+    transition: opacity 0.4s var(--ease-gallery) 80ms;
+  }
+
+  @include mobile {
+    .hero__auftritt {
+      padding-top: 12vh;
+    }
+
+    .hero__gesicht {
+      width: min(88vw, 420px);
+      height: min(48vh, 420px);
+    }
+
+    .hero__spruch {
+      width: min(22rem, calc(100% - 2 * var(--page-inset)));
+      margin-top: var(--spacing-16);
+    }
+  }
+}
+
+@include motion-reduce {
+  .hero {
+    grid-template-rows: auto auto auto;
+  }
+
+  .hero__auftritt {
+    position: relative;
+    inset: auto;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-16);
+    align-self: start;
+    padding-top: 11vh;
+  }
+
+  .hero__gesicht {
+    width: min(168px, 42vw);
+    height: min(210px, 26vh);
+    opacity: 1;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .hero__spruch {
+    position: relative;
+    width: min(52rem, calc(100% - 2 * var(--page-inset)));
+    margin-top: var(--spacing-16);
+  }
+
+  .hero__cluster {
+    padding-top: var(--spacing-28);
+    padding-bottom: 0;
+  }
+
+  /* Im Fluss unter den Saetzen, sonst liegt die Wortmarke absolut
+     ueber dem Spruch. */
+  .hero__marke {
+    position: relative;
+    inset: auto;
+    z-index: 6;
+    margin-top: var(--spacing-16);
+    padding-bottom: calc(var(--bild-hoehe) * 0.45);
   }
 }

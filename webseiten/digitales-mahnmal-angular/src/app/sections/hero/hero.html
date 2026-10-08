@@ -1,13 +1,33 @@
 <!-- Nacht statt Papier: der Hero oeffnet das Mahnmal, nicht eine Galerie.
-     Dunkle Flaeche, helle Schrift, die Skyline als Kulisse darunter. -->
-<section class="hero surface-ink">
+     Erst ein Gesicht und zwei Saetze. Mit dem zweiten erloeschen die
+     Fenster. Danach zaehlt die Zahl. Erst wenn sie steht, kommt
+     die Wortmarke. -->
+<section class="hero surface-ink" [attr.data-akt]="akt()">
+  <div class="hero__auftritt">
+    <img
+      class="hero__gesicht"
+      [src]="hero.gesicht.pfad"
+      [alt]="hero.gesicht.alt"
+      fetchpriority="high"
+      decoding="async"
+    />
+    <p class="hero__spruch">
+      <span class="hero__satz hero__satz--liebe">{{ hero.spruch.liebe }}</span>
+      <span class="hero__satz hero__satz--verlassen">{{ hero.spruch.verlassen }}</span>
+    </p>
+  </div>
+
   <div class="hero__cluster inset">
-    <!-- Die Fortzuege sind das Signal des Heros: ein Counter, der hochzaehlt. -->
+    <!-- Die Fortzuege zaehlen, sobald die Fenster aus sind. -->
     <dl class="hero__stats">
       @for (k of hero.stats; track k.label) {
         <div class="hero__stat">
           <dt class="hero__stat-label">{{ k.kurzLabel }} {{ k.jahr }}</dt>
-          <dd class="hero__stat-wert"><app-zaehlwert [wert]="k.wert" [dauer]="900" /></dd>
+          <dd class="hero__stat-wert">
+            @if (zahlSichtbar()) {
+              <app-zaehlwert [wert]="k.wert" [dauer]="zaehlDauer" />
+            }
+          </dd>
         </div>
       }
     </dl>
@@ -21,15 +41,14 @@
     <span class="hero__verb">{{ marke.wortmarkeVerb }}</span>
   </h1>
 
-  <!-- Das Gemaelde traegt die untere Bildhaelfte; die Wortmarke steigt
-       daraus auf. Bewusst hoch geladen, es ist das erste sichtbare Bild.
-       Die Leinwand legt sich darueber und loescht nach und nach Fenster. -->
+  <!-- Das Gemaelde traegt die untere Bildhaelfte. Die Leinwand legt sich
+       darueber und loescht die Fenster, sobald der zweite Satz
+       gesagt ist. Die Wortmarke wartet, bis das vorbei ist. -->
   <div class="hero__bild" #bildflaeche>
     <img
       #aufnahme
       [src]="hero.bild.pfad"
       [alt]="hero.bild.alt"
-      fetchpriority="high"
       decoding="async"
     />
     <canvas

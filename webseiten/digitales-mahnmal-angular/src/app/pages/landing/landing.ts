@@ -8,7 +8,6 @@ import { Ausbluten } from '../../sections/ausbluten/ausbluten';
 import { Forderungen } from '../../sections/forderungen/forderungen';
 import { Hero } from '../../sections/hero/hero';
 import { Kapital } from '../../sections/kapital/kapital';
-import { Kopffahne } from '../../layout/kopffahne/kopffahne';
 import { Unterschreiben } from '../../layout/unterschreiben/unterschreiben';
 import { Unterstuetzer } from '../../sections/unterstuetzer/unterstuetzer';
 import { Wegmarken } from '../../layout/wegmarken/wegmarken';
@@ -20,11 +19,11 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
  *
  * Die Striche rechts oben oeffnen die Kapitel; die ids der Hosts
  * sind ihre Ziele und stehen in KAPITEL (content.ts). Unten rechts laeuft
- * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Am Kopf
- * haengt eine lange Flagge. Sie steht ruhig an der Stelle der Kronen,
- * durchscheinend, in einem Tuch.
+ * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Der
+ * Auftakt beginnt persoenlich: ein Gesicht, zwei Saetze, dann Wortmarke
+ * und Zahl. Die Flagge haengt hier nicht mehr.
  *
- *   Hero (Ink)        Startseite — Behauptung und Wortmarke
+ *   Hero (Ink)        Startseite — Gesicht, dann Behauptung und Wortmarke
  *   Wer geht (Ink)    Ihre Geschichten
  *   Ausbluten (Ink)   Die Zahlen beginnen mit der Karte
  *   Zahlen (Ink)      Reihe, Qualifikation, Abgabenkeil — haelt das Kapitel
@@ -42,7 +41,6 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
   imports: [
     Wegmarken,
     Unterschreiben,
-    Kopffahne,
     Hero,
     WerGeht,
     Zahlen,
@@ -58,7 +56,6 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
   template: `
     <app-wegmarken />
     <app-unterschreiben />
-    <app-kopffahne />
 
     <app-hero id="auftakt" />
     <app-wer-geht id="wer-geht" />

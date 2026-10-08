@@ -162,6 +162,12 @@ export const BILDER = {
     nachweis:
       'Leonhard Lenz, „Frankfurt am Main city center from other side of the Main at night“, 22. März 2020 (CC0)',
   },
+  /** Stockporträt für den Auftakt. Keine reale Stimme — ersetzen, sobald eine freigegebene Aufnahme da ist. */
+  gesicht: {
+    pfad: '/bilder/forderungen/gesicht-6.jpg',
+    alt: 'Porträt eines jungen Mannes vor dunklem Grund, Blick in die Kamera',
+    nachweis: 'Albert Dera, „Porträt“ (Unsplash License)',
+  },
   sequenz1: {
     pfad: '/bilder/seq-1.jpg',
     alt: 'Die Frankfurter Skyline bei Nacht, hell erleuchtete Bürotürme vor dunklem Himmel',
@@ -430,26 +436,34 @@ export const HERO = {
   stats: [KENNZAHLEN.fortzuege],
   /** Aufnahme, aus der die Wortmarke aufsteigt. */
   bild: BILDER.hero,
+  /**
+   * Das Gesicht spricht, bevor die Kampagne sich nennt.
+   * Der zweite Satz ist der Moment, in dem die Stadt im Hintergrund erlischt.
+   */
+  gesicht: BILDER.gesicht,
+  spruch: {
+    liebe: 'Ich liebe meine Familie und Freunde.',
+    verlassen: 'Trotzdem habe ich sie verlassen.',
+  },
 } as const;
 
 /* ---------------------------------------------------------------------------
- * Wer geht — eine kleine Menge, in der einzelne Luecken Geschichten oeffnen
+ * Wer geht — Gesichter mit ihrer Geschichte, eines nach dem anderen
  *
- * Die Zahl der Figuren folgt nicht dem statistischen Jahresanteil. Sie soll
- * als Gruppe lesbar bleiben. Die benannten Loecher sind die Tueren.
+ * Zuerst noch einmal das Gesicht aus dem Hero. Ein Wisch nach rechts
+ * legt die naechste Stimme frei. Die Texte bleiben Beispielrollen, bis
+ * jemand sie fuer die Uebergabe freigibt.
  * ------------------------------------------------------------------------- */
 
 export const WER_GEHT = {
   titel: 'Sie fehlen.',
-  hinweis: 'Lies ihre Geschichte.',
-  /** Unterstrichen. Öffnet die Petition mit „Geschichte veröffentlichen“. */
-  hinweisLink: 'Ergänze deine eigene',
-  oeffnenLabel: 'Lies ihre Geschichte',
-  schliessen: 'Schließen',
+  wischen: 'Nach rechts wischen',
+  zurueck: 'Zurück',
+  vorherige: 'Vorherige Geschichte',
+  naechste: 'Nächste Geschichte',
   platzhalter:
     'Dummy-Name und -Bild. Echte Stimmen erscheinen hier, sobald jemand sie für die Übergabe freigibt.',
   cta: { label: 'Eigene Geschichte hinterlassen', pfad: '/petition' },
-  menge: 72,
 } as const;
 
 export const FORTGEHENDE: readonly Fortgehende[] = [
@@ -1128,6 +1142,14 @@ export const FOOTER = {
       lizenzUrl: 'https://unsplash.com/license',
       quelle: 'https://unsplash.com/photos/3TLl_97HNJo',
       bearbeitung: 'farblich angepasst',
+    },
+    {
+      werk: 'Porträt',
+      urheber: 'Albert Dera',
+      lizenz: 'Unsplash License',
+      lizenzUrl: 'https://unsplash.com/license',
+      quelle: 'https://unsplash.com/photos/ILip77SbmOE',
+      bearbeitung: 'Ränder ins Dunkel maskiert',
     },
     {
       werk: 'Germany, states (admin-1, 1:10m)',
