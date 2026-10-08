@@ -1,0 +1,183 @@
+@use 'mixins' as *;
+
+/* Postkarte auf Putty: das Muster links, der Weg rechts, darunter die Aufnahmen. */
+
+:host {
+  display: block;
+}
+
+.pk {
+  padding-block: var(--spacing-96);
+}
+
+.pk__kopf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-20);
+  margin: 0 auto var(--spacing-60);
+  max-width: 40rem;
+}
+
+.pk__titel {
+  @include serif-section;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pk__zeile {
+  display: block;
+}
+
+.pk__zeile.t-italic {
+  @include serif-monument;
+}
+
+.pk__an {
+  @include serif-heading;
+  display: block;
+  margin-top: var(--spacing-16);
+}
+
+.pk__einleitung {
+  @include grotesk-body;
+  max-width: 48ch;
+  color: var(--color-graphite);
+  margin: 0;
+}
+
+.pk__buehne {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(16rem, 0.7fr);
+  gap: var(--spacing-60);
+  align-items: center;
+  max-width: 68rem;
+  margin-inline: auto;
+}
+
+.pk__karte,
+.pk__wege {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Die Karte ist Papier auf Putty. Kein Schatten — der Rand reicht. */
+.pk__karte {
+  display: grid;
+  grid-template-columns: 1.3fr 0.85fr;
+  min-height: 22rem;
+  background: var(--color-paper);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-cards);
+}
+
+.pk__mitteilung,
+.pk__anschrift {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  padding: var(--spacing-28);
+}
+
+.pk__mitteilung {
+  border-right: 1px solid var(--color-vellum);
+}
+
+.pk__mikro {
+  color: var(--color-ash);
+  letter-spacing: 0.16em;
+  margin: 0;
+}
+
+.pk__absatz {
+  @include grotesk-body;
+  margin: 0;
+}
+
+.pk__absender {
+  @include grotesk-label;
+  color: var(--color-ash);
+  margin: auto 0 0;
+}
+
+.pk__anschrift {
+  justify-content: space-between;
+}
+
+.pk__marke {
+  align-self: flex-end;
+  display: grid;
+  place-items: center;
+  width: 3.6rem;
+  height: 4.4rem;
+  border: 1px dashed var(--color-ash);
+  color: var(--color-ash);
+  letter-spacing: 0.14em;
+}
+
+.pk__empfaenger {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.pk__adresszeile {
+  @include grotesk-stat;
+  margin: 0;
+}
+
+.pk__liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-28);
+  margin: 0 0 var(--spacing-32);
+  padding: 0;
+  list-style: none;
+}
+
+.pk__weg-titel {
+  @include serif-heading-sm;
+  margin: 0 0 var(--spacing-4);
+}
+
+.pk__weg-text {
+  @include grotesk-label;
+  color: var(--color-graphite);
+  margin: 0;
+  line-height: 1.6;
+}
+
+@include motion-reduce {
+  .pk__karte,
+  .pk__wege {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include tablet {
+  .pk {
+    padding-block: var(--spacing-60);
+  }
+
+  .pk__buehne,
+  .pk__karte {
+    grid-template-columns: 1fr;
+  }
+
+  .pk__mitteilung {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-vellum);
+  }
+}

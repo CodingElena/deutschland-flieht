@@ -1,0 +1,110 @@
+@use 'mixins' as *;
+
+/* Aufnahmen vom Abschicken. Dieselbe Wand auf Putty und auf Bone. */
+
+:host {
+  display: block;
+  margin-top: var(--spacing-96);
+}
+
+.pw__label {
+  color: var(--color-graphite);
+  letter-spacing: 0.16em;
+  margin: 0 0 var(--spacing-20);
+}
+
+.pw__leer {
+  @include grotesk-body;
+  max-width: 46ch;
+  color: var(--color-graphite);
+  margin: 0;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pw__raster {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-20);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pw__karte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 640ms var(--ease-gallery),
+    transform 640ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pw__rahmen {
+  background: var(--surface-ink-room);
+  border-radius: var(--radius-cards);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+.pw__medium {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+video.pw__medium {
+  object-fit: contain;
+  background: var(--surface-ink-room);
+}
+
+.pw__meta {
+  color: var(--color-graphite);
+  letter-spacing: 0.12em;
+  margin: 0;
+}
+
+.pw__satz {
+  @include grotesk-body;
+  margin: 0;
+}
+
+@include motion-reduce {
+  .pw__leer,
+  .pw__karte {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include tablet {
+  :host {
+    margin-top: var(--spacing-60);
+  }
+
+  .pw__raster {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include mobile {
+  .pw__raster {
+    grid-template-columns: 1fr;
+  }
+}

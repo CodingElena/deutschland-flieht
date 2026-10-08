@@ -132,6 +132,24 @@ export interface Motiv {
   readonly label: string;
 }
 
+/**
+ * Foto oder Video vom Abschicken einer Postkarte.
+ * Nur mit Freigabe. Die Datei liegt unter public/postkarten/.
+ */
+export interface PostkartenAufnahme {
+  readonly id: string;
+  readonly medium: 'foto' | 'video';
+  readonly pfad: string;
+  /** Standbild, nur bei Videos. */
+  readonly poster?: string;
+  readonly alt: string;
+  /** Nur mit Zustimmung. Sonst weglassen. */
+  readonly name?: string;
+  /** Ort und Jahr, etwa „Zürich, 2026“. */
+  readonly kontext: string;
+  readonly zeile?: string;
+}
+
 /** Ein Abschnitt eines Rechtstextes (Impressum, Datenschutz). */
 export interface RechtsAbschnitt {
   readonly titel: string;
@@ -399,6 +417,7 @@ export const KAPITEL: readonly Kapitel[] = [
   { id: 'und-dann', label: 'Und dann?', dunkel: true },
   { id: 'forderungen', label: 'Forderungen', dunkel: true },
   { id: 'petition', label: 'Petition', dunkel: false },
+  { id: 'postkarte', label: 'Postkarte', dunkel: false },
   { id: 'belege', label: 'Aktuelle Entwicklungen', dunkel: false },
   {
     id: 'unterstuetzer',
@@ -438,7 +457,8 @@ export const HERO = {
   bild: BILDER.hero,
   /**
    * Das Gesicht spricht, bevor die Kampagne sich nennt.
-   * Der zweite Satz ist der Moment, in dem die Stadt im Hintergrund erlischt.
+   * Die Fenster sterben schon waehrend des ersten Satzes.
+   * Der zweite Satz laesst den ersten verblassen.
    */
   gesicht: BILDER.gesicht,
   spruch: {
@@ -1000,9 +1020,18 @@ export const AUSWERTUNG = {
 /* ---------------------------------------------------------------------------
  * Atlas — Schlussbild ganz am Ende
  *
- * Das Zitat steht allein bei der Figur. Die Kugel muss lesbar bleiben,
- * deshalb eigene Sektion statt Kulisse hinter einer anderen Gruppe.
+ * Das Zitat steht bei der Figur. Darunter der Takt: wie oft rechnerisch
+ * jemand das Land verlässt, seit die Seite offen ist. Die Sekunden folgen
+ * aus dem letzten Jahr der Wanderungsreihe (365 Tage, keine Echtzeit),
+ * damit sie nicht neben den Kennzahlen herlaufen.
  * ------------------------------------------------------------------------- */
+
+const SEKUNDEN_IM_JAHR = 365 * 24 * 3600;
+
+/** Ganze Sekunden je Person. Die Zeile darunter nennt die ungerundete Rechnung. */
+const sekundenJe = (anzahl: number): number => Math.round(SEKUNDEN_IM_JAHR / anzahl);
+
+const wanderungJetzt = WANDERUNG.jahre[WANDERUNG.jahre.length - 1];
 
 export const ATLAS = {
   zitat:
@@ -1013,6 +1042,18 @@ export const ATLAS = {
   frage: 'was würdest du ihm raten?',
   herkunft: 'Atlas Shrugged — Ayn Rand',
   bild: BILDER.atlas,
+  takt: {
+    sekunden: sekundenJe(wanderungJetzt.fortzuege),
+    nettoSekunden: sekundenJe(Math.abs(wanderungJetzt.saldo)),
+    fortzuege: wanderungJetzt.fortzuege,
+    jahr: wanderungJetzt.jahr,
+    url: WANDERUNG.url,
+    satz: 'verlässt rechnerisch ein Deutscher das Land.',
+    seit: 'Seit du diese Seite geöffnet hast:',
+    rechnung: 'Durchschnittsrechnung, keine Echtzeit:',
+    formel: '365 · 24 · 3600 s ÷',
+    netto: 'Nach Abzug der Rückkehrer netto etwa alle',
+  },
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -1025,6 +1066,7 @@ export const FOOTER = {
      sammlung Pflicht, nicht Kür. Die Seiten müssen vor dem Livegang stehen. */
   links: [
     { label: 'Petition', pfad: '/petition' },
+    { label: 'Postkarte', pfad: '/postkarte' },
     { label: 'Aktuelle Entwicklungen', pfad: '/entwicklungen' },
     { label: 'Impressum', pfad: '/impressum' },
     { label: 'Datenschutz', pfad: '/datenschutz' },
@@ -1203,6 +1245,8 @@ export const PETITION = {
     'in der Summe sind es Hunderttausende, und niemand muss darauf antworten, ' +
     'solange niemand sie zählt. Genau das ändert diese Liste.',
 
+  postkarteLink: 'Oder eine Postkarte ans Kanzleramt schreiben',
+
   /** Adressat der Übergabe. Steht ganz oben, weil es die erste Rückfrage ist. */
   empfaenger: {
     label: 'ADRESSAT',
@@ -1365,6 +1409,248 @@ export const PETITION = {
 } as const;
 
 /* ---------------------------------------------------------------------------
+ * Postkarte ans Kanzleramt
+ *
+ * Unabhaengig von der Petition. Wer ausgewandert ist oder es ueberlegt,
+ * schreibt eine Karte — selbst eingeworfen oder von der Kampagne verschickt.
+ * Der Standardtext steht hier; im Formular laesst er sich aendern oder durch
+ * die eigene Geschichte ersetzen.
+ *
+ * Aufnahmen vom Abschicken kommen selten ueber das Formular, meist ueber
+ * persoenliche Kontakte. Sie werden nicht automatisch veroeffentlicht:
+ * Datei nach public/postkarten/ legen und unten eintragen. Ohne Freigabe
+ * kein Eintrag.
+ * ------------------------------------------------------------------------- */
+
+const POSTKARTE_STANDARD = [
+  'An das Bundeskanzleramt,',
+  'ich schreibe Ihnen, weil ich Deutschland verlassen habe — oder weil ich es ' +
+    'ernsthaft überlege. Nicht aus Abenteuerlust. Weil sich Arbeit, Aufstieg und ' +
+    'Vorsorge anderswo sichtbarer lohnen.',
+  'Jeder Fortzug ist eine Privatentscheidung. In der Summe sind es Hunderttausende. ' +
+    'Solange niemand sie zählt, muss niemand darauf antworten.',
+  'Ich will kein anderes Land. Ich will, dass Bleiben sich wieder lohnt.',
+] as const;
+
+export const POSTKARTE = {
+  titelZeile1: 'Schreib eine',
+  titelZeile2Kursiv: 'Postkarte',
+  titelZeile3: 'ans Kanzleramt.',
+  einleitung:
+    'Wer ausgewandert ist oder es überlegt, kann eine Karte an das Bundeskanzleramt ' +
+    'schicken. Selbst einwerfen oder abschicken lassen — unabhängig davon, ob du die ' +
+    'Petition unterschreibst.',
+  textHinweis:
+    'Auf der Karte steht ein Text. Änder ihn, oder nimm den, den du als Geschichte ' +
+    'auf dieser Seite veröffentlichst.',
+
+  muster: {
+    mitteilung: 'Mitteilung',
+    anschrift: 'Anschrift',
+    marke: 'Marke',
+    absender: 'Dein Name, dein Ort',
+    beschreibung: 'Muster der Postkarte mit Standardtext und Adresse des Bundeskanzleramts',
+  },
+
+  standardAbsaetze: POSTKARTE_STANDARD,
+  /** Dieselbe Vorlage, für das Formular in einem Feld. */
+  standardtext: POSTKARTE_STANDARD.join('\n\n'),
+
+  adresseLabel: 'Bundeskanzleramt',
+  adresse: ['Bundeskanzleramt', 'Willy-Brandt-Straße 1', '10557 Berlin'],
+  adresseKopieren: 'Adresse kopieren',
+  adresseKopiert: 'Adresse kopiert',
+
+  nebenkarte: [
+    {
+      titel: 'Selbst oder durch uns',
+      text: 'Einwerfen kannst du sie selbst. Oder wir schicken sie für dich ab.',
+    },
+    {
+      titel: 'Text oder Geschichte',
+      text: 'Der Standardtext steht schon auf der Karte. Änder ihn, oder nimm deine Geschichte.',
+    },
+    {
+      titel: 'Foto, besser ein Video',
+      text: 'Wer selbst abschickt, kann den Moment mitschicken. Veröffentlicht wird nur, was freigegeben ist.',
+    },
+  ],
+
+  cta: { label: 'Postkarte schreiben', pfad: '/postkarte' },
+
+  wand: {
+    label: 'Aufnahmen vom Abschicken',
+    foto: 'Foto',
+    video: 'Video',
+    leer:
+      'Noch keine Aufnahme. Wer die Karte selbst einwirft, kann ein Foto oder — besser — ' +
+      'ein kurzes Video schicken. Es erscheint hier, sobald es freigegeben ist.',
+  },
+
+  dialog: {
+    titel: 'Schick uns den Moment.',
+    text:
+      'Wenn du die Karte selbst einwirfst: schick ein Foto davon. Noch besser ein kurzes ' +
+      'Video, wie sie in den Kasten geht. Wir setzen es in diese Section, sobald du die ' +
+      'Veröffentlichung freigibst.',
+    aufnehmen: 'Foto oder Video auswählen',
+    spaeter: 'Später',
+  },
+
+  formular: {
+    titel: 'Deine Postkarte',
+    abschnittStand: 'Wo du stehst',
+    abschnittVersand: 'Wer sie abschickt',
+    abschnittText: 'Der Text',
+    abschnittPerson: 'Absender',
+    abschnittEinwilligung: 'Einwilligung',
+
+    stand: [
+      {
+        id: 'gegangen',
+        label: 'Ich bin ausgewandert',
+        text: 'Die Karte kommt von dort, wo du jetzt lebst.',
+      },
+      {
+        id: 'ueberlegt',
+        label: 'Ich überlege, zu gehen',
+        text: 'Auch das ist eine Stimme. Du musst nicht schon weg sein.',
+      },
+    ],
+    versand: [
+      {
+        id: 'selbst',
+        label: 'Ich schicke sie selbst ab',
+        text: 'Du bekommst die Adresse. Ein Foto vom Einwerfen — besser ein kurzes Video — kannst du mitschicken.',
+      },
+      {
+        id: 'fuer-mich',
+        label: 'Schickt sie für mich ab',
+        text: 'Wir drucken deinen Text und schicken die Karte an das Bundeskanzleramt.',
+      },
+    ],
+    textart: [
+      {
+        id: 'standard',
+        label: 'Standardtext',
+        text: 'Steht schon im Feld. Änder ihn, bis er von dir ist.',
+      },
+      {
+        id: 'geschichte',
+        label: 'Meine Geschichte',
+        text: 'Derselbe Text, den du auf der Seite veröffentlichst. Hier kannst du ihn noch kürzen.',
+      },
+    ],
+
+    text: 'Text der Karte',
+    textPlatzhalter: 'Der Text, den du auch als Geschichte veröffentlichst.',
+    zeichenFrei: 'Zeichen frei',
+
+    vorname: 'Vorname',
+    nachname: 'Nachname',
+    email: 'E-Mail-Adresse',
+    emailHinweis: 'Für die Rückmeldung. Steht nicht auf der Karte und wird nicht veröffentlicht.',
+    ort: 'Ort',
+    ortHinweis: 'Steht als Absender auf der Karte.',
+    land: 'Land',
+    landHinweis: 'Das Land, in dem du jetzt lebst.',
+    landHinweisFrei: 'Freiwillig, solange du noch in Deutschland bist.',
+
+    aufnahme: 'Aufnahme vom Abschicken',
+    aufnahmeHinweis:
+      'Freiwillig. Foto als JPG, PNG oder WebP, höchstens 8 MB. Video als MP4, WebM oder MOV, ' +
+      'höchstens 40 MB. Ein Video vom Einwerfen sagt mehr als ein Foto.',
+    aufnahmeWaehlen: 'Foto oder Video auswählen',
+    aufnahmeAendern: 'Andere Aufnahme',
+    aufnahmeEntfernen: 'Aufnahme entfernen',
+    aufnahmeFehlerTyp: 'Bitte ein Foto (JPG, PNG, WebP) oder ein Video (MP4, WebM, MOV).',
+    aufnahmeFehlerGroesseFoto: 'Das Foto darf höchstens 8 MB groß sein.',
+    aufnahmeFehlerGroesseVideo: 'Das Video darf höchstens 40 MB groß sein.',
+    aufnahmeFreigabe:
+      'Ihr dürft diese Aufnahme in der Section „Schreib eine Postkarte“ veröffentlichen.',
+    nameBeiAufnahme: 'Mein Name darf unter der Aufnahme stehen.',
+
+    einwilligung:
+      'Ich bin damit einverstanden, dass Text, Name und Ort für diese Postkarte an das ' +
+      'Bundeskanzleramt verarbeitet werden. Schickt ihr sie für mich ab, darf dieser Text ' +
+      'in meinem Namen verschickt werden. Die Einwilligung kann ich jederzeit formlos widerrufen.',
+
+    absenden: 'Postkarte aufgeben',
+    datenschutzHinweis:
+      'Angaben zur Verarbeitung stehen in der Datenschutzerklärung. Es werden keine ' +
+      'Tracker, keine Analyse-Dienste und keine externen Schriften geladen.',
+  },
+
+  fehlerUeberschrift: 'Bitte prüf noch diese Angaben:',
+  fehler: {
+    stand: 'Wähl aus, ob du ausgewandert bist oder es überlegst.',
+    versand: 'Wähl aus, ob du die Karte selbst abschickst oder wir sie schicken.',
+    text: 'Die Karte braucht einen Text — der Standardtext oder deine Geschichte.',
+    vorname: 'Bitte trag deinen Vornamen ein.',
+    nachname: 'Bitte trag deinen Nachnamen ein.',
+    email: 'Bitte eine gültige E-Mail-Adresse angeben — an sie geht die Rückmeldung.',
+    ort: 'Bitte trag den Ort ein, der als Absender auf der Karte steht.',
+    land: 'Bitte trag das Land ein, in dem du jetzt lebst.',
+    einwilligung: 'Ohne Einwilligung dürfen wir die Karte nicht annehmen.',
+    aufnahmeFreigabe: 'Ohne Freigabe dürfen wir die Aufnahme nicht veröffentlichen.',
+  },
+
+  ablauf: {
+    label: 'Was danach passiert',
+    schritte: [
+      {
+        titel: 'Selbst abschicken',
+        text:
+          'Du schickst die Karte an die Adresse oben. Ein Foto oder Video vom Abschicken ' +
+          'kannst du dazulegen — veröffentlicht wird es nur mit deiner Freigabe.',
+      },
+      {
+        titel: 'Abschicken lassen',
+        text:
+          'Wir drucken deinen Text und schicken die Karte. Dafür braucht es eine Bestätigung ' +
+          'per E-Mail, sonst könnte jeder jeden eintragen.',
+      },
+      {
+        titel: 'Veröffentlichen',
+        text:
+          'Name unter einer Aufnahme nur, wenn du das extra erlaubst. Die meisten Aufnahmen ' +
+          'erreichen uns über persönliche Kontakte und werden erst nach Freigabe gezeigt.',
+      },
+    ],
+  },
+
+  quittung: {
+    titel: 'Nichts wurde gesendet.',
+    textSelbst:
+      'Deine Eingaben waren vollständig — gespeichert oder hochgeladen wurde nichts. ' +
+      'Die Adresse steht auf dieser Seite, die Karte kannst du trotzdem selbst abschicken.',
+    textFuerMich:
+      'Deine Eingaben waren vollständig — gedruckt oder verschickt wurde nichts. ' +
+      'Diese Seite läuft im Demo-Modus.',
+    fehltTitel: 'Bis zum Echtbetrieb fehlen',
+    fehlt: [
+      'ein Endpunkt, der Text und Aufnahme entgegennimmt',
+      'Druck und Versand an das Bundeskanzleramt, wenn wir die Karte schicken',
+      'eine Freigabe, bevor eine Aufnahme in der Section erscheint',
+      'Double-Opt-In per E-Mail, sonst ist die Liste angreifbar',
+      'Impressum und Datenschutzerklärung mit den echten Angaben',
+    ],
+    zurueck: 'Eingaben erneut ansehen',
+  },
+
+  hinweisOhneBackend:
+    'Demo-Modus: Es wird nichts gespeichert, nichts gedruckt und nichts hochgeladen.',
+} as const;
+
+/**
+ * Freigegebene Aufnahmen. Leer, bis jemand eine Datei freigibt.
+ * Eintrag example:
+ * { id: 'zuerich-2026', medium: 'video', pfad: '/postkarten/zuerich.mp4',
+ *   poster: '/postkarten/zuerich.jpg', alt: '…', name: '…', kontext: 'Zürich, 2026' }
+ */
+export const POSTKARTEN_AUFNAHMEN: readonly PostkartenAufnahme[] = [];
+
+/* ---------------------------------------------------------------------------
  * Rechtstexte
  *
  * ACHTUNG — beide Texte sind Geruest, nicht fertige Rechtstexte.
@@ -1432,9 +1718,10 @@ export const IMPRESSUM = {
 export const DATENSCHUTZ = {
   titel: 'Datenschutz',
   einleitung:
-    'Diese Seite lädt keine externen Schriften, keine Karten, keine Videos und ' +
-    'setzt keine Analyse- oder Werbe-Cookies. Verarbeitet werden nur die Daten, ' +
-    'die für den Betrieb und für die Petition nötig sind.',
+    'Diese Seite lädt keine externen Schriften, keine Karten und keine Videos von ' +
+    'Dritten und setzt keine Analyse- oder Werbe-Cookies. Verarbeitet werden nur ' +
+    'die Daten, die für den Betrieb, die Petition und die Postkarte ans Kanzleramt ' +
+    'nötig sind. Eine Aufnahme vom Abschicken liegt, falls freigegeben, auf dieser Domain.',
   abschnitte: [
     {
       titel: 'Verantwortlicher',
@@ -1471,6 +1758,25 @@ export const DATENSCHUTZ = {
           'Ein Porträt nur, wenn du eines hochlädst. Kontaktdaten bleiben ungenannt. ' +
           'Ohne Freigabe fließen die Angaben ausschließlich anonymisiert in die ' +
           'Gesamtzahl und die Auswertung nach Postleitzahlgebieten ein.',
+      ],
+    },
+    {
+      titel: 'Postkarte ans Kanzleramt',
+      absaetze: [
+        'Pflichtangaben sind Vorname, Nachname, E-Mail-Adresse, Ort und der Text ' +
+          'der Karte. Wer ausgewandert ist, gibt zusätzlich das Land an. Freiwillig ' +
+          'sind ein Foto oder ein Video vom Abschicken und die Freigabe, Name und ' +
+          'Aufnahme zu zeigen.',
+        'Zweck ist der Versand an das Bundeskanzleramt — durch uns, wenn du das ' +
+          'wählst — und, nur bei gesonderter Freigabe, die Veröffentlichung der ' +
+          'Aufnahme in der Postkarten-Section. Rechtsgrundlage ist deine Einwilligung ' +
+          'nach Art. 6 Abs. 1 lit. a DSGVO.',
+        'Ohne diese Freigabe bleibt die Aufnahme unveröffentlicht. Die Karte an das ' +
+          'Kanzleramt trägt den Text, den Namen und den Ort, die du angibst. Die ' +
+          'E-Mail-Adresse steht nicht auf der Karte.',
+        'Die Angaben werden gelöscht, sobald die Karte übergeben ist und eine ' +
+          'veröffentlichte Aufnahme nicht mehr gezeigt wird, spätestens [sechs] Monate ' +
+          'nach der Übergabe. Eine Löschung kannst du vorher verlangen.',
       ],
     },
     {

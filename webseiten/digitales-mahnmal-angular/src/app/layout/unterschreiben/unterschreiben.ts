@@ -19,10 +19,11 @@ import { PETITION_CTA } from '../../core/content';
  * Hero nach oben aus dem Bild gelaufen ist, tritt er als Knopf in die untere
  * Ecke und bleibt dort, solange man scrollt.
  *
- * Nur beim Abschluss weicht er: dort steht der Aufruf ohnehin in voller
- * Groesse in der Flaeche, ein zweiter Knopf daneben waere eine Dopplung.
+ * Nur beim Abschluss und beim Postkarten-Aufruf weicht er: dort steht
+ * der Aufruf ohnehin in voller Groesse, ein zweiter Knopf daneben waere
+ * eine Dopplung.
  *
- * Beide Schwellen kommen aus IntersectionObservern, nicht aus einem
+ * Die Schwellen kommen aus IntersectionObservern, nicht aus einem
  * Scroll-Handler — wie bei den Wegmarken.
  */
 @Component({
@@ -41,9 +42,11 @@ export class Unterschreiben {
   private readonly imAuftakt = signal(true);
   /** Ob der Abschluss mit seinem eigenen Aufruf im Bild ist. */
   private readonly beimAbschluss = signal(false);
+  /** Ob der Knopf der Postkarte im Bild ist. */
+  private readonly beiPostkarte = signal(false);
 
   protected readonly sichtbar = computed(
-    () => !this.imAuftakt() && !this.beimAbschluss(),
+    () => !this.imAuftakt() && !this.beimAbschluss() && !this.beiPostkarte(),
   );
 
   constructor() {
@@ -52,6 +55,7 @@ export class Unterschreiben {
          schneidet, steht sein unterstrichenes Wort noch im Bild. */
       this.beobachten('auftakt', this.imAuftakt, '-50% 0px 0px 0px');
       this.beobachten('petition', this.beimAbschluss);
+      this.beobachten('postkarte-aufruf', this.beiPostkarte);
     });
   }
 

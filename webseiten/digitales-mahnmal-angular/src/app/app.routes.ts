@@ -17,6 +17,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/petition/petition-page').then((m) => m.PetitionPage),
   },
   {
+    path: 'postkarte',
+    title: 'Postkarte ans Kanzleramt — Deutschland flieht.',
+    loadComponent: () => import('./pages/postkarte/postkarte-page').then((m) => m.PostkartePage),
+  },
+  {
     path: 'entwicklungen',
     title: 'Aktuelle Entwicklungen und Daten — Deutschland flieht.',
     loadComponent: () =>

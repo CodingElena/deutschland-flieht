@@ -1,0 +1,39 @@
+<section class="pw" aria-labelledby="pw-titel">
+  <h2 id="pw-titel" class="pw__label t-micro">{{ wand.label }}</h2>
+
+  @if (aufnahmen.length === 0) {
+    <p class="pw__leer" appReveal>{{ wand.leer }}</p>
+  } @else {
+    <ul class="pw__raster">
+      @for (aufnahme of aufnahmen; track aufnahme.id; let i = $index) {
+        <li class="pw__karte" appReveal [appRevealDelay]="i * 80">
+          <div class="pw__rahmen">
+            @if (aufnahme.medium === 'video') {
+              <video
+                class="pw__medium"
+                controls
+                playsinline
+                preload="metadata"
+                [attr.aria-label]="aufnahme.alt"
+                [attr.poster]="aufnahme.poster || null"
+                [src]="aufnahme.pfad"
+              ></video>
+            } @else {
+              <img
+                class="pw__medium"
+                [src]="aufnahme.pfad"
+                [alt]="aufnahme.alt"
+                loading="lazy"
+                decoding="async"
+              />
+            }
+          </div>
+          <p class="pw__meta t-micro">{{ zeile(aufnahme) }}</p>
+          @if (aufnahme.zeile) {
+            <p class="pw__satz">{{ aufnahme.zeile }}</p>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

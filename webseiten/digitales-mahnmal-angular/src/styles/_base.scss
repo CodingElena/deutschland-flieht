@@ -183,6 +183,12 @@ body {
   border-top: 1px solid var(--color-vellum);
 }
 
+/* Der Hinweis „Schick uns den Moment“ ist ein nativer Dialog. Der Schleier
+   gehoert nicht zur Komponente: ::backdrop bekommt kein Emulations-Attribut. */
+dialog::backdrop {
+  background: rgb(26 24 22 / 72%);
+}
+
 .surface-ink .hairline {
   border-top-color: rgba(255, 255, 255, 0.18);
 }

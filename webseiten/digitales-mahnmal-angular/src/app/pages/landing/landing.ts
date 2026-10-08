@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Abschluss } from '../../sections/abschluss/abschluss';
+import { Postkarte } from '../../sections/postkarte/postkarte';
 import { Auswertung } from '../../sections/auswertung/auswertung';
 import { Beitraege } from '../../sections/beitraege/beitraege';
 import { Atlas } from '../../sections/atlas/atlas';
@@ -20,8 +21,9 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
  * Die Striche rechts oben oeffnen die Kapitel; die ids der Hosts
  * sind ihre Ziele und stehen in KAPITEL (content.ts). Unten rechts laeuft
  * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Der
- * Auftakt beginnt persoenlich: ein Gesicht, zwei Saetze, dann Wortmarke
- * und Zahl. Die Flagge haengt hier nicht mehr.
+ * Auftakt beginnt mit der beleuchteten Stadt. Das Gesicht spricht,
+ * waehrend die Fenster sterben; die Wortmarke schlaegt vor der Zahl ein.
+ * Die Flagge haengt hier nicht mehr.
  *
  *   Hero (Ink)        Startseite — Gesicht, dann Behauptung und Wortmarke
  *   Wer geht (Ink)    Ihre Geschichten
@@ -31,9 +33,10 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
  *   Forderungen (Ink) Es muss sich etwas aendern
  *   Abschluss (Chalk) Petition — direkt hinter den Forderungen
  *   Auswertung (Chalk) Aufklappbar darunter, Regionen und Gruende
+ *   Postkarte (Putty) Karte ans Kanzleramt, Aufnahmen vom Abschicken
  *   Entwicklungen (Bone) Eigene Saetze mit Quelle, Papier in der Nebenspalte
  *   Unterstuetzer     Logos; der Atlas gehoert dazu
- *   Atlas (Ink)       Zitat und Figur, ganz am Ende vor der Fusszeile
+ *   Atlas (Ink)       Zitat, Figur und der Takt der Fortzuege, ganz am Ende
  */
 @Component({
   selector: 'app-landing',
@@ -49,6 +52,7 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
     Forderungen,
     Abschluss,
     Auswertung,
+    Postkarte,
     Beitraege,
     Unterstuetzer,
     Atlas,
@@ -65,6 +69,7 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
     <app-forderungen id="forderungen" />
     <app-abschluss id="petition" />
     <app-auswertung />
+    <app-postkarte id="postkarte" />
     <app-beitraege id="belege" />
     <app-unterstuetzer id="unterstuetzer" />
     <app-atlas id="atlas" />

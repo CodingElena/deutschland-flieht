@@ -1,0 +1,50 @@
+<section class="pk surface-putty inset" aria-labelledby="pk-titel">
+  <header class="pk__kopf">
+    <h2 id="pk-titel" class="pk__titel">
+      <span class="pk__zeile">{{ inhalt.titelZeile1 }}</span>
+      <span class="pk__zeile t-italic">{{ inhalt.titelZeile2Kursiv }}</span>
+      <span class="pk__an">{{ inhalt.titelZeile3 }}</span>
+    </h2>
+    <p class="pk__einleitung">{{ inhalt.einleitung }}</p>
+    <p class="pk__einleitung">{{ inhalt.textHinweis }}</p>
+  </header>
+
+  <div class="pk__buehne">
+    <article class="pk__karte" appReveal [attr.aria-label]="inhalt.muster.beschreibung">
+      <div class="pk__mitteilung">
+        <p class="pk__mikro t-micro">{{ inhalt.muster.mitteilung }}</p>
+        @for (absatz of inhalt.standardAbsaetze; track absatz) {
+          <p class="pk__absatz">{{ absatz }}</p>
+        }
+        <p class="pk__absender">{{ inhalt.muster.absender }}</p>
+      </div>
+
+      <div class="pk__anschrift">
+        <span class="pk__marke t-micro" aria-hidden="true">{{ inhalt.muster.marke }}</span>
+        <div class="pk__empfaenger">
+          <p class="pk__mikro t-micro">{{ inhalt.muster.anschrift }}</p>
+          @for (zeile of inhalt.adresse; track zeile) {
+            <p class="pk__adresszeile">{{ zeile }}</p>
+          }
+        </div>
+      </div>
+    </article>
+
+    <div class="pk__wege" appReveal [appRevealDelay]="80">
+      <ul class="pk__liste">
+        @for (punkt of inhalt.nebenkarte; track punkt.titel) {
+          <li>
+            <h3 class="pk__weg-titel">{{ punkt.titel }}</h3>
+            <p class="pk__weg-text">{{ punkt.text }}</p>
+          </li>
+        }
+      </ul>
+
+      <div id="postkarte-aufruf">
+        <a class="pill" [routerLink]="inhalt.cta.pfad">{{ inhalt.cta.label }}</a>
+      </div>
+    </div>
+  </div>
+
+  <app-postkarten-wand />
+</section>

@@ -1,0 +1,454 @@
+<section class="ka surface-bone inset">
+  <header class="ka__kopf">
+    <h1 id="ka-titel" class="ka__titel">
+      <span class="ka__zeile">{{ inhalt.titelZeile1 }}</span>
+      <span class="ka__zeile t-italic">{{ inhalt.titelZeile2Kursiv }}</span>
+      <span class="ka__an">{{ inhalt.titelZeile3 }}</span>
+    </h1>
+    <p class="ka__einleitung">{{ inhalt.einleitung }}</p>
+    <p class="ka__einleitung">{{ inhalt.textHinweis }}</p>
+  </header>
+
+  <div class="ka__spalten">
+    <div class="ka__doku">
+      <section class="ka__block" aria-labelledby="ka-anschrift">
+        <h2 id="ka-anschrift" class="ka__label t-micro">{{ inhalt.muster.anschrift }}</h2>
+        @for (zeile of inhalt.adresse; track zeile) {
+          <p class="ka__adresszeile">{{ zeile }}</p>
+        }
+      </section>
+
+      <hr class="hairline" />
+
+      <section class="ka__block" aria-labelledby="ka-ablauf">
+        <h2 id="ka-ablauf" class="ka__label t-micro">{{ inhalt.ablauf.label }}</h2>
+        <ol class="ka__schritte">
+          @for (s of inhalt.ablauf.schritte; track s.titel; let i = $index) {
+            <li class="ka__schritt">
+              <span class="ka__schritt-nr t-micro" aria-hidden="true">{{ i + 1 }}</span>
+              <div>
+                <h3 class="ka__schritt-titel">{{ s.titel }}</h3>
+                <p class="ka__schritt-text">{{ s.text }}</p>
+              </div>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
+
+    <div class="ka__formularblock">
+      <div class="ka__karte">
+        @if (abgeschickt()) {
+          <div class="ka__quittung" role="status">
+            <h2 class="ka__quittung-titel">{{ inhalt.quittung.titel }}</h2>
+            <p class="ka__quittung-text">
+              {{ selbst ? inhalt.quittung.textSelbst : inhalt.quittung.textFuerMich }}
+            </p>
+            <h3 class="ka__label t-micro">{{ inhalt.quittung.fehltTitel }}</h3>
+            <ul class="ka__quittung-liste">
+              @for (punkt of inhalt.quittung.fehlt; track punkt) {
+                <li>{{ punkt }}</li>
+              }
+            </ul>
+            <button class="pill" type="button" (click)="zurueckZumFormular()">
+              {{ inhalt.quittung.zurueck }}
+            </button>
+          </div>
+        } @else {
+          <form class="ka__formular" [formGroup]="formular" (ngSubmit)="absenden()" novalidate>
+            <header class="ka__formular-kopf">
+              <h2 class="ka__formular-titel">{{ inhalt.formular.titel }}</h2>
+            </header>
+
+            @if (offeneFehler().length > 0) {
+              <div class="ka__fehlerbox" role="alert">
+                <p class="ka__fehlerbox-titel">{{ inhalt.fehlerUeberschrift }}</p>
+                <ul class="ka__fehlerbox-liste">
+                  @for (f of offeneFehler(); track f.feld) {
+                    <li>
+                      <button class="ka__fehlerbox-link" type="button" (click)="fokussieren(f.feld)">
+                        {{ f.text }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <fieldset
+              id="ka-stand"
+              class="ka__wahl"
+              tabindex="-1"
+              [class.ist-fehlerhaft]="fehler('stand')"
+            >
+              <legend class="ka__gruppe-label t-micro">{{ inhalt.formular.abschnittStand }}</legend>
+              <div class="ka__wahlen">
+                @for (option of inhalt.formular.stand; track option.id) {
+                  <label
+                    class="ka__option"
+                    [class.ist-gewaehlt]="formular.controls.stand.value === option.id"
+                  >
+                    <input
+                      class="sr-only"
+                      type="radio"
+                      formControlName="stand"
+                      [value]="option.id"
+                    />
+                    <span class="ka__option-titel">{{ option.label }}</span>
+                    <span class="ka__option-text">{{ option.text }}</span>
+                  </label>
+                }
+              </div>
+              @if (fehler('stand')) {
+                <p class="ka__fehler">{{ fehlerText('stand') }}</p>
+              }
+            </fieldset>
+
+            <fieldset
+              id="ka-versand"
+              class="ka__wahl"
+              tabindex="-1"
+              [class.ist-fehlerhaft]="fehler('versand')"
+            >
+              <legend class="ka__gruppe-label t-micro">{{ inhalt.formular.abschnittVersand }}</legend>
+              <div class="ka__wahlen">
+                @for (option of inhalt.formular.versand; track option.id) {
+                  <label
+                    class="ka__option"
+                    [class.ist-gewaehlt]="formular.controls.versand.value === option.id"
+                  >
+                    <input
+                      class="sr-only"
+                      type="radio"
+                      formControlName="versand"
+                      [value]="option.id"
+                    />
+                    <span class="ka__option-titel">{{ option.label }}</span>
+                    <span class="ka__option-text">{{ option.text }}</span>
+                  </label>
+                }
+              </div>
+              @if (fehler('versand')) {
+                <p class="ka__fehler">{{ fehlerText('versand') }}</p>
+              }
+
+              @if (selbst) {
+                <div class="ka__adresse">
+                  <p class="ka__gruppe-label t-micro">{{ inhalt.muster.anschrift }}</p>
+                  @for (zeile of inhalt.adresse; track zeile) {
+                    <p class="ka__adresszeile">{{ zeile }}</p>
+                  }
+                  <button class="ka__textlink" type="button" (click)="adresseKopieren()">
+                    {{ adresseKopiert() ? inhalt.adresseKopiert : inhalt.adresseKopieren }}
+                  </button>
+                  <p class="sr-only" role="status">
+                    @if (adresseKopiert()) {
+                      {{ inhalt.adresseKopiert }}
+                    }
+                  </p>
+                </div>
+
+                <div class="ka__feld">
+                  <p class="ka__feld-label t-micro" id="ka-aufnahme-label">
+                    {{ inhalt.formular.aufnahme }}
+                  </p>
+                  <p class="ka__feldhinweis" id="ka-aufnahme-hinweis">
+                    {{ inhalt.formular.aufnahmeHinweis }}
+                  </p>
+                  <div class="ka__aufnahme-zeile">
+                    @if (aufnahmeVorschau(); as src) {
+                      @if (aufnahmeVideo()) {
+                        <video class="ka__vorschau" [src]="src" controls playsinline></video>
+                      } @else {
+                        <img class="ka__vorschau" [src]="src" alt="" />
+                      }
+                    }
+                    <label class="ka__datei-wahl" for="ka-aufnahme">
+                      {{
+                        aufnahmeVorschau()
+                          ? inhalt.formular.aufnahmeAendern
+                          : inhalt.formular.aufnahmeWaehlen
+                      }}
+                    </label>
+                    <input
+                      #dateiEingabe
+                      id="ka-aufnahme"
+                      class="sr-only"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov"
+                      aria-labelledby="ka-aufnahme-label"
+                      [attr.aria-describedby]="
+                        aufnahmeFehler()
+                          ? 'ka-aufnahme-hinweis ka-aufnahme-fehler'
+                          : 'ka-aufnahme-hinweis'
+                      "
+                      (change)="aufnahmeGewaehlt($event)"
+                    />
+                    @if (aufnahmeVorschau()) {
+                      <button
+                        class="ka__textlink"
+                        type="button"
+                        (click)="aufnahmeEntfernen(dateiEingabe)"
+                      >
+                        {{ inhalt.formular.aufnahmeEntfernen }}
+                      </button>
+                    }
+                  </div>
+                  @if (aufnahmeFehler()) {
+                    <p id="ka-aufnahme-fehler" class="ka__fehler">{{ aufnahmeFehler() }}</p>
+                  }
+                </div>
+
+                @if (aufnahmeVorschau()) {
+                  <div class="ka__feld">
+                    <label class="ka__haken" [class.ist-fehlerhaft]="fehler('aufnahmeFreigabe')">
+                      <input
+                        id="ka-aufnahmeFreigabe"
+                        class="ka__checkbox"
+                        type="checkbox"
+                        formControlName="aufnahmeFreigabe"
+                        [attr.aria-invalid]="fehler('aufnahmeFreigabe') ? 'true' : null"
+                      />
+                      <span class="ka__haken-text">
+                        {{ inhalt.formular.aufnahmeFreigabe }} <span aria-hidden="true">*</span>
+                      </span>
+                    </label>
+                    @if (fehler('aufnahmeFreigabe')) {
+                      <p class="ka__fehler">{{ fehlerText('aufnahmeFreigabe') }}</p>
+                    }
+                  </div>
+                  <label class="ka__haken">
+                    <input class="ka__checkbox" type="checkbox" formControlName="nameBeiAufnahme" />
+                    <span class="ka__haken-text">{{ inhalt.formular.nameBeiAufnahme }}</span>
+                  </label>
+                }
+              }
+            </fieldset>
+
+            <fieldset id="ka-text" class="ka__wahl" tabindex="-1">
+              <legend class="ka__gruppe-label t-micro">{{ inhalt.formular.abschnittText }}</legend>
+              <div class="ka__wahlen">
+                @for (option of inhalt.formular.textart; track option.id) {
+                  <label
+                    class="ka__option"
+                    [class.ist-gewaehlt]="formular.controls.textart.value === option.id"
+                  >
+                    <input
+                      class="sr-only"
+                      type="radio"
+                      formControlName="textart"
+                      [value]="option.id"
+                    />
+                    <span class="ka__option-titel">{{ option.label }}</span>
+                    <span class="ka__option-text">{{ option.text }}</span>
+                  </label>
+                }
+              </div>
+              <div class="ka__feld">
+                <label class="ka__feld-label t-micro" for="ka-textfeld">
+                  {{ inhalt.formular.text }} <span aria-hidden="true">*</span>
+                </label>
+                <textarea
+                  id="ka-textfeld"
+                  class="ka__input ka__textarea"
+                  rows="8"
+                  [maxlength]="textMax"
+                  formControlName="text"
+                  [class.ist-fehlerhaft]="fehler('text')"
+                  [attr.aria-invalid]="fehler('text') ? 'true' : null"
+                  [placeholder]="geschichte ? inhalt.formular.textPlatzhalter : ''"
+                ></textarea>
+                @if (fehler('text')) {
+                  <p class="ka__fehler">{{ fehlerText('text') }}</p>
+                }
+                <p class="ka__zeichen t-micro" aria-hidden="true">
+                  {{ verbleibend() }} {{ inhalt.formular.zeichenFrei }}
+                </p>
+              </div>
+            </fieldset>
+
+            <div class="ka__gruppe">
+              <p class="ka__gruppe-label t-micro">{{ inhalt.formular.abschnittPerson }}</p>
+              <div class="ka__paar">
+                <div class="ka__feld">
+                  <label class="ka__feld-label t-micro" for="ka-vorname">
+                    {{ inhalt.formular.vorname }} <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="ka-vorname"
+                    class="ka__input"
+                    type="text"
+                    formControlName="vorname"
+                    autocomplete="given-name"
+                    required
+                    [class.ist-fehlerhaft]="fehler('vorname')"
+                    [attr.aria-invalid]="fehler('vorname') ? 'true' : null"
+                  />
+                  @if (fehler('vorname')) {
+                    <p class="ka__fehler">{{ fehlerText('vorname') }}</p>
+                  }
+                </div>
+                <div class="ka__feld">
+                  <label class="ka__feld-label t-micro" for="ka-nachname">
+                    {{ inhalt.formular.nachname }} <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="ka-nachname"
+                    class="ka__input"
+                    type="text"
+                    formControlName="nachname"
+                    autocomplete="family-name"
+                    required
+                    [class.ist-fehlerhaft]="fehler('nachname')"
+                    [attr.aria-invalid]="fehler('nachname') ? 'true' : null"
+                  />
+                  @if (fehler('nachname')) {
+                    <p class="ka__fehler">{{ fehlerText('nachname') }}</p>
+                  }
+                </div>
+              </div>
+
+              <div class="ka__feld">
+                <label class="ka__feld-label t-micro" for="ka-email">
+                  {{ inhalt.formular.email }} <span aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="ka-email"
+                  class="ka__input"
+                  type="email"
+                  formControlName="email"
+                  autocomplete="email"
+                  required
+                  [class.ist-fehlerhaft]="fehler('email')"
+                  [attr.aria-invalid]="fehler('email') ? 'true' : null"
+                  [attr.aria-describedby]="fehler('email') ? null : 'ka-email-hinweis'"
+                />
+                @if (fehler('email')) {
+                  <p class="ka__fehler">{{ fehlerText('email') }}</p>
+                } @else {
+                  <p id="ka-email-hinweis" class="ka__feldhinweis">
+                    {{ inhalt.formular.emailHinweis }}
+                  </p>
+                }
+              </div>
+
+              <div class="ka__paar">
+                <div class="ka__feld">
+                  <label class="ka__feld-label t-micro" for="ka-ort">
+                    {{ inhalt.formular.ort }} <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="ka-ort"
+                    class="ka__input"
+                    type="text"
+                    formControlName="ort"
+                    autocomplete="address-level2"
+                    required
+                    [class.ist-fehlerhaft]="fehler('ort')"
+                    [attr.aria-invalid]="fehler('ort') ? 'true' : null"
+                    [attr.aria-describedby]="fehler('ort') ? null : 'ka-ort-hinweis'"
+                  />
+                  @if (fehler('ort')) {
+                    <p class="ka__fehler">{{ fehlerText('ort') }}</p>
+                  } @else {
+                    <p id="ka-ort-hinweis" class="ka__feldhinweis">{{ inhalt.formular.ortHinweis }}</p>
+                  }
+                </div>
+                <div class="ka__feld">
+                  <label class="ka__feld-label t-micro" for="ka-land">
+                    {{ inhalt.formular.land }}
+                    @if (gegangen) {
+                      <span aria-hidden="true">*</span>
+                    }
+                  </label>
+                  <input
+                    id="ka-land"
+                    class="ka__input"
+                    type="text"
+                    formControlName="land"
+                    autocomplete="country-name"
+                    [class.ist-fehlerhaft]="fehler('land')"
+                    [attr.aria-invalid]="fehler('land') ? 'true' : null"
+                    [attr.aria-describedby]="fehler('land') ? null : 'ka-land-hinweis'"
+                  />
+                  @if (fehler('land')) {
+                    <p class="ka__fehler">{{ fehlerText('land') }}</p>
+                  } @else {
+                    <p id="ka-land-hinweis" class="ka__feldhinweis">
+                      {{ gegangen ? inhalt.formular.landHinweis : inhalt.formular.landHinweisFrei }}
+                    </p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="ka__gruppe">
+              <p class="ka__gruppe-label t-micro">{{ inhalt.formular.abschnittEinwilligung }}</p>
+              <div class="ka__feld">
+                <label class="ka__haken" [class.ist-fehlerhaft]="fehler('einwilligung')">
+                  <input
+                    id="ka-einwilligung"
+                    class="ka__checkbox"
+                    type="checkbox"
+                    formControlName="einwilligung"
+                    required
+                    [attr.aria-invalid]="fehler('einwilligung') ? 'true' : null"
+                  />
+                  <span class="ka__haken-text">
+                    {{ inhalt.formular.einwilligung }} <span aria-hidden="true">*</span>
+                  </span>
+                </label>
+                @if (fehler('einwilligung')) {
+                  <p class="ka__fehler">{{ fehlerText('einwilligung') }}</p>
+                }
+              </div>
+            </div>
+
+            <div class="ka__honig" aria-hidden="true">
+              <label for="ka-webseite">Website (bitte frei lassen)</label>
+              <input
+                id="ka-webseite"
+                type="text"
+                formControlName="webseite"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="ka__abschluss">
+              <button class="pill" type="submit">{{ inhalt.formular.absenden }}</button>
+              <p class="ka__datenschutz">
+                {{ inhalt.formular.datenschutzHinweis }}
+                <a class="ghost-link" routerLink="/datenschutz">Datenschutzerklärung</a>
+              </p>
+            </div>
+
+            <p class="ka__hinweis t-micro">{{ inhalt.hinweisOhneBackend }}</p>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+
+  <app-postkarten-wand />
+</section>
+
+<dialog
+  #hinweis
+  class="ka__dialog"
+  tabindex="-1"
+  aria-labelledby="ka-dialog-titel"
+  aria-describedby="ka-dialog-text"
+  (click)="hintergrundSchliessen($event)"
+>
+  <h2 id="ka-dialog-titel" class="ka__dialog-titel">{{ inhalt.dialog.titel }}</h2>
+  <p id="ka-dialog-text" class="ka__dialog-text">{{ inhalt.dialog.text }}</p>
+  <div class="ka__dialog-aktionen">
+    <button class="pill" type="button" (click)="aufnahmeAusDialog()">
+      {{ inhalt.dialog.aufnehmen }}
+    </button>
+    <button class="ka__textlink" type="button" (click)="hinweisSchliessen()">
+      {{ inhalt.dialog.spaeter }}
+    </button>
+  </div>
+</dialog>
