@@ -4,9 +4,11 @@ import { RouterLink } from '@angular/router';
 import {
   ABGABEN_VERGLEICH,
   AUSBLUTEN,
+  ENTWICKLUNGEN,
   FOOTER,
   KENNZAHLEN,
   MARKE,
+  TAKT,
   WANDERUNG,
   ZAHLEN_GEPRUEFT,
 } from '../../core/content';
@@ -29,6 +31,9 @@ export class SiteFooter {
   protected readonly vergleich = ABGABEN_VERGLEICH;
   protected readonly qualifikation = KENNZAHLEN.qualifikation;
   protected readonly ausbluten = AUSBLUTEN;
+  protected readonly takt = TAKT;
+  protected readonly entwicklungen = ENTWICKLUNGEN;
+  protected readonly fortzuegeText = TAKT.fortzuege.toLocaleString('de-DE');
   /** Solange Kennzahlen ungeprueft sind, weist die Seite selbst darauf hin. */
   protected readonly zahlenGeprueft = ZAHLEN_GEPRUEFT;
   protected readonly jahr = new Date().getFullYear();

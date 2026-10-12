@@ -1,11 +1,18 @@
 @use 'mixins' as *;
 
+:host {
+  display: block;
+}
+
 .at {
-  position: relative;
-  display: flex;
+  display: grid;
+  /* Schmale Textspalte, damit der Satz in mehreren Zeilen fällt.
+     Die Figur behält ihren Ausschnitt. */
+  grid-template-columns: minmax(0, min(32rem, 36vw)) min(48vw, 75svh);
+  grid-template-rows: minmax(0, 1fr);
   justify-content: center;
   align-items: stretch;
-  gap: clamp(1.5rem, 3vw, 3.5rem);
+  column-gap: clamp(1.5rem, 3vw, 3.5rem);
   overflow: hidden;
   min-height: 100svh;
   padding-left: clamp(2.5rem, 8vw, 9rem);
@@ -13,13 +20,14 @@
   background: #000;
 }
 
-/* Neben dem Text, gleiche Hoehe wie der Ausschnitt. 132 Prozent schneiden
-   unter den Haenden ab, die Figur bleibt gross. */
+/* Neben dem Text, über beide Zeilen, gleiche Höhe wie der Ausschnitt.
+   132 Prozent schneiden unter den Händen ab, die Figur bleibt groß. */
 .at__figur {
+  grid-column: 2;
+  grid-row: 1 / -1;
   position: relative;
-  flex: 0 0 auto;
-  width: min(48vw, 75svh);
-  height: 100svh;
+  width: 100%;
+  min-height: 100svh;
   margin: 0;
   overflow: hidden;
   pointer-events: none;
@@ -27,12 +35,15 @@
   justify-content: flex-end;
   align-items: flex-start;
 
+  /* Absolut, damit die Bildhöhe die Sektion nicht über den Viewport schiebt. */
   img {
+    position: absolute;
+    top: 0;
+    right: 0;
     display: block;
     width: auto;
     height: 132%;
     max-width: none;
-    margin-left: auto;
     user-select: none;
     filter: grayscale(0.06) contrast(1.18) brightness(1.42);
   }
@@ -41,19 +52,16 @@
 .at__zitat {
   position: relative;
   z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: var(--spacing-28);
-  min-height: 100svh;
-  flex: 0 1 32rem;
-  /* Schmaler, damit der Satz wieder in mehr Zeilen faellt. Der Block
-     sitzt mit der Figur zusammen in der Mitte. */
-  max-width: min(32rem, 36vw);
+  align-self: stretch;
   margin: 0;
-  padding-block: var(--spacing-60);
+  padding-block: var(--spacing-52);
   color: var(--color-paper);
-
   opacity: 0;
   transform: translateY(18px);
   transition:
@@ -100,37 +108,36 @@
 
 @include tablet {
   .at {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    justify-content: stretch;
+    column-gap: 0;
     min-height: 0;
     padding-inline: 0;
   }
 
   .at__zitat {
-    min-height: 0;
-    flex: none;
+    grid-column: 1;
+    grid-row: 1;
     max-width: 36rem;
     padding-block: var(--spacing-52) var(--spacing-20);
     justify-content: flex-start;
   }
 
-  /* Unter 900px untereinander: zuerst der Text, dann derselbe
-     Ausschnitt bis zu den Haenden. */
+  /* Unter 900px untereinander: zuerst der Text, dann der Ausschnitt. */
   .at__figur {
-    position: relative;
-    top: auto;
-    right: auto;
-    bottom: auto;
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
     width: min(100%, 560px);
     height: auto;
-    aspect-ratio: 75 / 78;
-    margin-inline: auto;
     min-height: 0;
+    aspect-ratio: 75 / 78;
 
     img {
       position: absolute;
       top: 0;
+      right: auto;
       left: 50%;
       width: 100%;
       height: auto;

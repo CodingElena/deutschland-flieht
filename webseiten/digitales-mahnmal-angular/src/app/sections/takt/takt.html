@@ -1,0 +1,36 @@
+<section #flaeche class="tk surface-ink inset" [attr.aria-label]="sektion.aria">
+  <div class="tk__karte" appReveal>
+    <svg class="tk__ring" viewBox="0 0 64 64" aria-hidden="true">
+      <circle class="tk__ring-spur" cx="32" cy="32" r="26" />
+      <circle
+        class="tk__ring-lauf"
+        cx="32"
+        cy="32"
+        r="26"
+        pathLength="100"
+        stroke-dasharray="100"
+        transform="rotate(-90 32 32)"
+        [attr.stroke-dashoffset]="versatz()"
+      />
+      <circle class="tk__ring-schein" [attr.cx]="punkt().x" [attr.cy]="punkt().y" r="4.5" />
+      <circle class="tk__ring-punkt" [attr.cx]="punkt().x" [attr.cy]="punkt().y" r="2.15" />
+    </svg>
+
+    <div class="tk__text">
+      <p class="tk__satz" aria-live="polite" aria-atomic="true">
+        {{ sektion.seit }}
+        @if (zaehler() === 1) {
+          hat <strong class="tk__zahl">{{ zaehlerText() }}</strong> {{ sektion.verlassenEinzahl }}
+        } @else {
+          haben <strong class="tk__zahl">{{ zaehlerText() }}</strong> {{ sektion.verlassenMehrzahl }}
+        }
+      </p>
+      <p class="tk__rhythmus">
+        Alle
+        <strong class="tk__betonung">{{ umlaufSekunden }}&nbsp;Sekunden</strong>
+        {{ sektion.rhythmus }}<a class="tk__fn" href="#zn-fn-5" id="at-ref-5"><sup>5</sup></a
+        >.
+      </p>
+    </div>
+  </div>
+</section>

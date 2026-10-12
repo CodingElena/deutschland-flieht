@@ -5,9 +5,7 @@ import { Reveal } from '../../shared/reveal';
 
 /**
  * Schlussbild: Atlas mit der Welt auf den Schultern.
- *
- * Eigene Sektion ganz am Ende, damit Figur und Kugel lesbar bleiben —
- * nicht als Kulisse hinter einer anderen Gruppe.
+ * Der Takt der Fortzüge folgt direkt darunter.
  */
 @Component({
   selector: 'app-atlas',

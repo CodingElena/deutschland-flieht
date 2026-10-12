@@ -386,9 +386,9 @@ export const MARKE = {
  * richtet die Leiste ihre eigene Farbe aus, statt zu raten.
  *
  * Nicht jede Sektion braucht eine eigene Wegmarke. Auswertung haengt an
- * der Petition. Die Kennzahlen gehoeren zur Karte, der Atlas zu den
- * Unterstuetzern — `dazu` haelt das Kapitel aktiv, ohne einen weiteren
- * Punkt in der Leiste.
+ * der Petition, der Takt an den Forderungen. Die Kennzahlen gehoeren zur
+ * Karte, der Atlas zu den Unterstuetzern — `dazu` haelt das Kapitel aktiv,
+ * ohne einen weiteren Punkt in der Leiste.
  * ------------------------------------------------------------------------- */
 
 /** Sektion ohne eigenen Menuepunkt, die ihr Kapitel aktiv haelt. */
@@ -423,7 +423,10 @@ export const KAPITEL: readonly Kapitel[] = [
     id: 'unterstuetzer',
     label: 'Unterstützer',
     dunkel: false,
-    dazu: [{ id: 'atlas', dunkel: true }],
+    dazu: [
+      { id: 'atlas', dunkel: true },
+      { id: 'takt', dunkel: true },
+    ],
   },
 ];
 
@@ -805,6 +808,8 @@ export const ENTWICKLUNGEN = {
   auswertungLabel: 'AUSWERTUNG',
   belegeLabel: 'BELEGE',
   belegeTitel: 'Was anderswo steht.',
+  /** Verweis aus den Fußnoten der Startseite auf diese Seite. */
+  datengrundlage: 'Datengrundlage',
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -1018,12 +1023,10 @@ export const AUSWERTUNG = {
 } as const;
 
 /* ---------------------------------------------------------------------------
- * Atlas — Schlussbild ganz am Ende
+ * Takt — Schluss unter dem Atlas
  *
- * Das Zitat steht bei der Figur. Darunter der Takt: wie oft rechnerisch
- * jemand das Land verlässt, seit die Seite offen ist. Die Sekunden folgen
- * aus dem letzten Jahr der Wanderungsreihe (365 Tage, keine Echtzeit),
- * damit sie nicht neben den Kennzahlen herlaufen.
+ * Eine Umdrehung des Rings ist eine Person. Die Sekunden folgen aus dem
+ * letzten Jahr der Wanderungsreihe (365 Tage, keine Echtzeit).
  * ------------------------------------------------------------------------- */
 
 const SEKUNDEN_IM_JAHR = 365 * 24 * 3600;
@@ -1032,6 +1035,26 @@ const SEKUNDEN_IM_JAHR = 365 * 24 * 3600;
 const sekundenJe = (anzahl: number): number => Math.round(SEKUNDEN_IM_JAHR / anzahl);
 
 const wanderungJetzt = WANDERUNG.jahre[WANDERUNG.jahre.length - 1];
+
+export const TAKT = {
+  sekunden: sekundenJe(wanderungJetzt.fortzuege),
+  nettoSekunden: sekundenJe(Math.abs(wanderungJetzt.saldo)),
+  fortzuege: wanderungJetzt.fortzuege,
+  jahr: wanderungJetzt.jahr,
+  url: WANDERUNG.url,
+  aria: 'Rechnerische Fortzüge seit dem Öffnen der Seite',
+  seit: 'Seit du diese Seite geöffnet hast,',
+  verlassenEinzahl: 'Mensch Deutschland verlassen.',
+  verlassenMehrzahl: 'Menschen Deutschland verlassen.',
+  rhythmus: 'geht ein Mensch',
+  rechnung: 'Durchschnittsrechnung, keine Echtzeit:',
+  formel: '365 · 24 · 3600 s ÷',
+  netto: 'Nach Abzug der Rückkehrer netto etwa alle',
+} as const;
+
+/* ---------------------------------------------------------------------------
+ * Atlas — Schlussbild ganz am Ende
+ * ------------------------------------------------------------------------- */
 
 export const ATLAS = {
   zitat:
@@ -1042,18 +1065,6 @@ export const ATLAS = {
   frage: 'was würdest du ihm raten?',
   herkunft: 'Atlas Shrugged — Ayn Rand',
   bild: BILDER.atlas,
-  takt: {
-    sekunden: sekundenJe(wanderungJetzt.fortzuege),
-    nettoSekunden: sekundenJe(Math.abs(wanderungJetzt.saldo)),
-    fortzuege: wanderungJetzt.fortzuege,
-    jahr: wanderungJetzt.jahr,
-    url: WANDERUNG.url,
-    satz: 'verlässt rechnerisch ein Deutscher das Land.',
-    seit: 'Seit du diese Seite geöffnet hast:',
-    rechnung: 'Durchschnittsrechnung, keine Echtzeit:',
-    formel: '365 · 24 · 3600 s ÷',
-    netto: 'Nach Abzug der Rückkehrer netto etwa alle',
-  },
 } as const;
 
 /* ---------------------------------------------------------------------------

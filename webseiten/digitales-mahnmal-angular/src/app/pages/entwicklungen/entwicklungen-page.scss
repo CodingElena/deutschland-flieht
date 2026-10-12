@@ -77,6 +77,12 @@
   border-radius: var(--radius-links);
 }
 
+.ew__block-titel,
+#belege {
+  /* Fußnoten springen hierher. Ohne Abstand liegt die Zeile am Fensterrand. */
+  scroll-margin-top: 3.5rem;
+}
+
 .ew__block-titel {
   @include serif-heading-lg;
   margin: var(--spacing-16) 0 0;

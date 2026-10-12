@@ -7,6 +7,7 @@ import { Beitraege } from '../../sections/beitraege/beitraege';
 import { Atlas } from '../../sections/atlas/atlas';
 import { Ausbluten } from '../../sections/ausbluten/ausbluten';
 import { Forderungen } from '../../sections/forderungen/forderungen';
+import { Takt } from '../../sections/takt/takt';
 import { Hero } from '../../sections/hero/hero';
 import { Kapital } from '../../sections/kapital/kapital';
 import { Unterschreiben } from '../../layout/unterschreiben/unterschreiben';
@@ -36,7 +37,8 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
  *   Postkarte (Putty) Karte ans Kanzleramt, Aufnahmen vom Abschicken
  *   Entwicklungen (Bone) Eigene Saetze mit Quelle, Papier in der Nebenspalte
  *   Unterstuetzer     Logos; der Atlas gehoert dazu
- *   Atlas (Ink)       Zitat, Figur und der Takt der Fortzuege, ganz am Ende
+ *   Atlas (Ink)       Zitat und Figur
+ *   Takt (Ink)        Eine Umdrehung, eine Person — Schluss unter dem Atlas
  */
 @Component({
   selector: 'app-landing',
@@ -50,6 +52,7 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
     Ausbluten,
     Kapital,
     Forderungen,
+    Takt,
     Abschluss,
     Auswertung,
     Postkarte,
@@ -67,6 +70,7 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
     <app-zahlen id="zahlen" />
     <app-kapital id="und-dann" />
     <app-forderungen id="forderungen" />
+    <app-takt id="takt" />
     <app-abschluss id="petition" />
     <app-auswertung />
     <app-postkarte id="postkarte" />

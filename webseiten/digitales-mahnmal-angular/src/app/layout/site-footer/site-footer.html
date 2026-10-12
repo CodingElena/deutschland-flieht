@@ -17,20 +17,44 @@
       <li id="zn-fn-1" class="fuss__mikro">
         {{ wanderung.text }}
         <a [href]="wanderung.url">{{ wanderung.quelle }}</a>
-        — {{ wanderung.stand }}
+        — {{ wanderung.stand }}.
+        <a [routerLink]="entwicklungen.pfad" fragment="ew-reihe">{{
+          entwicklungen.datengrundlage
+        }}</a>
       </li>
       <li id="zn-fn-2" class="fuss__mikro">
         {{ vergleich.text }}
-        <a [href]="vergleich.url">{{ vergleich.quelle }}</a>
+        <a [href]="vergleich.url">{{ vergleich.quelle }}</a
+        >.
+        <a [routerLink]="entwicklungen.pfad" fragment="ew-keil">{{
+          entwicklungen.datengrundlage
+        }}</a>
       </li>
       <li id="zn-fn-3" class="fuss__mikro">
         {{ qualifikation.label }}
         <a [href]="qualifikation.url">{{ qualifikation.quelle }}</a>
-        — {{ qualifikation.jahr }}
+        — {{ qualifikation.jahr }}.
+        <a [routerLink]="entwicklungen.pfad" fragment="belege">{{
+          entwicklungen.datengrundlage
+        }}</a>
       </li>
       <li id="zn-fn-4" class="fuss__mikro">
         Fortzüge deutscher Staatsangehöriger 2025 nach Zielland (Karte).
-        <a [href]="ausbluten.url">{{ ausbluten.quelle }}</a>
+        <a [href]="ausbluten.url">{{ ausbluten.quelle }}</a
+        >.
+        <a [routerLink]="entwicklungen.pfad" fragment="ew-reihe">{{
+          entwicklungen.datengrundlage
+        }}</a>
+      </li>
+      <li id="zn-fn-5" class="fuss__mikro">
+        {{ takt.rechnung }}
+        {{ takt.formel }}
+        <a [href]="takt.url">{{ fortzuegeText }} Fortzüge ({{ takt.jahr }})</a>,
+        also alle {{ takt.sekunden }} Sekunden eine Person.
+        {{ takt.netto }} {{ takt.nettoSekunden }} Sekunden.
+        <a [routerLink]="entwicklungen.pfad" fragment="ew-reihe">{{
+          entwicklungen.datengrundlage
+        }}</a>
       </li>
     </ol>
   </div>

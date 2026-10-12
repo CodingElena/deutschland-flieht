@@ -1,0 +1,116 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+.tk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: var(--spacing-52) var(--spacing-96);
+  background: #000;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--color-paper);
+}
+
+.tk__karte {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-32);
+  width: min(62rem, 100%);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 800ms var(--ease-gallery),
+    transform 800ms var(--ease-gallery);
+
+  &.ist-sichtbar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  .tk__karte {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tk__ring {
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  overflow: visible;
+}
+
+.tk__ring-spur,
+.tk__ring-lauf {
+  fill: none;
+  stroke-width: 1.75;
+}
+
+.tk__ring-spur {
+  stroke: rgba(255, 255, 255, 0.22);
+}
+
+.tk__ring-lauf {
+  stroke: var(--color-rot);
+  stroke-linecap: round;
+}
+
+.tk__ring-schein {
+  fill: var(--color-rot);
+  opacity: 0.4;
+}
+
+.tk__ring-punkt {
+  fill: var(--color-paper);
+}
+
+.tk__text {
+  min-width: 0;
+}
+
+.tk__satz {
+  @include grotesk-stat;
+  font-size: var(--text-heading-sm-fluid);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-heading-sm);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.tk__rhythmus {
+  @include grotesk-stat;
+  font-size: var(--text-heading-sm-fluid);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-heading-sm);
+  margin: var(--spacing-16) 0 0;
+  color: rgba(255, 255, 255, 0.84);
+  text-wrap: pretty;
+}
+
+.tk__zahl,
+.tk__betonung {
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.tk__fn {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-paper);
+  }
+}
+
+@include mobile {
+  .tk__karte {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
