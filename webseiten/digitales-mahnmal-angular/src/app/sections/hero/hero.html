@@ -1,24 +1,30 @@
-<!-- Nacht statt Papier: der Hero oeffnet das Mahnmal, nicht eine Galerie.
-     Erst ein Gesicht und zwei Saetze. Mit dem zweiten erloeschen die
-     Fenster. Danach zaehlt die Zahl. Erst wenn sie steht, kommt
-     die Wortmarke. -->
-<section class="hero surface-ink" [attr.data-akt]="akt()">
+<!-- Fünf Gesichter öffnen das Mahnmal. Kurz danach das Zitat.
+     Dann wird jede Kachel zur leeren Silhouette. Kurz bleibt nur
+     Schwarz. Danach schlägt die Wortmarke ein, und die Zahl folgt. -->
+<section
+  class="hero surface-ink"
+  [class.hero--geht]="geht()"
+  [attr.data-akt]="akt()"
+  [style.--staffel]="staffelMs + 'ms'"
+  [style.--verblassen]="verblassenMs + 'ms'"
+>
+  <div class="hero__wand" #wand aria-hidden="true">
+    @for (kachel of kacheln; track kachel.id) {
+      <figure class="hero__gesicht" [style.--verzug]="kachel.verzug">
+        <img #aufnahme [src]="kachel.pfad" alt="" decoding="async" />
+        <canvas #silhouette class="hero__silhouette"></canvas>
+      </figure>
+    }
+  </div>
+
   <div class="hero__auftritt">
-    <img
-      class="hero__gesicht"
-      [src]="hero.gesicht.pfad"
-      [alt]="hero.gesicht.alt"
-      fetchpriority="high"
-      decoding="async"
-    />
     <p class="hero__spruch">
-      <span class="hero__satz hero__satz--liebe">{{ hero.spruch.liebe }}</span>
-      <span class="hero__satz hero__satz--verlassen">{{ hero.spruch.verlassen }}</span>
+      <span class="hero__satz">{{ hero.spruch.liebe }}</span>
+      <span class="hero__satz">{{ hero.spruch.verlassen }}</span>
     </p>
   </div>
 
   <div class="hero__cluster inset">
-    <!-- Die Fortzuege zaehlen, sobald die Fenster aus sind. -->
     <dl class="hero__stats">
       @for (k of hero.stats; track k.label) {
         <div class="hero__stat">
@@ -34,28 +40,12 @@
     <a class="hero__daten ghost-link" [routerLink]="daten.pfad">{{ daten.startLabel }}</a>
   </div>
 
-  <!-- Die Wortmarke traegt den Seitentitel. Sie ruht auf der Oberkante des
-       Gemaeldes und sinkt beim Scrollen dahinter weg. -->
-  <h1 class="hero__marke" [style.transform]="'translateY(' + markeVersatz() + 'px)'">
+  <!-- Die Wortmarke traegt den Seitentitel. Sie steht im Schwarz und
+       sinkt beim Scrollen nach unten weg. -->
+  <h1 class="hero__marke" [style.--sink]="markeVersatz() + 'px'">
     <span class="hero__wort">{{ marke.wortmarke }}</span>
     <span class="hero__verb">{{ marke.wortmarkeVerb }}</span>
   </h1>
 
-  <!-- Das Gemaelde traegt die untere Bildhaelfte. Die Leinwand legt sich
-       darueber und loescht die Fenster, sobald der zweite Satz
-       gesagt ist. Die Wortmarke wartet, bis das vorbei ist. -->
-  <div class="hero__bild" #bildflaeche>
-    <img
-      #aufnahme
-      [src]="hero.bild.pfad"
-      [alt]="hero.bild.alt"
-      decoding="async"
-    />
-    <canvas
-      class="hero__leinwand"
-      [class.hero__leinwand--aktiv]="leinwandAktiv()"
-      #leinwand
-      aria-hidden="true"
-    ></canvas>
-  </div>
+  <div class="hero__atem" aria-hidden="true"></div>
 </section>

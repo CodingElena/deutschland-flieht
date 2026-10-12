@@ -8,6 +8,7 @@ import {
   inject,
   signal,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
@@ -15,14 +16,16 @@ import { RouterLink } from '@angular/router';
 import { ENTWICKLUNGEN, HERO, MARKE } from '../../core/content';
 import { fensterScroll } from '../../core/scroll-progress';
 import { Zaehlwert } from '../../shared/zaehlwert';
-import { LICHT_DAUER_MS, planeLichtausfall } from './hero-lichter';
+import { zeichneSilhouette } from './hero-silhouette';
 
 /**
- * Hero — erst ein Gesicht, dann die Wortmarke.
+ * Hero — fünf Porträts werden zu leeren Menschen.
  *
- * Das Gesicht spricht zwei Saetze. Mit dem zweiten ("sie verlassen")
- * erloeschen die Fenster. Danach zaehlt die Zahl hoch, und erst
- * wenn sie steht, kommt die Wortmarke.
+ * Zuerst die Gesichter, groß und allein. Kurz danach das Zitat darüber.
+ * Dann wird ein Bild nach dem anderen zur Silhouette: dieselbe Kachel,
+ * nur noch die leere Form. Wenn alle fünf leer sind, bleibt kurz nur
+ * Schwarz. Danach schlägt die Wortmarke ein. Die Zahl kommt erst, wenn
+ * der Titel schon steht.
  *
  * Die Wortmarke laeuft absichtlich ueber die Viewportbreite hinaus und
  * wird an beiden Raendern beschnitten.
@@ -33,14 +36,26 @@ import { LICHT_DAUER_MS, planeLichtausfall } from './hero-lichter';
  */
 
 /** Akt des Auftakts. `warte` ist nur der erste Frame, damit das Einblenden laeuft. */
-type HeroAkt = 'warte' | 'liebe' | 'fehlen' | 'zahl' | 'marke';
+type HeroAkt = 'warte' | 'gesichter' | 'zitat' | 'silhouette' | 'schwarz' | 'urteil' | 'zahl';
 
-/** Pause auf dem ersten Satz, bevor der zweite einsetzt. */
-const AKT_FEHLEN_MS = 1600;
-/** Kurzer Schlag auf der dunklen Stadt, dann die Zahl. */
-const PAUSE_NACH_DUNKEL_MS = 120;
-/** Hochzaehlen, danach erscheint die Wortmarke. */
-const ZAEHL_DAUER_MS = 900;
+/** Fünf Aufnahmen, jede einmal. */
+const ANZAHL = 5;
+/** Die Gesichter stehen allein, bevor das Zitat kommt. */
+const FOTOS_MS = 1800;
+/** Das Zitat liegt auf den Gesichtern, bevor die erste Form leer wird. */
+const ZITAT_MS = 2200;
+/** Abstand, in dem die nächste Kachel zur Silhouette wird. */
+const STAFFEL_MS = 460;
+/** Ein Gesicht wird über diese Spanne zur leeren Form. */
+const VERBLASSEN_MS = 1100;
+/** Alle fünf Silhouetten bleiben kurz stehen. */
+const HALTEN_MS = 1100;
+/** Reines Schwarz zwischen den leeren Kacheln und der Wortmarke. */
+const SCHWARZ_MS = 700;
+/** Die Zahl kommt erst, wenn die Wortmarke schon steht. */
+const PAUSE_VOR_ZAHL_MS = 900;
+/** Hochzaehlen. Die Wortmarke steht dann schon. */
+const ZAEHL_DAUER_MS = 620;
 
 @Component({
   selector: 'app-hero',
@@ -53,24 +68,33 @@ export class Hero {
   protected readonly hero = HERO;
   protected readonly marke = MARKE;
   protected readonly daten = ENTWICKLUNGEN;
-  protected readonly leinwandAktiv = signal(false);
   protected readonly akt = signal<HeroAkt>('warte');
-  /** Die Zahl kommt erst, wenn die Fenster aus sind, und bleibt danach stehen. */
-  protected readonly zahlSichtbar = computed(
-    () => this.akt() === 'zahl' || this.akt() === 'marke',
-  );
+  /** Einmal wahr, sobald die Gesichter zu Silhouetten werden. Bleibt wahr, damit die Animation nicht neu startet. */
+  protected readonly geht = computed(() => {
+    const akt = this.akt();
+    return akt === 'silhouette' || akt === 'schwarz' || akt === 'urteil' || akt === 'zahl';
+  });
+  /** Die Zahl kommt erst, wenn die Wortmarke steht. */
+  protected readonly zahlSichtbar = computed(() => this.akt() === 'zahl');
   protected readonly zaehlDauer = ZAEHL_DAUER_MS;
+  protected readonly staffelMs = STAFFEL_MS;
+  protected readonly verblassenMs = VERBLASSEN_MS;
 
-  private readonly aufnahme = viewChild<ElementRef<HTMLImageElement>>('aufnahme');
-  private readonly leinwand = viewChild<ElementRef<HTMLCanvasElement>>('leinwand');
-  private readonly bildflaeche = viewChild<ElementRef<HTMLElement>>('bildflaeche');
+  protected readonly kacheln = HERO.gesichter.slice(0, ANZAHL).map((bild, index) => ({
+    id: index,
+    pfad: bild.pfad,
+    verzug: index,
+  }));
+
+  private readonly wand = viewChild<ElementRef<HTMLElement>>('wand');
+  private readonly aufnahmen = viewChildren<ElementRef<HTMLImageElement>>('aufnahme');
+  private readonly leinwaende = viewChildren<ElementRef<HTMLCanvasElement>>('silhouette');
 
   private readonly scroll = fensterScroll();
 
   /**
-   * Die Wortmarke ruht auf der Oberkante des Gemaeldes und sinkt beim
-   * Scrollen dahinter weg. Sie bewegt sich schneller als die Seite, dadurch
-   * wirkt es, als tauche sie hinter der Kante ab, statt nur mitzulaufen.
+   * Die Wortmarke sitzt in der Mitte des Schwarzes und sinkt beim
+   * Scrollen nach unten weg. Sie bewegt sich schneller als die Seite.
    */
   protected readonly markeVersatz = computed(() =>
     Math.min(this.scroll() * 0.9, 420),
@@ -84,101 +108,102 @@ export class Hero {
       const abort = new AbortController();
       destroy.onDestroy(() => abort.abort());
 
-      let pauseNachDunkel = 0;
-      let pauseNachZahl = 0;
-
-      const zeigeMarke = (): void => {
-        if (abort.signal.aborted || this.akt() === 'marke') {
-          return;
-        }
-        this.akt.set('marke');
-      };
-
-      const zeigeZahl = (): void => {
-        if (abort.signal.aborted || this.akt() === 'zahl' || this.akt() === 'marke') {
-          return;
-        }
-        this.akt.set('zahl');
-        pauseNachZahl = window.setTimeout(zeigeMarke, ZAEHL_DAUER_MS);
-      };
-
-      const lichter = (onFertig?: () => void): void => {
-        if (abort.signal.aborted || this.leinwandAktiv()) {
-          return;
-        }
-        const img = this.aufnahme()?.nativeElement;
-        const canvas = this.leinwand()?.nativeElement;
-        const box = this.bildflaeche()?.nativeElement;
-        if (!img || !canvas || !box || !img.naturalWidth) {
-          return;
-        }
-        const ok = planeLichtausfall({
-          canvas,
-          bild: img,
-          container: box,
-          signal: abort.signal,
-          anfang: reduziert ? 1 : 0,
-          onFertig,
+      const neuZeichnen = (): void => {
+        const flaechen = this.aufnahmen();
+        const leinwaende = this.leinwaende();
+        flaechen.forEach((aufnahme, index) => {
+          const img = aufnahme.nativeElement;
+          const canvas = leinwaende[index]?.nativeElement;
+          const container = img.parentElement;
+          if (!canvas || !container) {
+            return;
+          }
+          const zeichnen = (): void => {
+            if (abort.signal.aborted) {
+              return;
+            }
+            zeichneSilhouette(canvas, img, container);
+          };
+          if (img.complete && img.naturalWidth) {
+            zeichnen();
+            return;
+          }
+          img.addEventListener('load', zeichnen, { once: true, signal: abort.signal });
         });
-        this.leinwandAktiv.set(ok);
-        if (!ok) {
-          onFertig?.();
-        }
       };
 
-      const wennBildDa = (danach: () => void): void => {
-        const img = this.aufnahme()?.nativeElement;
-        if (!img || abort.signal.aborted) {
-          return;
-        }
-        if (img.complete && img.naturalWidth) {
-          danach();
-          return;
-        }
-        img.addEventListener('load', () => danach(), { once: true, signal: abort.signal });
-      };
+      neuZeichnen();
+      const wand = this.wand()?.nativeElement;
+      const beobachter = new ResizeObserver(() => neuZeichnen());
+      if (wand) {
+        beobachter.observe(wand);
+      }
+      abort.signal.addEventListener('abort', () => beobachter.disconnect(), { once: true });
 
       if (reduziert) {
-        this.akt.set('marke');
-        wennBildDa(lichter);
+        this.akt.set('zahl');
         return;
       }
 
-      /* Zwei Frames warten, damit der erste Zustand gezeichnet ist
-         und das Einblenden des Gesichts als Uebergang laeuft. */
+      const startSilhouette = FOTOS_MS + ZITAT_MS;
+      const letzteFertig = startSilhouette + (ANZAHL - 1) * STAFFEL_MS + VERBLASSEN_MS;
+
+      /* Zwei Frames warten, damit die fünf Gesichter als eigener Schlag
+         gezeichnet sind, bevor das Zitat kommt. */
       const rahmen = requestAnimationFrame(() => {
         const rahmen2 = requestAnimationFrame(() => {
           if (abort.signal.aborted) {
             return;
           }
-          this.akt.set('liebe');
+          this.akt.set('gesichter');
         });
         abort.signal.addEventListener('abort', () => cancelAnimationFrame(rahmen2), { once: true });
       });
 
-      const zuFehlen = window.setTimeout(() => {
-        this.akt.set('fehlen');
-        wennBildDa(() =>
-          lichter(() => {
-            pauseNachDunkel = window.setTimeout(zeigeZahl, PAUSE_NACH_DUNKEL_MS);
-          }),
-        );
-      }, AKT_FEHLEN_MS);
+      const zuZitat = window.setTimeout(() => {
+        if (abort.signal.aborted) {
+          return;
+        }
+        this.akt.set('zitat');
+      }, FOTOS_MS);
 
-      /* Falls die Aufnahme nicht laedt: Zahl und Wortmarke kommen trotzdem. */
-      const notfall = window.setTimeout(
-        zeigeZahl,
-        AKT_FEHLEN_MS + LICHT_DAUER_MS + PAUSE_NACH_DUNKEL_MS + 400,
-      );
+      const zuSilhouette = window.setTimeout(() => {
+        if (abort.signal.aborted) {
+          return;
+        }
+        this.akt.set('silhouette');
+      }, startSilhouette);
+
+      const zuSchwarz = window.setTimeout(() => {
+        if (abort.signal.aborted) {
+          return;
+        }
+        this.akt.set('schwarz');
+      }, letzteFertig + HALTEN_MS);
+
+      const zuUrteil = window.setTimeout(() => {
+        if (abort.signal.aborted) {
+          return;
+        }
+        this.akt.set('urteil');
+      }, letzteFertig + HALTEN_MS + SCHWARZ_MS);
+
+      const zuZahl = window.setTimeout(() => {
+        if (abort.signal.aborted) {
+          return;
+        }
+        this.akt.set('zahl');
+      }, letzteFertig + HALTEN_MS + SCHWARZ_MS + PAUSE_VOR_ZAHL_MS);
 
       abort.signal.addEventListener(
         'abort',
         () => {
           cancelAnimationFrame(rahmen);
-          window.clearTimeout(zuFehlen);
-          window.clearTimeout(pauseNachDunkel);
-          window.clearTimeout(pauseNachZahl);
-          window.clearTimeout(notfall);
+          window.clearTimeout(zuZitat);
+          window.clearTimeout(zuSilhouette);
+          window.clearTimeout(zuSchwarz);
+          window.clearTimeout(zuUrteil);
+          window.clearTimeout(zuZahl);
         },
         { once: true },
       );

@@ -1,92 +1,140 @@
 @use 'mixins' as *;
 
 .hero {
-  /* Hoehe des Gemaeldebands am unteren Rand. Die Wortmarke haengt an
-     dieser Kante, deshalb steht der Wert an einer Stelle. */
-  --bild-hoehe: 58vh;
-  /* Zusaetzliche Hoehe nach oben: dort laeuft die Skyline in die dunkle
-     Flaeche aus, statt als Rechteckkante zu stehen. Der Ueberhang ist
-     lang, damit der Verlauf nicht auf eine kurze Kante zusammengedrueckt
-     wird. */
-  --bild-ueberhang: clamp(72px, 16vh, 190px);
-  /* Leicht in die Skyline gezogen: die Wortmarke steigt aus der Stadt
-     auf, statt im Zwischenraum unter dem Counter zu schweben. */
-  --marke-hebung: clamp(-36px, -3vh, -8px);
-  /* Platzbudget Hoehe: Abstand oben und Counter-Groesse stehen als Variablen,
-     damit die Wortmarke weiss, wie viel Raum ihr bleibt (siehe --marke-max). */
-  --pad-oben: 18vh;
+  /* Die Wortmarke liegt in der Mitte des Schwarzes. Die Zahl sitzt
+     darunter, sobald der Titel steht. */
+  --marke-hebung: 46%;
   --zaehler-fs: var(--text-kolossal-fluid);
-  /* Counter-Block: Label, Link und Abstaende unter der Zahl. */
-  --zaehler-rest: 72px;
-  /* Luft zwischen Counter-Block und Wortmarke. */
-  --marke-luft: 24px;
-  /* Groesste Schrift, die die Wortmarke (zwei Zeilen, ca. 1,45 Zeilenhoehen)
-     zwischen Counter und Bildband hat. Verhindert, dass sich beide auf hohen
-     oder flachen Fenstern ueberlagern. */
-  --marke-max: calc(
-    (100svh - var(--bild-hoehe) - var(--marke-hebung) - var(--pad-oben) - var(--zaehler-fs) -
-        var(--zaehler-rest) - var(--marke-luft)) / 1.5
-  );
+  --marke-max: var(--text-display-fluid);
 
   position: relative;
   min-height: 100svh;
-  /* Etwas dunkler als die folgenden Ink-Sektionen: der erste Blick
-     soll enger, schwerer sein als der Rest der Seite. */
-  background: #12110f;
+  background: #000;
   display: grid;
   grid-template-rows: 1fr;
   /* Zwingend: die Wortmarke ist breiter als der Viewport. Ohne diese
-     Begrenzung waechst die Grid-Spalte auf die Breite des Wortes mit, und
-     alles darin - auch der zentrierte Textblock - wird gegenueber dem
-     sichtbaren Bild nach rechts verschoben. */
+     Begrenzung waechst die Grid-Spalte auf die Breite des Wortes mit. */
   grid-template-columns: minmax(0, 1fr);
-  /* Die Wortmarke laeuft ueber die Viewportbreite hinaus und wird hier
-     beschnitten — genau das ist der beabsichtigte Effekt. */
   overflow: hidden;
 }
 
-/* --- Gesicht ----------------------------------------------------------------
-   Spricht vor der Wortmarke. Der schwarze Grund der Aufnahme laeuft ueber
-   die Maske in die Nacht, die Skyline bleibt darunter sichtbar. */
+/* --- Gesichter ------------------------------------------------------------
+   Fünf Kacheln. Zuerst das Porträt, danach nur noch die leere Form. */
+
+.hero__wand {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  pointer-events: none;
+  background: #000;
+}
+
+.hero__gesicht {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #000;
+
+  img,
+  .hero__silhouette {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  img {
+    object-fit: cover;
+    /* Muss zu BILD_Y in hero-silhouette.ts passen. */
+    object-position: center 18%;
+    filter: saturate(0.84) brightness(0.96);
+  }
+}
+
+.hero__silhouette {
+  opacity: 0;
+}
+
+@include from($bp-sm) {
+  .hero__wand {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+
+/* Portrait: die fünf Porträts stehen als Cluster, zwei über zwei,
+   die fünfte mittig, im Seitenverhältnis der Aufnahmen. Oben bleibt
+   der Menügriff frei. */
+@include mobile {
+  .hero__wand {
+    --kachel-h: min(
+      calc((100svh - 76px - 16px - 8px) / 3),
+      calc((100vw - 24px) * 2 / 3)
+    );
+    --kachel: calc(var(--kachel-h) * 0.75);
+
+    grid-template-columns: repeat(2, var(--kachel));
+    grid-template-rows: repeat(3, var(--kachel-h));
+    justify-content: center;
+    align-content: center;
+    gap: 4px;
+    padding: 76px 0 16px;
+  }
+
+  .hero__gesicht:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: var(--kachel);
+  }
+}
+
+/* --- Zitat ----------------------------------------------------------------
+   Liegt auf der Collage, solange die Gesichter da sind. Mit dem Schwarz
+   geht es weg, damit die Wortmarke den Raum allein hat. */
 
 .hero__auftritt {
   position: absolute;
   inset: 0;
   z-index: 4;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 8vh;
+  justify-content: center;
+  padding: 0 var(--page-inset) 8vh;
   pointer-events: none;
-}
 
-.hero__gesicht {
-  width: min(58vw, 520px);
-  height: min(52vh, 520px);
-  object-fit: cover;
-  object-position: center 18%;
-  /* Weich in die Nacht: das Gesicht steht frei, die Stadt bleibt
-     darunter als Grund. */
-  --gesicht-maske: radial-gradient(
-    ellipse 70% 72% at 50% 42%,
-    #000 28%,
-    rgb(0 0 0 / 0.55) 58%,
-    transparent 78%
-  );
-  mask-image: var(--gesicht-maske);
-  mask-repeat: no-repeat;
-  -webkit-mask-image: var(--gesicht-maske);
-  -webkit-mask-repeat: no-repeat;
+  /* Dunkle Mulde nur hinter den Zeilen, die Gesichter bleiben ringsum. */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: min(78vw, 52rem);
+    height: min(42vh, 22rem);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      ellipse at center,
+      rgb(0 0 0 / 0.62) 0%,
+      rgb(0 0 0 / 0.28) 46%,
+      transparent 72%
+    );
+  }
 }
 
 .hero__spruch {
   position: relative;
   z-index: 1;
-  width: min(52rem, calc(100% - 2 * var(--page-inset)));
-  margin: clamp(28px, 7vh, 80px) 0 0;
+  width: min(36rem, 100%);
+  margin: 0;
   text-align: center;
   color: var(--color-bone);
+  text-shadow: 0 1px 18px rgb(0 0 0 / 0.65);
   @include serif-heading;
 }
 
@@ -94,30 +142,26 @@
   display: block;
 
   & + & {
-    margin-top: 0.55em;
+    margin-top: 0.5em;
   }
 }
 
-/* --- Typo-Cluster --------------------------------------------------------- */
+/* --- Typo-Cluster ---------------------------------------------------------
+   Die Zahl kommt unter die Wortmarke, nicht darüber. */
 
 .hero__cluster {
-  position: relative;
-  /* Ueber Wortmarke und Skyline: die Zahl bleibt lesbar, sobald sie kommt. */
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 7vh;
   z-index: 6;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: var(--spacing-16);
   text-align: center;
-  /* Oben, aber nicht am Rand: die Zahl haengt mit Abstand unter der
-     Oberkante, darunter bleibt Raum fuer die angehobene Wortmarke. */
-  padding-top: var(--pad-oben);
-  padding-bottom: var(--spacing-40);
 }
-
-/* --- Counter --------------------------------------------------------------
-   Eine Zahl, die hochzaehlt. Label darunter als leise Bildunterschrift. */
 
 .hero__stats {
   display: flex;
@@ -136,7 +180,6 @@
   @include serif-kolossal;
   font-size: var(--zaehler-fs);
   margin: 0;
-  /* Haelt die Hoehe, bevor die Zahl eingesetzt wird. */
   min-height: 1em;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--color-bone);
@@ -150,8 +193,6 @@
   color: rgba(231, 229, 228, 0.48);
 }
 
-/* Leiser als die Petition: derselbe Weg wie unter den Grafiken,
-   nur schon auf der Startseite, wo die Kapitelliste noch fehlt. */
 .hero__daten {
   color: rgba(231, 229, 228, 0.72);
 
@@ -169,27 +210,18 @@
   }
 }
 
-/* --- Wortmarke -----------------------------------------------------------
-   Signaturelement, Stufe S8 der Leiter. Beide Zeilen haengen an einer
-   Groesse: "Deutschland" nimmt sie ganz, "flieht." als festes Verhaeltnis
-   darunter. Wird die Marke fuer flache Fenster verkleinert, genuegt
-   deshalb --marke-skala, statt zwei Groessen nachzuziehen.               */
+/* --- Wortmarke ----------------------------------------------------------- */
 
 .hero__marke {
-  /* Absolut gesetzt und mit der Unterkante genau auf die Oberkante des
-     Gemaeldes gelegt: die Wortmarke steht auf dieser Linie. Beim Scrollen
-     wird sie nach unten geschoben und verschwindet hinter dem Bild, das
-     eine Ebene darueber liegt. */
   position: absolute;
   left: 0;
   right: 0;
-  /* Unterkante an der Bildkante, durch --marke-hebung leicht ins
-     Gemaelde gezogen. Beim Scrollen sinkt sie dahinter weg. */
-  bottom: calc(var(--bild-hoehe) + var(--marke-hebung));
-  z-index: 2;
+  top: var(--marke-hebung);
+  z-index: 5;
   margin: 0;
   text-align: center;
   will-change: transform;
+  transform: translateY(calc(-50% + var(--sink, 0px)));
   @include serif-display;
   font-size: max(36px, min(calc(var(--text-display-fluid) * var(--marke-skala, 1)), var(--marke-max)));
   color: var(--color-rot);
@@ -202,301 +234,201 @@
 
 .hero__verb {
   display: block;
-  /* Aufrecht und im selben Gewicht wie "Deutschland": eine Feststellung,
-     kein lyrischer Nachsatz. Kursiv waere weicher als die Drohung. */
   font-style: normal;
   font-weight: var(--font-weight-medium);
-  /* Zweite Zeile als Schlag, nicht als Bildunterschrift: knapp ueber der
-     halben Hoehe des Wortes darueber. */
   font-size: 0.57em;
   letter-spacing: -0.028em;
   line-height: 0.9;
-  /* Kleiner Abstand, damit die zwei Zeilen als Urteil lesbar bleiben
-     und sich nicht ineinander schieben. */
   margin-top: 0.08em;
 }
 
-/* --- Bildflaeche ---------------------------------------------------------
-   Liegt hinter der Wortmarke am unteren Rand, wie die Landschaft in der
-   Vorlage, aus der die Marke aufsteigt. */
-
-.hero__bild {
+/* Ein Atem aus dem Flaggenrot, wenn die Wortmarke einschlägt. */
+.hero__atem {
   position: absolute;
-  inset: auto 0 0 0;
-  /* Band plus Ueberhang: der Ueberhang liegt in der dunklen Flaeche und
-     traegt den Verlauf, das Band darunter bleibt die Stadt. */
-  height: calc(var(--bild-hoehe) + var(--bild-ueberhang));
-  /* Liegt ueber der Wortmarke — nur so kann diese dahinter absinken. */
-  z-index: 3;
+  left: 50%;
+  top: var(--marke-hebung);
+  z-index: 2;
+  width: min(78vw, 56rem);
+  height: 46vh;
+  transform: translate(-50%, -50%);
   pointer-events: none;
-
-  @include nacht-kulisse;
-
-  /* Weicher Uebergang statt Rechteckkante. Der Himmel der Aufnahme ist
-     oben schon schwarz; die Tuerme setzen ungefaehr im oberen Viertel ein.
-     Der Verlauf legt dort erst wenig frei und wird erst im Vordergrund
-     dicht, damit die Lichter nicht an einer Schwelle anspringen. */
-  --skyline-maske: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 0.08) 10%,
-    rgb(0 0 0 / 0.2) 18%,
-    rgb(0 0 0 / 0.36) 28%,
-    rgb(0 0 0 / 0.52) 40%,
-    rgb(0 0 0 / 0.68) 52%,
-    rgb(0 0 0 / 0.82) 64%,
-    rgb(0 0 0 / 0.93) 76%,
-    #000 86%,
-    #000 100%
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(221 0 0 / 0.34) 0%,
+    rgb(221 0 0 / 0.08) 42%,
+    transparent 70%
   );
-  mask-image: var(--skyline-maske);
-  mask-size: 100% 100%;
-  mask-repeat: no-repeat;
-  -webkit-mask-image: var(--skyline-maske);
-  -webkit-mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-
-  img {
-    width: 100%;
-    height: 100%;
-    /* Ausschnitt aus der unteren Bildhaelfte: dort liegt der Vordergrund,
-       aus dem die Wortmarke aufsteigen soll. */
-    object-fit: cover;
-    object-position: center 48%;
-  }
-
-  .hero__leinwand {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    opacity: 0;
-  }
-
-  &:has(.hero__leinwand--aktiv) img {
-    opacity: 0;
-  }
-
-  .hero__leinwand--aktiv {
-    opacity: 1;
-  }
-
-  /* Farbgleicher Schleier: die Pixel der Aufnahme treffen #12110f nicht
-     von allein. Ohne diese Schicht bleibt am oberen Rand ein Tonbruch. */
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(
-      to bottom,
-      #12110f 0%,
-      rgb(18 17 15 / 0.7) 12%,
-      rgb(18 17 15 / 0.32) 24%,
-      rgb(18 17 15 / 0.08) 36%,
-      transparent 46%
-    );
-    pointer-events: none;
-  }
-
-  /* Die Overlay-Schicht aus nacht-kulisse bleibt hinter dem Verlauf. */
-  &::after {
-    z-index: 0;
-  }
 }
 
-/* Flache Fenster (Laptops, gedrehte Tablets): Counter und Marke
-   teilen sich dieselbe Hoehe. Wird die Wortmarke angehoben, ohne dass das
-   Bildband schrumpft, laufen die Bloecke ineinander. Deshalb hier ein
-   schmaleres Band und ein kompakterer Counter. */
+/* Flache Fenster: Wortmarke und Zahl bleiben auseinander. */
 @media (max-height: 860px) {
   .hero {
-    --bild-hoehe: 40vh;
-    --bild-ueberhang: clamp(44px, 10vh, 88px);
-    --marke-hebung: clamp(-28px, -5vh, -12px);
-    /* Nicht die naechste Stufe der Leiter, sondern dieselbe Stufe
-       gestaucht: die Wortmarke muss am Viewportrand beschnitten bleiben,
-       eine kleinere Stufe wuerde sie freistellen. */
+    --marke-hebung: 40%;
     --marke-skala: 0.74;
-    --pad-oben: 9vh;
-    /* Eine Stufe herunter, damit Counter und Marke sich die flache
-       Fensterhoehe nicht streitig machen. */
     --zaehler-fs: var(--text-monument-fluid);
   }
 
   .hero__cluster {
+    bottom: 4vh;
     gap: var(--spacing-4);
   }
 }
 
-/* Hohe Fenster (grosse Monitore): das Bildband bleibt schmaler und der
-   Counter kleiner, sonst schiebt das 58-vh-Band die Wortmarke bis in den
-   Counter hinauf. */
 @media (min-height: 861px) {
   .hero {
-    --bild-hoehe: 46vh;
-    --pad-oben: 9vh;
-    --zaehler-fs: min(var(--text-kolossal-fluid), 14svh);
+    --zaehler-fs: min(var(--text-kolossal-fluid), 12svh);
   }
 }
 
-@include tablet {
-  .hero {
-    --pad-oben: 15vh;
-    --bild-hoehe: 38vh;
-    --bild-ueberhang: clamp(36px, 9vh, 72px);
-    --marke-hebung: clamp(-28px, -5vh, -12px);
-  }
-}
-
-/* Portrait-Telefone sind fast immer unter 860px hoch, die Stauchung
-   darueber gilt aber fuer flache, breite Fenster. Auf der schmalen
-   Breite liegt 11vw schon am Minimum und wuerde mit --marke-skala
-   nochmals auf rund 40px fallen — kleiner als der Counter darueber.
-   Hier zaehlt die Zeilenbreite: "Deutschland" soll sie fast fuellen. */
+/* Portrait-Telefone: "Deutschland" soll die Zeile fast füllen. */
 @include mobile {
   .hero {
     --text-display-fluid: clamp(56px, 17vw, 92px);
     --marke-skala: 1;
+    --marke-hebung: 42%;
+  }
+
+  .hero__spruch {
+    width: min(22rem, 100%);
   }
 }
 
-/* Querformat und sehr flache Fenster: der Counter faellt noch eine Stufe,
-   damit er nicht in die Wortmarke laeuft. */
 @media (max-height: 640px) {
   .hero {
     --zaehler-fs: var(--text-section-fluid);
+    --marke-hebung: 38%;
   }
 }
 
 /* --- Auftakt --------------------------------------------------------------
-   Mit Bewegung: Gesicht und Saetze, dann die Fenster, dann die Zahl,
-   ganz am Ende die Wortmarke.
-   Ohne Bewegung: alles auf einmal, das Gesicht klein ueber den Saetzen,
-   die Fenster bereits dunkel. */
+   Mit Bewegung: fünf Gesichter, dann das Zitat, dann wird jede Kachel
+   zur leeren Silhouette. Kurz Schwarz. Die Wortmarke schlägt ein,
+   danach die Zahl.
+   Ohne Bewegung: Wortmarke und Zahl sofort, ohne die Wand. */
 
 @include motion-safe {
-  .hero__gesicht {
-    opacity: 0;
-    transition: opacity 0.4s var(--ease-gallery);
-  }
-
-  .hero[data-akt='liebe'] .hero__gesicht,
-  .hero[data-akt='fehlen'] .hero__gesicht {
-    opacity: 1;
-  }
-
-  .hero__auftritt {
-    transition: opacity 0.35s var(--ease-gallery);
-  }
-
-  .hero[data-akt='zahl'] .hero__auftritt,
-  .hero[data-akt='marke'] .hero__auftritt {
-    opacity: 0;
-  }
-
-  .hero__satz {
-    opacity: 0;
-    transform: translateY(0.35em);
-    transition:
-      opacity 0.35s var(--ease-gallery),
-      transform 0.35s var(--ease-gallery);
-  }
-
-  .hero[data-akt='liebe'] .hero__satz--liebe,
-  .hero[data-akt='fehlen'] .hero__satz--liebe {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.2s;
-  }
-
-  .hero[data-akt='fehlen'] .hero__satz--verlassen {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.05s;
-  }
-
+  .hero__auftritt,
   .hero__cluster,
   .hero__marke {
     opacity: 0;
   }
 
-  .hero:not([data-akt='zahl']):not([data-akt='marke']) .hero__cluster {
+  .hero[data-akt='zitat'] .hero__auftritt,
+  .hero[data-akt='silhouette'] .hero__auftritt {
+    opacity: 1;
+    transition: opacity 0.8s ease-out;
+  }
+
+  .hero[data-akt='schwarz'] .hero__auftritt,
+  .hero[data-akt='urteil'] .hero__auftritt,
+  .hero[data-akt='zahl'] .hero__auftritt {
+    opacity: 0;
+    transition: opacity 0.35s ease-in;
+  }
+
+  .hero:not([data-akt='zahl']) .hero__cluster {
     pointer-events: none;
   }
 
-  .hero[data-akt='zahl'] .hero__cluster,
-  .hero[data-akt='marke'] .hero__cluster {
+  .hero[data-akt='zahl'] .hero__cluster {
     opacity: 1;
-    transition: opacity 0.4s var(--ease-gallery) 60ms;
+    transition: opacity 0.45s ease-out;
   }
 
-  .hero[data-akt='marke'] .hero__marke {
-    opacity: 1;
-    transition: opacity 0.4s var(--ease-gallery) 80ms;
+  .hero__verb {
+    transform: scale(1.06);
+    transform-origin: center top;
   }
 
-  @include mobile {
-    .hero__auftritt {
-      padding-top: 12vh;
+  .hero[data-akt='urteil'] .hero__marke,
+  .hero[data-akt='zahl'] .hero__marke {
+    opacity: 1;
+    transition: opacity 0.45s ease-out;
+  }
+
+  .hero[data-akt='urteil'] .hero__verb,
+  .hero[data-akt='zahl'] .hero__verb {
+    transform: none;
+    transition: transform 0.35s var(--ease-gallery);
+  }
+
+  .hero--geht .hero__gesicht img {
+    animation: hero-foto-weg var(--verblassen, 1100ms) ease-in-out forwards;
+    animation-delay: calc(var(--verzug) * var(--staffel, 460ms));
+  }
+
+  .hero--geht .hero__silhouette {
+    animation: hero-silhouette var(--verblassen, 1100ms) ease-in-out forwards;
+    animation-delay: calc(var(--verzug) * var(--staffel, 460ms));
+  }
+
+  .hero[data-akt='schwarz'] .hero__wand,
+  .hero[data-akt='urteil'] .hero__wand,
+  .hero[data-akt='zahl'] .hero__wand {
+    opacity: 0;
+    transition: opacity 0.4s ease-in;
+  }
+
+  .hero[data-akt='urteil'] .hero__atem {
+    animation: hero-atem 700ms ease-out forwards;
+  }
+
+  @keyframes hero-foto-weg {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes hero-silhouette {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes hero-atem {
+    0% {
+      opacity: 0;
     }
 
-    .hero__gesicht {
-      width: min(88vw, 420px);
-      height: min(48vh, 420px);
+    28% {
+      opacity: 1;
     }
 
-    .hero__spruch {
-      width: min(22rem, calc(100% - 2 * var(--page-inset)));
-      margin-top: var(--spacing-16);
+    100% {
+      opacity: 0;
     }
   }
 }
 
 @include motion-reduce {
-  .hero {
-    grid-template-rows: auto auto auto;
+  .hero__wand {
+    display: none;
   }
 
   .hero__auftritt {
     position: relative;
     inset: auto;
     z-index: 6;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-16);
-    align-self: start;
-    padding-top: 11vh;
+    padding: 14vh var(--page-inset) 0;
+
+    &::before {
+      display: none;
+    }
   }
 
-  .hero__gesicht {
-    width: min(168px, 42vw);
-    height: min(210px, 26vh);
-    opacity: 1;
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-
-  .hero__spruch {
+  .hero__marke {
     position: relative;
-    width: min(52rem, calc(100% - 2 * var(--page-inset)));
-    margin-top: var(--spacing-16);
+    top: auto;
+    z-index: 6;
+    margin-top: var(--spacing-28);
+    transform: none;
   }
 
   .hero__cluster {
-    padding-top: var(--spacing-28);
-    padding-bottom: 0;
-  }
-
-  /* Im Fluss unter den Saetzen, sonst liegt die Wortmarke absolut
-     ueber dem Spruch. */
-  .hero__marke {
     position: relative;
-    inset: auto;
-    z-index: 6;
-    margin-top: var(--spacing-16);
-    padding-bottom: calc(var(--bild-hoehe) * 0.45);
+    bottom: auto;
+    margin-top: var(--spacing-28);
+    padding-bottom: 18vh;
   }
 }

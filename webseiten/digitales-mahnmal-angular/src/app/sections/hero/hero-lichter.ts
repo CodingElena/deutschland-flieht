@@ -1,21 +1,24 @@
 /**
  * Lichtausfall in der Hero-Skyline.
  *
- * Die Aufnahme ist ein Foto, keine Vektorstadt. Deshalb werden helle
- * Pixel (Fenster) gesucht, zu kleinen Gruppen gebuendelt und nacheinander
- * abgedunkelt. Ein Rest bleibt an: die Stadt stirbt nicht in einem Ruck,
- * sie leert sich.
+ * Die Aufnahme ist ein Foto, keine Vektorstadt. Helle Pixel (Fenster)
+ * werden gesucht, zu kleinen Gruppen gebuendelt und als Welle von den
+ * Tuermen nach unten geloescht: oben zuerst, dann bricht der Rest nach.
+ * Jedes Fenster flammt einmal warm auf und ist danach dunkel. Ein Rest
+ * ganz unten bleibt an — die Stadt ist nicht zu Ende, sie leert sich.
  *
  * Bei prefers-reduced-motion oder einem Fehlschlag bleibt das <img>.
  */
 
 const ZELLE = 6;
 const HELLIGKEIT = 96;
-const ANTEIL_AUS = 0.88;
-/** Die Fenster gehen aus, dann kommt die Wortmarke. */
-const DAUER_MS = 3100;
+const ANTEIL_AUS = 0.96;
+/** Kurz aufflammen, dann aus. Die Wortmarke trifft in diese Welle. */
+const FLACKER_MS = 48;
+/** Die Tuerme halten kurz, dann kippt die Stadt. */
+const DAUER_MS = 2000;
 
-/** Dauer des Lichtausfalls. Die Wortmarke wartet darauf. */
+/** Dauer des Lichtausfalls. Die Zahl wartet darauf. */
 export const LICHT_DAUER_MS = DAUER_MS;
 
 interface Licht {
@@ -25,6 +28,7 @@ interface Licht {
   h: number;
   /** Byte-Offsets in ImageData.data (Schritt 4). */
   pixel: readonly number[];
+  geflackert: boolean;
 }
 
 export function planeLichtausfall(opts: {
@@ -47,7 +51,8 @@ export function planeLichtausfall(opts: {
   let start: number | null = null;
   let lichter: Licht[] = [];
   let bilddaten: ImageData | null = null;
-  let erloschen = 0;
+  let original: Uint8ClampedArray | null = null;
+  let totZeiger = 0;
   let frame = 0;
   let fertigGemeldet = false;
 
@@ -68,6 +73,38 @@ export function planeLichtausfall(opts: {
     };
   };
 
+  const wendeAn = (elapsed: number): void => {
+    if (!bilddaten || !original) {
+      return;
+    }
+    const grenze = Math.floor(lichter.length * ANTEIL_AUS);
+    const fenster = DAUER_MS - FLACKER_MS;
+    let dirty = false;
+
+    while (totZeiger < grenze && elapsed >= beginn(totZeiger, grenze, fenster) + FLACKER_MS) {
+      loescheLicht(bilddaten, original, lichter[totZeiger]);
+      totZeiger += 1;
+      dirty = true;
+    }
+
+    for (let i = totZeiger; i < grenze; i += 1) {
+      if (elapsed < beginn(i, grenze, fenster)) {
+        break;
+      }
+      const licht = lichter[i];
+      if (licht.geflackert) {
+        continue;
+      }
+      flackereLicht(bilddaten, original, licht);
+      licht.geflackert = true;
+      dirty = true;
+    }
+
+    if (dirty) {
+      ctx.putImageData(bilddaten, 0, 0);
+    }
+  };
+
   const aufbauen = (fortschritt = 0): boolean => {
     const { breite, hoehe } = messen();
     canvas.width = breite;
@@ -80,14 +117,11 @@ export function planeLichtausfall(opts: {
       return false;
     }
 
+    original = new Uint8ClampedArray(bilddaten.data);
     lichter = findeLichter(bilddaten);
-    mischen(lichter);
-    const sollAus = Math.floor(lichter.length * ANTEIL_AUS);
-    erloschen = Math.min(sollAus, Math.floor(easing(fortschritt) * sollAus));
-    for (let i = 0; i < erloschen; i += 1) {
-      loescheLicht(bilddaten, lichter[i]);
-    }
-    ctx.putImageData(bilddaten, 0, 0);
+    alsWelle(lichter, hoehe);
+    totZeiger = 0;
+    wendeAn(Math.min(1, Math.max(0, fortschritt)) * DAUER_MS);
     return lichter.length > 0;
   };
 
@@ -98,18 +132,10 @@ export function planeLichtausfall(opts: {
     if (start === null) {
       start = jetzt;
     }
-    const t = Math.min(1, (jetzt - start) / DAUER_MS);
-    const sollAus = Math.floor(lichter.length * ANTEIL_AUS);
-    const soll = Math.min(sollAus, Math.floor(easing(t) * sollAus));
+    const elapsed = Math.min(DAUER_MS, jetzt - start);
+    wendeAn(elapsed);
 
-    while (erloschen < soll) {
-      const licht = lichter[erloschen];
-      loescheLicht(bilddaten, licht);
-      ctx.putImageData(bilddaten, 0, 0, licht.x, licht.y, licht.w, licht.h);
-      erloschen += 1;
-    }
-
-    if (t < 1) {
+    if (elapsed < DAUER_MS) {
       frame = requestAnimationFrame(tick);
       return;
     }
@@ -131,6 +157,7 @@ export function planeLichtausfall(opts: {
 
   if (anfang >= 1) {
     start = performance.now() - DAUER_MS;
+    meldeFertig();
   } else {
     frame = requestAnimationFrame(tick);
   }
@@ -144,6 +171,15 @@ export function planeLichtausfall(opts: {
   );
 
   return true;
+}
+
+/** Wann Licht `index` aufflammt. Erst langsam, dann kippt die Front. */
+function beginn(index: number, grenze: number, fenster: number): number {
+  if (grenze <= 1) {
+    return 0;
+  }
+  const anteil = index / (grenze - 1);
+  return fenster * Math.pow(anteil, 0.54);
 }
 
 /** object-fit: cover plus object-position als Anteile 0–1. */
@@ -203,9 +239,28 @@ function findeLichter(bilddaten: ImageData): Licht[] {
       w: Math.min(ZELLE + 1, width - gx * ZELLE),
       h: Math.min(ZELLE + 1, height - gy * ZELLE),
       pixel,
+      geflackert: false,
     });
   }
   return lichter;
+}
+
+/** Von den Tuermen nach unten. Innerhalb einer Zeile bleibt die Ordnung zufaellig. */
+function alsWelle(lichter: Licht[], hoehe: number): void {
+  const band = Math.max(8, Math.round(hoehe * 0.045));
+  const los = lichter.map(() => Math.random());
+  const reihe = lichter.map((licht, index) => ({ licht, index }));
+  reihe.sort((a, b) => {
+    const bandA = Math.floor(a.licht.y / band);
+    const bandB = Math.floor(b.licht.y / band);
+    if (bandA !== bandB) {
+      return bandA - bandB;
+    }
+    return los[a.index] - los[b.index];
+  });
+  for (let i = 0; i < reihe.length; i += 1) {
+    lichter[i] = reihe[i].licht;
+  }
 }
 
 function istFenster(r: number, g: number, b: number): boolean {
@@ -217,24 +272,20 @@ function istFenster(r: number, g: number, b: number): boolean {
   return r + g > b * 1.08;
 }
 
-function loescheLicht(bilddaten: ImageData, licht: Licht): void {
+function flackereLicht(bilddaten: ImageData, original: Uint8ClampedArray, licht: Licht): void {
   const data = bilddaten.data;
   for (const i of licht.pixel) {
-    data[i] = Math.round(data[i] * 0.05 + 10);
-    data[i + 1] = Math.round(data[i + 1] * 0.04 + 9);
-    data[i + 2] = Math.round(data[i + 2] * 0.04 + 8);
+    data[i] = Math.min(255, original[i] + 110);
+    data[i + 1] = Math.min(255, Math.round(original[i + 1] * 0.7 + 28));
+    data[i + 2] = Math.round(original[i + 2] * 0.28);
   }
 }
 
-function easing(t: number): number {
-  return 0.5 - 0.5 * Math.cos(t * Math.PI);
-}
-
-function mischen<T>(liste: T[]): void {
-  for (let i = liste.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = liste[i];
-    liste[i] = liste[j];
-    liste[j] = tmp;
+function loescheLicht(bilddaten: ImageData, original: Uint8ClampedArray, licht: Licht): void {
+  const data = bilddaten.data;
+  for (const i of licht.pixel) {
+    data[i] = Math.round(original[i] * 0.03 + 7);
+    data[i + 1] = Math.round(original[i + 1] * 0.025 + 6);
+    data[i + 2] = Math.round(original[i + 2] * 0.02 + 5);
   }
 }
