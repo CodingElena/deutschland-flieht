@@ -17,11 +17,10 @@ import { fensterScroll } from '../../core/scroll-progress';
 import { Zaehlwert } from '../../shared/zaehlwert';
 
 /**
- * Hero — die belebte Straße, dann die leere.
+ * Hero — Version 3, das Büro.
  *
- * Der Film läuft einmal, stumm, über den ganzen Auftakt. Die Leute
- * verschwinden darin. Wenn die Straße leer ist, bleibt das letzte Bild
- * stehen. Darauf schlägt die Wortmarke ein, danach die Zahl.
+ * Der Film läuft einmal, stumm, über den ganzen Auftakt. Das letzte
+ * Bild bleibt stehen. Darauf schlägt die Wortmarke ein, danach die Zahl.
  *
  * Die Wortmarke läuft absichtlich über die Viewportbreite hinaus und
  * wird an beiden Rändern beschnitten. Sie sinkt beim Scrollen nach unten.
@@ -37,8 +36,12 @@ type HeroAkt = 'film' | 'urteil' | 'zahl';
 const PAUSE_VOR_ZAHL_MS = 900;
 /** Hochzählen. Die Wortmarke steht dann schon. */
 const ZAEHL_DAUER_MS = 620;
-/** Falls der Film nicht startet, steht der Titel trotzdem. */
-const NOTFALL_MS = 6000;
+/** Der Film läuft in doppelter Geschwindigkeit. */
+const TEMPO = 2;
+/** Puffer nach der Filmlänge, falls `ended` ausbleibt. */
+const NOTFALL_PUFFER_MS = 1500;
+/** Falls die Länge unbekannt bleibt. */
+const NOTFALL_OHNE_LAENGE_MS = 16000;
 
 @Component({
   selector: 'app-hero',
@@ -110,13 +113,27 @@ export class Hero {
       }
 
       video.muted = true;
+      video.playbackRate = TEMPO;
       const gestartet = video.play();
       void gestartet?.catch(() => zeigeSchluss());
 
       video.addEventListener('ended', zeigeSchluss, { signal: abort.signal });
+      video.addEventListener('error', zeigeSchluss, { signal: abort.signal });
 
-      const notfall = window.setTimeout(zeigeSchluss, NOTFALL_MS);
-      abort.signal.addEventListener('abort', () => window.clearTimeout(notfall), { once: true });
+      const planeNotfall = (): void => {
+        const tempo = video.playbackRate > 0 ? video.playbackRate : 1;
+        const ms =
+          Number.isFinite(video.duration) && video.duration > 0
+            ? (video.duration / tempo) * 1000 + NOTFALL_PUFFER_MS
+            : NOTFALL_OHNE_LAENGE_MS;
+        const notfall = window.setTimeout(zeigeSchluss, ms);
+        abort.signal.addEventListener('abort', () => window.clearTimeout(notfall), { once: true });
+      };
+      if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        planeNotfall();
+      } else {
+        video.addEventListener('loadedmetadata', planeNotfall, { once: true, signal: abort.signal });
+      }
     });
   }
 }

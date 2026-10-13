@@ -1,6 +1,5 @@
-<!-- Der Film ist der Auftakt: eine belebte Straße, die Leute
-     verschwinden. Das letzte Bild bleibt stehen. Darauf die Wortmarke,
-     danach die Zahl. -->
+<!-- Version 3: das Büro füllt den Auftakt. Das letzte Bild bleibt
+     stehen. Darauf die Wortmarke, danach die Zahl. -->
 <section class="hero surface-ink" [attr.data-akt]="akt()">
   <video
     #film
@@ -32,8 +31,8 @@
     <a class="hero__daten ghost-link" [routerLink]="daten.pfad">{{ daten.startLabel }}</a>
   </div>
 
-  <!-- Die Wortmarke trägt den Seitentitel. Sie steht auf der leeren
-       Straße und sinkt beim Scrollen nach unten weg. -->
+  <!-- Die Wortmarke trägt den Seitentitel. Sie steht auf dem letzten
+       Bild und sinkt beim Scrollen nach unten weg. -->
   <h1 class="hero__marke" [style.--sink]="markeVersatz() + 'px'">
     <span class="hero__wort">{{ marke.wortmarke }}</span>
     <span class="hero__verb">{{ marke.wortmarkeVerb }}</span>

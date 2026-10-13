@@ -457,12 +457,12 @@ export const HERO = {
   /** Eine Kennzahl — das Signal des Heros. Zaehlt als Counter hoch. */
   stats: [KENNZAHLEN.fortzuege],
   /**
-   * Der Auftakt selbst: eine belebte Straße, die Leute verschwinden.
-   * Der Film läuft einmal und bleibt auf dem leeren Bild stehen.
+   * Version 3: das Büro. Der Film läuft einmal und bleibt
+   * auf dem letzten Bild stehen.
    */
   film: {
-    pfad: '/videos/hero.mp4',
-    beschreibung: 'Eine belebte Straße. Die Menschen darauf verschwinden.',
+    pfad: '/videos/hero-v3.mp4',
+    beschreibung: 'Ein Büro. Menschen sitzen an den Schreibtischen.',
   },
   /** Aufnahme, aus der die Wortmarke aufsteigt. */
   bild: BILDER.hero,

@@ -22,7 +22,7 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
  * Die Striche rechts oben oeffnen die Kapitel; die ids der Hosts
  * sind ihre Ziele und stehen in KAPITEL (content.ts). Unten rechts laeuft
  * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Der
- * Auftakt ist der Film: eine belebte Straße, die Leute verschwinden.
+ * Auftakt ist der Film, Version 3: das Büro.
  * Die Wortmarke schlägt auf dem leeren Bild ein, vor der Zahl.
  * Die Flagge haengt hier nicht mehr.
  *
