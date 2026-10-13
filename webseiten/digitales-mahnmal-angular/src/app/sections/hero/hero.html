@@ -1,28 +1,20 @@
-<!-- Fünf Gesichter öffnen das Mahnmal. Kurz danach das Zitat.
-     Dann wird jede Kachel zur leeren Silhouette. Kurz bleibt nur
-     Schwarz. Danach schlägt die Wortmarke ein, und die Zahl folgt. -->
-<section
-  class="hero surface-ink"
-  [class.hero--geht]="geht()"
-  [attr.data-akt]="akt()"
-  [style.--staffel]="staffelMs + 'ms'"
-  [style.--verblassen]="verblassenMs + 'ms'"
->
-  <div class="hero__wand" #wand aria-hidden="true">
-    @for (kachel of kacheln; track kachel.id) {
-      <figure class="hero__gesicht" [style.--verzug]="kachel.verzug">
-        <img #aufnahme [src]="kachel.pfad" alt="" decoding="async" />
-        <canvas #silhouette class="hero__silhouette"></canvas>
-      </figure>
-    }
-  </div>
+<!-- Der Film ist der Auftakt: eine belebte Straße, die Leute
+     verschwinden. Das letzte Bild bleibt stehen. Darauf die Wortmarke,
+     danach die Zahl. -->
+<section class="hero surface-ink" [attr.data-akt]="akt()">
+  <video
+    #film
+    class="hero__film"
+    [src]="hero.film.pfad"
+    muted
+    autoplay
+    playsinline
+    preload="auto"
+    disablepictureinpicture
+    [attr.aria-label]="hero.film.beschreibung"
+  ></video>
 
-  <div class="hero__auftritt">
-    <p class="hero__spruch">
-      <span class="hero__satz">{{ hero.spruch.liebe }}</span>
-      <span class="hero__satz">{{ hero.spruch.verlassen }}</span>
-    </p>
-  </div>
+  <div class="hero__schleier" aria-hidden="true"></div>
 
   <div class="hero__cluster inset">
     <dl class="hero__stats">
@@ -40,8 +32,8 @@
     <a class="hero__daten ghost-link" [routerLink]="daten.pfad">{{ daten.startLabel }}</a>
   </div>
 
-  <!-- Die Wortmarke traegt den Seitentitel. Sie steht im Schwarz und
-       sinkt beim Scrollen nach unten weg. -->
+  <!-- Die Wortmarke trägt den Seitentitel. Sie steht auf der leeren
+       Straße und sinkt beim Scrollen nach unten weg. -->
   <h1 class="hero__marke" [style.--sink]="markeVersatz() + 'px'">
     <span class="hero__wort">{{ marke.wortmarke }}</span>
     <span class="hero__verb">{{ marke.wortmarkeVerb }}</span>

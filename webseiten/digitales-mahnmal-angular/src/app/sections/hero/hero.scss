@@ -1,8 +1,8 @@
 @use 'mixins' as *;
 
 .hero {
-  /* Die Wortmarke liegt in der Mitte des Schwarzes. Die Zahl sitzt
-     darunter, sobald der Titel steht. */
+  /* Die Wortmarke liegt in der Mitte. Die Zahl sitzt darunter,
+     sobald der Titel steht. */
   --marke-hebung: 46%;
   --zaehler-fs: var(--text-kolossal-fluid);
   --marke-max: var(--text-display-fluid);
@@ -13,141 +13,40 @@
   display: grid;
   grid-template-rows: 1fr;
   /* Zwingend: die Wortmarke ist breiter als der Viewport. Ohne diese
-     Begrenzung waechst die Grid-Spalte auf die Breite des Wortes mit. */
+     Begrenzung wächst die Grid-Spalte auf die Breite des Wortes mit. */
   grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
 }
 
-/* --- Gesichter ------------------------------------------------------------
-   Fünf Kacheln. Zuerst das Porträt, danach nur noch die leere Form. */
+/* --- Film -----------------------------------------------------------------
+   Eine Einstellung, bildfüllend. Das letzte Bild bleibt stehen. */
 
-.hero__wand {
+.hero__film {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: repeat(5, minmax(0, 1fr));
-  gap: 4px;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  background: #000;
   pointer-events: none;
-  background: #000;
 }
 
-.hero__gesicht {
-  position: relative;
-  margin: 0;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  background: #000;
-
-  img,
-  .hero__silhouette {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  img {
-    object-fit: cover;
-    /* Muss zu BILD_Y in hero-silhouette.ts passen. */
-    object-position: center 18%;
-    filter: saturate(0.84) brightness(0.96);
-  }
-}
-
-.hero__silhouette {
+/* Dunkle Mulde erst, wenn der Titel auf der Straße steht. */
+.hero__schleier {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
   opacity: 0;
-}
-
-@include from($bp-sm) {
-  .hero__wand {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    grid-template-rows: minmax(0, 1fr);
-  }
-}
-
-/* Portrait: die fünf Porträts stehen als Cluster, zwei über zwei,
-   die fünfte mittig, im Seitenverhältnis der Aufnahmen. Oben bleibt
-   der Menügriff frei. */
-@include mobile {
-  .hero__wand {
-    --kachel-h: min(
-      calc((100svh - 76px - 16px - 8px) / 3),
-      calc((100vw - 24px) * 2 / 3)
-    );
-    --kachel: calc(var(--kachel-h) * 0.75);
-
-    grid-template-columns: repeat(2, var(--kachel));
-    grid-template-rows: repeat(3, var(--kachel-h));
-    justify-content: center;
-    align-content: center;
-    gap: 4px;
-    padding: 76px 0 16px;
-  }
-
-  .hero__gesicht:last-child {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: var(--kachel);
-  }
-}
-
-/* --- Zitat ----------------------------------------------------------------
-   Liegt auf der Collage, solange die Gesichter da sind. Mit dem Schwarz
-   geht es weg, damit die Wortmarke den Raum allein hat. */
-
-.hero__auftritt {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 var(--page-inset) 8vh;
-  pointer-events: none;
-
-  /* Dunkle Mulde nur hinter den Zeilen, die Gesichter bleiben ringsum. */
-  &::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 46%;
-    width: min(78vw, 52rem);
-    height: min(42vh, 22rem);
-    transform: translate(-50%, -50%);
-    background: radial-gradient(
-      ellipse at center,
-      rgb(0 0 0 / 0.62) 0%,
-      rgb(0 0 0 / 0.28) 46%,
-      transparent 72%
-    );
-  }
-}
-
-.hero__spruch {
-  position: relative;
-  z-index: 1;
-  width: min(36rem, 100%);
-  margin: 0;
-  text-align: center;
-  color: var(--color-bone);
-  text-shadow: 0 1px 18px rgb(0 0 0 / 0.65);
-  @include serif-heading;
-}
-
-.hero__satz {
-  display: block;
-
-  & + & {
-    margin-top: 0.5em;
-  }
+  background:
+    linear-gradient(to top, rgb(0 0 0 / 0.62) 0%, rgb(0 0 0 / 0.12) 38%, transparent 58%),
+    radial-gradient(ellipse at center, rgb(0 0 0 / 0.42) 0%, rgb(0 0 0 / 0.12) 46%, transparent 72%);
 }
 
 /* --- Typo-Cluster ---------------------------------------------------------
-   Die Zahl kommt unter die Wortmarke, nicht darüber. */
+   Die Zahl kommt unter die Wortmarke. */
 
 .hero__cluster {
   position: absolute;
@@ -288,10 +187,6 @@
     --marke-skala: 1;
     --marke-hebung: 42%;
   }
-
-  .hero__spruch {
-    width: min(22rem, 100%);
-  }
 }
 
 @media (max-height: 640px) {
@@ -302,29 +197,13 @@
 }
 
 /* --- Auftakt --------------------------------------------------------------
-   Mit Bewegung: fünf Gesichter, dann das Zitat, dann wird jede Kachel
-   zur leeren Silhouette. Kurz Schwarz. Die Wortmarke schlägt ein,
-   danach die Zahl.
-   Ohne Bewegung: Wortmarke und Zahl sofort, ohne die Wand. */
+   Mit Bewegung: der Film läuft allein. Danach die Wortmarke, dann die Zahl.
+   Ohne Bewegung: Wortmarke und Zahl sofort, der Film steht am Ende. */
 
 @include motion-safe {
-  .hero__auftritt,
   .hero__cluster,
   .hero__marke {
     opacity: 0;
-  }
-
-  .hero[data-akt='zitat'] .hero__auftritt,
-  .hero[data-akt='silhouette'] .hero__auftritt {
-    opacity: 1;
-    transition: opacity 0.8s ease-out;
-  }
-
-  .hero[data-akt='schwarz'] .hero__auftritt,
-  .hero[data-akt='urteil'] .hero__auftritt,
-  .hero[data-akt='zahl'] .hero__auftritt {
-    opacity: 0;
-    transition: opacity 0.35s ease-in;
   }
 
   .hero:not([data-akt='zahl']) .hero__cluster {
@@ -347,43 +226,20 @@
     transition: opacity 0.45s ease-out;
   }
 
+  .hero[data-akt='urteil'] .hero__schleier,
+  .hero[data-akt='zahl'] .hero__schleier {
+    opacity: 1;
+    transition: opacity 0.6s ease-out;
+  }
+
   .hero[data-akt='urteil'] .hero__verb,
   .hero[data-akt='zahl'] .hero__verb {
     transform: none;
     transition: transform 0.35s var(--ease-gallery);
   }
 
-  .hero--geht .hero__gesicht img {
-    animation: hero-foto-weg var(--verblassen, 1100ms) ease-in-out forwards;
-    animation-delay: calc(var(--verzug) * var(--staffel, 460ms));
-  }
-
-  .hero--geht .hero__silhouette {
-    animation: hero-silhouette var(--verblassen, 1100ms) ease-in-out forwards;
-    animation-delay: calc(var(--verzug) * var(--staffel, 460ms));
-  }
-
-  .hero[data-akt='schwarz'] .hero__wand,
-  .hero[data-akt='urteil'] .hero__wand,
-  .hero[data-akt='zahl'] .hero__wand {
-    opacity: 0;
-    transition: opacity 0.4s ease-in;
-  }
-
   .hero[data-akt='urteil'] .hero__atem {
     animation: hero-atem 700ms ease-out forwards;
-  }
-
-  @keyframes hero-foto-weg {
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes hero-silhouette {
-    to {
-      opacity: 1;
-    }
   }
 
   @keyframes hero-atem {
@@ -398,37 +254,5 @@
     100% {
       opacity: 0;
     }
-  }
-}
-
-@include motion-reduce {
-  .hero__wand {
-    display: none;
-  }
-
-  .hero__auftritt {
-    position: relative;
-    inset: auto;
-    z-index: 6;
-    padding: 14vh var(--page-inset) 0;
-
-    &::before {
-      display: none;
-    }
-  }
-
-  .hero__marke {
-    position: relative;
-    top: auto;
-    z-index: 6;
-    margin-top: var(--spacing-28);
-    transform: none;
-  }
-
-  .hero__cluster {
-    position: relative;
-    bottom: auto;
-    margin-top: var(--spacing-28);
-    padding-bottom: 18vh;
   }
 }

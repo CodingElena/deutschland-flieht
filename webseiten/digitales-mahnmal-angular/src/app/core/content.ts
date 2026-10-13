@@ -456,6 +456,14 @@ export const PETITION_CTA = {
 export const HERO = {
   /** Eine Kennzahl — das Signal des Heros. Zaehlt als Counter hoch. */
   stats: [KENNZAHLEN.fortzuege],
+  /**
+   * Der Auftakt selbst: eine belebte Straße, die Leute verschwinden.
+   * Der Film läuft einmal und bleibt auf dem leeren Bild stehen.
+   */
+  film: {
+    pfad: '/videos/hero.mp4',
+    beschreibung: 'Eine belebte Straße. Die Menschen darauf verschwinden.',
+  },
   /** Aufnahme, aus der die Wortmarke aufsteigt. */
   bild: BILDER.hero,
   /**

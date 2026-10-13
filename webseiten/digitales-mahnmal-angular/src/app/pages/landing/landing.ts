@@ -22,11 +22,11 @@ import { Zahlen } from '../../sections/zahlen/zahlen';
  * Die Striche rechts oben oeffnen die Kapitel; die ids der Hosts
  * sind ihre Ziele und stehen in KAPITEL (content.ts). Unten rechts laeuft
  * der Aufruf zur Petition mit, sobald der Auftakt verlassen ist. Der
- * Auftakt beginnt mit der beleuchteten Stadt. Das Gesicht spricht,
- * waehrend die Fenster sterben; die Wortmarke schlaegt vor der Zahl ein.
+ * Auftakt ist der Film: eine belebte Straße, die Leute verschwinden.
+ * Die Wortmarke schlägt auf dem leeren Bild ein, vor der Zahl.
  * Die Flagge haengt hier nicht mehr.
  *
- *   Hero (Ink)        Startseite — Gesicht, dann Behauptung und Wortmarke
+ *   Hero (Ink)        Startseite — Film, dann Wortmarke und Zahl
  *   Wer geht (Ink)    Ihre Geschichten
  *   Ausbluten (Ink)   Die Zahlen beginnen mit der Karte
  *   Zahlen (Ink)      Reihe, Qualifikation, Abgabenkeil — haelt das Kapitel
