@@ -56,7 +56,7 @@
 })();
 
 /* ===========================================================================
- * Unterseiten: Menü, Credits, Einblenden, Kopfleiste
+ * Unterseiten: Menü, Einblenden, Kopfleiste
  * ========================================================================= */
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const $ = (s, r = document) => r.querySelector(s);
@@ -91,19 +91,6 @@ const $ = (s, r = document) => r.querySelector(s);
       setOpen(false);
       button.focus({ preventScroll: true });
     }
-  });
-})();
-
-/* --- Credits ----------------------------------------------------------------- */
-(function credits() {
-  const dialog = document.getElementById('credits-dialog');
-  if (!dialog) return;
-  const open = () => dialog.showModal();
-  document.getElementById('credits-open')?.addEventListener('click', open);
-  document.getElementById('foot-credits')?.addEventListener('click', open);
-  document.getElementById('credits-close')?.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (e) => {
-    if (e.target === dialog) dialog.close();
   });
 })();
 

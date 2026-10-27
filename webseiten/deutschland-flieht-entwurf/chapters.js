@@ -71,9 +71,6 @@ const pk = $('.pk');
 const devWrap = $('.dev-wrap');
 const atl = $('.atl');
 
-/* Footer „Quellen“ öffnet den Credits-Dialog */
-$('#foot-credits')?.addEventListener('click', () => document.getElementById('credits-open')?.click());
-
 /* --- Einblenden, sobald ein Kapitel ins Bild kommt --------------------------- */
 function onceVisible(element, className, margin, target = element) {
   if (!element) return;
@@ -320,8 +317,8 @@ if (pk) {
  * (kein Leuchten). Jede Forderung erzählt eine kleine Geschichte als Endlosschleife
  * (Münzen fließen, Papier stapelt sich und wird zersägt, ein Haus wächst ...).
  * Beim Aufklappen zeichnet sich die Szene, danach läuft die Handlung.
- * Läuft nur, solange die Zeile offen und sichtbar ist. Handy: keine Szenen.
- * Reduzierte Bewegung: Standbild.
+ * Desktop: links neben dem Text. Handy: über dem Text, etwas feiner gezeichnet.
+ * Läuft nur, solange die Zeile offen ist. Reduzierte Bewegung: Standbild.
  * ======================================================================== */
 (function chgSzenen() {
   const rows = [...document.querySelectorAll('.chg__row')];
@@ -381,7 +378,7 @@ if (pk) {
 
   /* ---------------------------------------------------------------- Renderer */
   const g = {
-    ctx: null, W: 0, H: 0, S: 100, cu: 0, cv: 0, dpr: 1, age: 0, tm: 0,
+    ctx: null, W: 0, H: 0, S: 100, cu: 0, cv: 0, dpr: 1, k: 1, age: 0, tm: 0,
     proj(x, y) {
       return [this.W / 2 + (x - this.cu) * this.S, this.H / 2 + (-y - this.cv) * this.S];
     },
@@ -396,7 +393,7 @@ if (pk) {
       const P = pts.map((q) => this.proj(q[0], q[1]));
       const segs = P.length - 1;
       const upto = r * segs;
-      const w = (o.w === undefined ? 4.4 : o.w) * this.dpr;
+      const w = (o.w === undefined ? 4.4 : o.w) * this.dpr * this.k;
       const full = r >= 0.999;
       const build = (ox, oy) => {
         ctx.beginPath();
@@ -411,12 +408,13 @@ if (pk) {
         }
         if (o.close && full) ctx.closePath();
       };
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.setLineDash(o.dash ? [o.dash[0] * this.dpr, o.dash[1] * this.dpr] : []);
-      ctx.lineDashOffset = (o.dashOff || 0) * this.dpr;
+      ctx.lineCap = o.cap || 'round';
+      ctx.lineJoin = o.join || 'round';
+      ctx.miterLimit = 2.6;
+      ctx.setLineDash(o.dash ? [o.dash[0] * this.dpr * this.k, o.dash[1] * this.dpr * this.k] : []);
+      ctx.lineDashOffset = (o.dashOff || 0) * this.dpr * this.k;
       if (o.shadow !== false && w > 0) {
-        build(3.4 * this.dpr, 4.6 * this.dpr);
+        build(3.4 * this.dpr * this.k, 4.6 * this.dpr * this.k);
         if (o.fill && full) {
           ctx.globalAlpha = a * 0.34;
           ctx.fillStyle = SHADOW + '1)';
@@ -466,7 +464,7 @@ if (pk) {
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.setLineDash([]);
-      build(3.4 * this.dpr, 4.6 * this.dpr);
+      build(3.4 * this.dpr * this.k, 4.6 * this.dpr * this.k);
       ctx.globalAlpha = 0.4;
       ctx.strokeStyle = SHADOW + '1)';
       ctx.lineWidth = w;
@@ -477,7 +475,7 @@ if (pk) {
       ctx.lineWidth = w;
       ctx.stroke();
       ctx.strokeStyle = '#1a0306';
-      ctx.lineWidth = Math.max(2, w - 9 * this.dpr);
+      ctx.lineWidth = Math.max(2 * this.k, w - 9 * this.dpr * this.k);
       ctx.stroke();
     },
     text(str, x, y, size, o = {}) {
@@ -486,13 +484,13 @@ if (pk) {
       const ctx = this.ctx;
       const q = this.proj(x, y);
       ctx.setLineDash([]);
-      ctx.font = (o.weight || 700) + ' ' + size * this.dpr + 'px ' + SANS;
+      ctx.font = (o.weight || 700) + ' ' + size * this.dpr * this.k + 'px ' + SANS;
       ctx.textAlign = o.align || 'center';
       ctx.textBaseline = 'middle';
       const a = r * (o.a === undefined ? 1 : o.a);
       ctx.globalAlpha = a * 0.42;
       ctx.fillStyle = SHADOW + '1)';
-      ctx.fillText(str, q[0] + 2.6 * this.dpr, q[1] + 3.4 * this.dpr);
+      ctx.fillText(str, q[0] + 2.6 * this.dpr * this.k, q[1] + 3.4 * this.dpr * this.k);
       ctx.globalAlpha = a;
       ctx.fillStyle = o.color || '#f4f1ec';
       ctx.fillText(str, q[0], q[1]);
@@ -514,237 +512,206 @@ if (pk) {
   };
 
   /* ------------------------------------------------------------------ Szenen */
-  /* 1 · Steuern: Lohn fließt zu Staat (49,3 %) und Netto (50,7 %), unten Vergleich mit OECD-Schnitt (35,1 %) */
+  /* 1 · Steuern: ein Euro reißt mittig auf (49,3 % / 50,7 %), unten Vergleich mit OECD-Schnitt (35,1 %) */
   function szeneSteuer() {
     const A = g.tm;
-    const bag = { x: -2.0, y: 0.05 }, st = { x: 0.15, y: 0.7 }, wa = { x: 0.15, y: -0.85 };
-    const P0 = [bag.x + 0.55, bag.y + 0.35], PS = [st.x - 1.0, st.y - 0.1], PW = [wa.x - 0.75, wa.y + 0.05];
-    const CS = [(P0[0] + PS[0]) / 2, 1.55], CW = [(P0[0] + PW[0]) / 2, -0.7];
-    for (const [c, end, d] of [[CS, PS, 0.5], [CW, PW, 0.6]]) {
-      const pts = [];
-      for (let i = 0; i <= 24; i++) pts.push(quad(P0, c, end, i / 24));
-      g.shape(pts, { w: 3, a: 0.5, dash: [9, 13], dashOff: -A * 34, d, shadow: false });
-    }
-    /* Münzen: 49,3 % zum Staat, Rest in die Tasche */
-    const T = 1.9, step = 0.42, t0 = 1.0;
-    const kmax = Math.floor((A - t0) / step);
-    let pulS = 0, pulW = 0, spawn = 0;
-    const coinsDraw = [];
-    for (let k = Math.max(0, kmax - 9); k <= kmax; k++) {
-      const u = (A - t0 - k * step) / T;
-      if (u < 0) continue;
-      if (u < 0.2) spawn = Math.max(spawn, 1 - u / 0.2);
-      const toS = Math.floor((k + 1) * 0.493) > Math.floor(k * 0.493);
-      if (u >= 1) {
-        const bump = Math.max(0, 1 - ((u - 1) * T) / 0.4);
-        if (toS) pulS = Math.max(pulS, bump);
-        else pulW = Math.max(pulW, bump);
-        continue;
+    const CYCLE = 7.2;
+    const C = A < 0.75 ? 0 : (A - 0.75) % CYCLE;
+    const R = 0.98;
+    const crackP = smooth(0.35, 1.2, C) * (1 - smooth(6.85, 7.15, C));
+    const splitT = smooth(1.12, 1.78, C) * (1 - smooth(6.35, 6.85, C));
+    const intro = A < 1.1 ? back((A - 0.02) / 0.68) : 1;
+    const shake = C > 1.12 && C < 1.7 ? Math.sin(C * 86) * 0.03 * (1 - (C - 1.12) / 0.58) : 0;
+    const cx = 0.04 + shake;
+    const cy = -0.22;
+    const yTip = R - Math.min(1, crackP) * 2 * R;
+    const jagN = [
+      [0, 1], [-0.06, 0.72], [0.08, 0.46], [-0.09, 0.18], [0.05, -0.08],
+      [-0.1, -0.36], [0.07, -0.62], [-0.04, -0.84], [0, -1],
+    ].map(([x, y]) => [x * R, y * R]);
+    const revealed = () => {
+      const pts = [jagN[0]];
+      for (let i = 1; i < jagN.length; i++) {
+        const a = jagN[i - 1], b = jagN[i];
+        if (b[1] >= yTip - 0.0001) pts.push(b);
+        else {
+          const f = (a[1] - yTip) / (a[1] - b[1] || 1);
+          pts.push([lerp(a[0], b[0], clamp(f)), yTip]);
+          break;
+        }
       }
-      const e = u * u * (3 - 2 * u) * 0.35 + u * 0.65;
-      const pos = quad(P0, toS ? CS : CW, toS ? PS : PW, e);
-      coinsDraw.push([pos[0], pos[1], 0.1 * (1 - 0.35 * smooth(0.8, 1, u)), k]);
+      return pts;
+    };
+    const halfOf = (side, rad) => {
+      const pts = [];
+      const n = 34;
+      const a0 = Math.PI / 2;
+      const a1 = side < 0 ? Math.PI * 1.5 : -Math.PI / 2;
+      for (let i = 0; i <= n; i++) {
+        const a = a0 + ((a1 - a0) * i) / n;
+        pts.push([Math.cos(a) * rad, Math.sin(a) * rad]);
+      }
+      for (let i = jagN.length - 1; i >= 0; i--) pts.push(jagN[i]);
+      pts.push(pts[0]);
+      return pts;
+    };
+    const arcOf = (side, rad) => {
+      const pts = [];
+      const n = 26;
+      const a0 = Math.PI / 2;
+      const a1 = side < 0 ? Math.PI * 1.5 : -Math.PI / 2;
+      for (let i = 0; i <= n; i++) {
+        const a = a0 + ((a1 - a0) * i) / n;
+        pts.push([Math.cos(a) * rad, Math.sin(a) * rad]);
+      }
+      return pts;
+    };
+    /* Euro sitzt im Münzteil und wird an der Bruchkante abgeschnitten */
+    const euroIn = (clipPts, x, y, rot, alpha, scale) => {
+      if (alpha < 0.02 || scale < 0.02) return;
+      const ctx = g.ctx;
+      const P = clipPts.map((q) => g.proj(q[0], q[1]));
+      const o = g.proj(x, y);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(P[0][0], P[0][1]);
+      for (let i = 1; i < P.length; i++) ctx.lineTo(P[i][0], P[i][1]);
+      ctx.clip();
+      ctx.font = '700 ' + 1.16 * R * scale * g.S + 'px ' + SANS;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.translate(o[0], o[1]);
+      ctx.rotate(-rot);
+      ctx.globalAlpha = alpha * 0.42;
+      ctx.fillStyle = SHADOW + '1)';
+      ctx.fillText('€', 2.6 * g.dpr * g.k, 3.4 * g.dpr * g.k);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#f4f1ec';
+      ctx.fillText('€', 0, 0);
+      ctx.restore();
+    };
+    const tear = (pts) => {
+      g.shape(pts, { w: 3.4, color: '#140206', shadow: false, d: 0 });
+      g.shape(pts, { w: 1.35, color: '#f4f1ec', shadow: false, d: 0 });
+    };
+
+    if (splitT < 0.025) {
+      const rad = R * intro * (1 + 0.028 * Math.sin(Math.min(crackP, 1) * Math.PI));
+      if (rad > 0.04) {
+        g.shape(circ(cx, cy, rad, 52), { fill: CREAM, close: true, d: 0.04 });
+        g.shape(circ(cx, cy, rad * 0.73, 40), { w: 2.5, color: DEEP, shadow: false, d: 0.2 });
+        euroIn(circ(cx, cy, rad * 0.92, 40), cx, cy, 0, out3((g.age - 0.25) / 0.4), intro);
+        if (crackP > 0.03) tear(revealed().map(([x, y]) => [cx + x * (rad / R), cy + y * (rad / R)]));
+      }
+    } else {
+      const gap = splitT * 0.5;
+      const wob = splitT > 0.9 ? Math.sin(A * 20) * 0.012 : 0;
+      const pose = (side) => ({
+        ox: side * (gap + wob),
+        oy: (side < 0 ? -0.07 : -0.02) * splitT + side * wob * 0.35,
+        rot: side * splitT * (side < 0 ? 0.2 : 0.08),
+      });
+      /* dunkle Spalte zwischen den Bruchkanten */
+      {
+        const L = pose(-1), Rr = pose(1);
+        const leftEdge = xf(jagN, cx + L.ox, cy + L.oy, L.rot);
+        const rightEdge = xf(jagN, cx + Rr.ox, cy + Rr.oy, Rr.rot);
+        g.shape(leftEdge.concat(rightEdge.slice().reverse()), { fill: '#140206', w: 0, close: true, d: 0, shadow: false, a: smooth(0.08, 0.45, splitT) });
+      }
+      const drawHalf = (side) => {
+        const p = pose(side);
+        const world = xf(halfOf(side, R), cx + p.ox, cy + p.oy, p.rot);
+        g.shape(world, { fill: CREAM, close: true, d: 0 });
+        euroIn(world, cx + p.ox, cy + p.oy, p.rot, 1, 1);
+        g.shape(xf(arcOf(side, R * 0.73), cx + p.ox, cy + p.oy, p.rot), { w: 2.5, color: DEEP, shadow: false, d: 0 });
+        tear(xf(jagN, cx + p.ox, cy + p.oy, p.rot));
+      };
+      drawHalf(-1);
+      drawHalf(1);
+      /* feine Folgerisse, bleiben an der jeweiligen Hälfte */
+      const hairs = [
+        { side: -1, pts: [[-0.02, 0.42], [-0.28, 0.56], [-0.36, 0.46]] },
+        { side: 1, pts: [[0.04, -0.16], [0.26, -0.3], [0.2, -0.44]] },
+        { side: -1, pts: [[-0.04, -0.5], [-0.24, -0.64]] },
+      ];
+      for (const h of hairs) {
+        const p = pose(h.side);
+        g.shape(xf(h.pts.map(([x, y]) => [x * R, y * R]), cx + p.ox, cy + p.oy, p.rot), {
+          w: 1.7, color: '#f4f1ec', shadow: false, d: 0, a: smooth(0.15, 0.55, splitT) * 0.8,
+        });
+      }
     }
-    /* Staat */
-    {
-      const s = (1 + 0.035 * pulS) * back((A - 0.2) / 0.7);
-      const B = (pts) => xf(pts, st.x, st.y - 0.2 * (s - 1), 0, s);
-      g.shape(B([[-0.66, 0.4], [0, 0.95], [0.66, 0.4], [-0.66, 0.4]]), { fill: CREAM, fillA: 0.9, close: true, d: 0.2 });
-      g.shape(B(circ(0, 0.58, 0.1, 16)), { w: 2.6, color: DEEP, shadow: false, d: 0.5 });
-      g.shape(B(rect(0, 0.3, 1.46, 0.14)), { fill: CREAM, fillA: 0.9, close: true, d: 0.25 });
-      for (const cx of [-0.48, -0.16, 0.16, 0.48]) g.shape(B(rect(cx, -0.1, 0.15, 0.6)), { fill: CREAM, fillA: 0.9, close: true, d: 0.3 });
-      g.shape(B(rect(0, -0.46, 1.62, 0.13)), { fill: CREAM, fillA: 0.9, close: true, d: 0.35 });
-      g.shape(B(rect(0, -0.6, 1.86, 0.13)), { fill: CREAM, fillA: 0.9, close: true, d: 0.4 });
+
+    /* Splitter fliegen aus dem Riss, ein Brocken bricht oben ab */
+    if (C > 1.08 && C < 3.6) {
+      const life = (C - 1.08) / 1.7;
+      for (let s = 0; s < 8; s++) {
+        const dir = s % 2 === 0 ? -1 : 1;
+        const along = (rnd(s + 1) - 0.5) * 1.35;
+        const speed = 0.35 + rnd(s + 4) * 0.7;
+        const x = cx + dir * (0.08 + life * speed);
+        const y = cy + along * 0.38 - life * life * (0.45 + rnd(s + 6) * 0.7);
+        const rot = (C * 5 + s) * dir;
+        const a = (1 - smooth(0.42, 1, life)) * smooth(0, 0.05, life);
+        const sz = 0.05 + rnd(s + 2) * 0.05;
+        const chip = [[0, sz], [-sz * 0.8, -sz * 0.5], [sz * 0.65, -sz * 0.35]];
+        g.shape(xf(chip, x, y, rot), { fill: '#f4f1ec', close: true, w: 0, a, d: 0, shadow: false });
+      }
+      const u = clamp((C - 1.12) / 2.1);
+      const shard = [[0, 0.18], [-0.11, 0.02], [-0.02, -0.12], [0.12, 0.04]];
+      g.shape(xf(shard, cx + 0.12 + u * 0.45, cy + R * 0.72 - u * 1.15, u * 2.2), {
+        fill: CREAM, close: true, w: 2.2, a: (1 - smooth(0.62, 1, u)) * smooth(0, 0.08, u), d: 0,
+      });
     }
-    /* Netto-Portemonnaie */
-    {
-      const s = (1 + 0.035 * pulW) * back((A - 0.35) / 0.7);
-      const B = (pts) => xf(pts, wa.x, wa.y, 0, s);
-      const wig = 0.03 * pulW * Math.sin(A * 20);
-      g.shape(B(xf(rect(0, 0, 0.5, 0.34), -0.12, 0.4, -0.2 + wig)), { fill: PINK, close: true, d: 0.5 });
-      g.shape(B(xf(rect(0, 0, 0.5, 0.34), 0.14, 0.42, 0.14 - wig)), { fill: CREAM, close: true, d: 0.55 });
-      g.shape(B(rrect(0, 0, 1.2, 0.76, 0.14)), { fill: CREAM, close: true, d: 0.4 });
-      g.shape(B([[-0.6, 0.12], [0.6, 0.12]]), { w: 3, color: DEEP, shadow: false, d: 0.6 });
-      g.shape(B(circ(0.4, -0.12, 0.1, 16)), { fill: DEEP, w: 2.4, close: true, d: 0.65 });
-    }
-    /* Lohnbeutel */
-    {
-      const sq = 1 + 0.02 * spawn;
-      const s = back((A - 0.05) / 0.7);
-      const B = (pts) => xf(pts, bag.x, bag.y - 0.1 * (1 - sq), 0, s * 1, s * sq);
-      g.shape(B(circ(0, -0.1, 0.52, 40)), { fill: CREAM, close: true, d: 0.05 });
-      g.shape(B([[-0.2, 0.36], [-0.34, 0.66], [0.34, 0.66], [0.2, 0.36]]), { fill: CREAM, close: true, d: 0.1 });
-      g.shape(B(rrect(0, 0.4, 0.5, 0.1, 0.05)), { fill: DEEP, w: 2.6, close: true, d: 0.2 });
-      g.text('€', bag.x, bag.y - 0.1 * (1 - sq) - 0.1 * s, 46, { color: DEEP, d: 0.3 });
-    }
-    /* fliegende Münzen obenauf */
-    for (const [x, y, r, k] of coinsDraw) coin(x, y, r, { a: 1, d: 0 });
-    /* Zahlen und Beschriftung */
+
     const cu = (to, d, dur) => (to * out3((A - d) / dur));
     const fmt = (v) => v.toFixed(1).replace('.', ',');
-    g.text(fmt(cu(49.3, 1.0, 2.6)) + ' %', st.x + 1.2, st.y + 0.18, 46, { align: 'left', d: 0.4 });
-    g.text('Steuern und Abgaben', st.x + 1.2, st.y - 0.25, 16, { align: 'left', weight: 600, d: 0.6 });
-    g.text(fmt(cu(50.7, 1.0, 2.6)) + ' %', wa.x + 1.2, wa.y + 0.18, 46, { align: 'left', d: 0.7 });
-    g.text('bleiben netto', wa.x + 1.2, wa.y - 0.25, 16, { align: 'left', weight: 600, d: 0.8 });
-    g.text('Bruttolohn', bag.x, -0.95, 18, { weight: 600, d: 0.5 });
+    g.text(fmt(cu(49.3, 1.15, 1.5)) + ' %', -1.2, 1.38, 40, { d: 1.05 });
+    g.text('Steuern und Abgaben', -1.2, 1.0, 15, { weight: 600, d: 1.2 });
+    g.text(fmt(cu(50.7, 1.15, 1.5)) + ' %', 1.22, 1.38, 40, { d: 1.15 });
+    g.text('bleiben netto', 1.22, 1.0, 15, { weight: 600, d: 1.3 });
     /* Vergleich: Abgabenkeil DE gegen OECD-Schnitt */
-    const bars = [{ y: -1.75, v: 49.3, l: 'Abgabenkeil Deutschland', d: 0.9 }, { y: -2.3, v: 35.1, l: 'OECD-Schnitt', d: 1.1 }];
+    const bars = [{ y: -1.82, v: 49.3, l: 'Abgabenkeil Deutschland', d: 1.45 }, { y: -2.36, v: 35.1, l: 'OECD-Schnitt', d: 1.65 }];
     const bx0 = -2.55, bw = 5.1;
     for (const b of bars) {
       g.shape(rrect(bx0 + bw / 2, b.y, bw, 0.24, 0.12), { w: 3.2, close: true, a: 0.7, d: b.d, shadow: false });
-      const f = (b.v / 100) * bw * out3((A - b.d - 0.5) / 1.6);
-      if (f > 0.05) g.shape(rrect(bx0 + f / 2, b.y, f, 0.24, 0.12), { fill: CREAM, close: true, w: 0, d: b.d + 0.4, shadow: false });
-      g.text(b.l, bx0, b.y + 0.32, 14, { align: 'left', weight: 600, d: b.d + 0.2 });
-      g.text(fmt(cu(b.v, b.d + 0.5, 1.6)) + ' %', bx0 + bw, b.y + 0.32, 14, { align: 'right', d: b.d + 0.2 });
+      const f = (b.v / 100) * bw * out3((A - b.d - 0.35) / 1.35);
+      if (f > 0.05) g.shape(rrect(bx0 + f / 2, b.y, f, 0.24, 0.12), { fill: CREAM, close: true, w: 0, d: b.d + 0.3, shadow: false });
+      g.text(b.l, bx0, b.y + 0.32, 14, { align: 'left', weight: 600, d: b.d + 0.15 });
+      g.text(fmt(cu(b.v, b.d + 0.35, 1.35)) + ' %', bx0 + bw, b.y + 0.32, 14, { align: 'right', d: b.d + 0.15 });
     }
   }
 
-  /* 2 · Sozialstaat: Tresor speist Rohre in drei Sparschweine; Münzstapel wachsen */
+  /* 2 · Sozialstaat: etwa 52 % der Staatsausgaben 2025 sind Sozialleistungen (Destatis, vorläufig) */
   function szeneTresor() {
     const A = g.tm;
-    const vx = -1.7, vy = 0.05;
-    const piggies = [{ x: 1.15, y: 1.0 }, { x: 1.15, y: 0.05 }, { x: 1.15, y: -0.9 }];
-    const trunk = [[vx + 0.62, vy], [-0.55, vy]];
-    const paths = piggies.map((p) => [[vx + 0.62, vy], [-0.55, vy], [-0.55, p.y + 0.6], [p.x, p.y + 0.6], [p.x, p.y + 0.3]]);
-    /* Rohre */
-    g.tube(trunk, { d: 0.3, w: 0.2 });
-    for (let i = 0; i < 3; i++) g.tube(paths[i].slice(1), { d: 0.5 + i * 0.15, w: 0.2 });
-    /* Tresor */
-    {
-      const s = back((A - 0.05) / 0.7);
-      const B = (pts) => xf(pts, vx, vy, 0, s);
-      g.shape(B(rrect(0, 0, 1.4, 1.56, 0.14)), { fill: CREAM, close: true, d: 0.05 });
-      g.shape(B(rrect(0, 0, 1.12, 1.28, 0.1)), { w: 2.8, color: DEEP, close: true, shadow: false, d: 0.2 });
-      g.shape(B(circ(0, 0.02, 0.46, 40)), { fill: '#1a0306', w: 3.6, close: true, d: 0.3 });
-      for (let i = 0; i < 24; i++) {
-        const a = A * 0.5 + (i / 24) * TAU, l = i % 3 === 0 ? 0.11 : 0.06;
-        g.shape(B([[Math.cos(a) * 0.46, Math.sin(a) * 0.46 + 0.02], [Math.cos(a) * (0.46 - l), Math.sin(a) * (0.46 - l) + 0.02]]), { w: 3, shadow: false, d: 0.5 + i * 0.01 });
-      }
-      for (let i = 0; i < 4; i++) {
-        const a = -A * 0.7 + (i / 4) * TAU;
-        g.shape(B([[0, 0.02], [Math.cos(a) * 0.28, Math.sin(a) * 0.28 + 0.02]]), { w: 4.2, d: 0.6 });
-      }
-      g.shape(B(circ(0, 0.02, 0.1, 16)), { fill: CREAM, close: true, d: 0.6 });
-      for (const [bx, by] of [[-0.55, 0.62], [0.55, 0.62], [-0.55, -0.62], [0.55, -0.62]]) g.shape(B(circ(bx, by, 0.045, 10)), { fill: DEEP, w: 2.4, close: true, d: 0.4, shadow: false });
-      g.shape(B([[-0.5, -0.78], [-0.5, -0.92], [-0.3, -0.92]]), { w: 4, d: 0.3, shadow: false });
-      g.shape(B([[0.5, -0.78], [0.5, -0.92], [0.3, -0.92]]), { w: 4, d: 0.3, shadow: false });
-    }
-    g.text('Pflichtbeiträge', vx, -1.15, 17, { weight: 600, d: 0.6 });
-    /* Münzen laufen durch die Rohre */
-    const lens = paths.map((pts) => {
-      const c = [0];
-      for (let i = 1; i < pts.length; i++) c.push(c[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-      return c;
+    const x0 = -2.45, bw = 4.9, by = 0.12, bh = 0.56;
+    const share = 0.52;
+    const grow = back((A - 0.45) / 1.35);
+    const shown = Math.min(share * Math.max(grow, 0), 0.96);
+    const p = out3((A - 0.4) / 1.5);
+    g.text(Math.round(52 * p) + ' %', 0, 1.5, 48, { d: 0.15 });
+    g.text('der Staatsausgaben', 0, 1.02, 16, { weight: 600, d: 0.35 });
+    g.text('für Sozialleistungen', 0, 0.7, 16, { weight: 600, d: 0.48 });
+    g.shape(rrect(x0 + bw / 2, by, bw, bh, 0.18), { w: 3.2, close: true, a: 0.75, d: 0.2, shadow: false });
+    const f = bw * shown;
+    if (f > 0.08) g.shape(rrect(x0 + f / 2, by, f, bh, Math.min(0.18, f / 2)), { fill: CREAM, close: true, w: 2.4, d: 0 });
+    const mid = x0 + bw * 0.5;
+    g.shape([[mid, by - bh / 2 - 0.07], [mid, by + bh / 2 + 0.07]], { w: 1.7, color: '#f4f1ec', shadow: false, d: 0.75, a: 0.95 });
+    g.text('Sozialleistungen', x0, by - 0.55, 14, { align: 'left', weight: 600, d: 0.9 });
+    g.text('übrige Ausgaben', x0 + bw, by - 0.55, 14, { align: 'right', weight: 600, d: 1.0 });
+    const items = ['Renten und Pensionen', 'Arbeitslosengeld I', 'Bürgergeld', 'soziale Sachleistungen'];
+    items.forEach((label, i) => {
+      g.text(label, x0, -0.95 - i * 0.36, 15, { align: 'left', weight: 600, d: 1.05 + i * 0.1 });
     });
-    const posAt = (i, d) => {
-      const pts = paths[i], c = lens[i];
-      for (let k = 1; k < pts.length; k++) {
-        if (d <= c[k]) {
-          const f = (d - c[k - 1]) / (c[k] - c[k - 1]);
-          return [lerp(pts[k - 1][0], pts[k][0], f), lerp(pts[k - 1][1], pts[k][1], f)];
-        }
-      }
-      return pts[pts.length - 1];
-    };
-    const speed = 1.15, period = 0.9;
-    const arrivals = [0, 0, 0];
-    const bump = [0, 0, 0];
-    for (let i = 0; i < 3; i++) {
-      const total = lens[i][lens[i].length - 1];
-      const tr = total / speed;
-      const tStart = 1.3 + i * 0.3;
-      const kmax = Math.floor((A - tStart) / period);
-      for (let k = Math.max(0, kmax - Math.ceil(tr / period) - 1); k <= kmax; k++) {
-        const t = A - tStart - k * period;
-        if (t < 0) continue;
-        if (t >= tr) {
-          arrivals[i]++;
-          bump[i] = Math.max(bump[i], Math.max(0, 1 - (t - tr) / 0.35));
-          continue;
-        }
-        const p = posAt(i, t * speed);
-        coin(p[0], p[1], 0.095, { w: 3 });
-      }
-      arrivals[i] = arrivals[i] + Math.max(0, Math.floor((A - tStart - Math.ceil(tr / period) * period) / period));
-    }
-    /* Sparschweine */
-    piggies.forEach((pg, i) => {
-      const sq = bump[i];
-      const s = 0.66 * back((A - 0.5 - i * 0.15) / 0.7);
-      const sx = s * (1 + 0.07 * sq), sy = s * (1 - 0.1 * sq);
-      const B = (pts) => xf(pts, pg.x, pg.y - 0.05 * (1 - sy / s), 0, sx, sy);
-      g.shape(B([[-0.2, -0.28], [-0.2, -0.52], [-0.05, -0.52], [-0.05, -0.28]]), { fill: CREAM, close: true, d: 0.7 });
-      g.shape(B([[0.18, -0.28], [0.18, -0.52], [0.33, -0.52], [0.33, -0.28]]), { fill: CREAM, close: true, d: 0.7 });
-      g.shape(B(ell(0, 0, 0.58, 0.4)), { fill: CREAM, close: true, d: 0.6 });
-      g.shape(B([[-0.58, 0.05], [-0.74, 0.12], [-0.7, 0.26], [-0.62, 0.18]]), { w: 3.4, d: 0.9 });
-      g.shape(B([[0.2, 0.32], [0.3, 0.55], [0.42, 0.28], [0.2, 0.32]]), { fill: PINK, close: true, d: 0.8 });
-      g.shape(B(ell(0.6, -0.04, 0.14, 0.11, 16)), { fill: PINK, close: true, d: 0.8 });
-      g.shape(B(circ(0.56, -0.04, 0.02, 6)), { fill: DEEP, w: 2, close: true, shadow: false, d: 0.9 });
-      g.shape(B(circ(0.64, -0.04, 0.02, 6)), { fill: DEEP, w: 2, close: true, shadow: false, d: 0.9 });
-      g.shape(B(circ(0.34, 0.12, 0.05, 10)), { fill: DEEP, w: 2, close: true, shadow: false, d: 0.9 });
-      g.shape(B([[-0.1, 0.4], [0.12, 0.4]]), { w: 4, color: DEEP, shadow: false, d: 0.9 });
-      /* Münzturm daneben */
-      const n = arrivals[i] > 0 ? ((arrivals[i] - 1) % 6) + 1 : 0;
-      for (let k = 0; k < n; k++) {
-        const pop = back((A - 0) * 0 + 1);
-        g.shape(ell(pg.x + 0.98, pg.y - 0.4 + k * 0.1, 0.2, 0.065, 20), { fill: CREAM, close: true, w: 3, d: 0, a: pop });
-      }
-    });
-    g.text('Privat vorsorgen', 1.15, 2.25, 24, { d: 0.9 });
-    g.text('eigenes Vermögen statt Zwang', 1.15, 1.88, 14, { weight: 600, d: 1.1 });
+    g.text('2.249 Mrd. € · 2025, vorläufig', 0, -2.52, 14, { weight: 600, d: 1.5 });
   }
 
-  /* 3 · Rente: Münzstapel brennt; Wippe: 1962 sechs Beitragszahler je Rentner, heute zwei */
+  /* 3 · Rente: Wippe, 1962 sechs Beitragszahler je Rentner, heute zwei */
   function szeneRente() {
     const A = g.tm;
-    const cx = -1.45;
-    /* Münzstapel */
-    const cyc = (A % 8) / 8;
-    const b = 3.3 * smooth(0.08, 0.86, cyc) * (1 - smooth(0.9, 1, cyc));
-    const ch = 0.17, rx = 0.62, ry = 0.17, base = -1.1;
-    let topY = base;
-    for (let k = 0; k < 7; k++) {
-      const rem = k >= 3 ? clamp(1 - (b - (6 - k))) : 1;
-      const h = ch * rem;
-      if (rem <= 0.02) continue;
-      const y = base + k * ch;
-      const d = 0.1 + k * 0.08;
-      g.shape(rect(cx, y + h / 2, rx * 2, h), { fill: CREAM, close: true, d });
-      for (const rxx of [-0.4, -0.2, 0, 0.2, 0.4]) g.shape([[cx + rxx * rx * 1.4, y + 0.02], [cx + rxx * rx * 1.4, y + h - 0.02]], { w: 2, color: DEEP, shadow: false, a: 0.5, d: d + 0.2 });
-      g.shape(ell(cx, y + h, rx, ry, 30), { fill: WHITE, close: true, w: 3.6, d: d + 0.1 });
-      topY = y + h;
-    }
-    /* Flammen */
-    const flame = (x, y, w, hh, ph, fill, o = {}) => {
-      const L = [], R = [];
-      for (let i = 0; i <= 10; i++) {
-        const u = i / 10;
-        const sway = Math.sin(A * 3.2 + ph + u * 5) * 0.14 * u + Math.sin(A * 5.1 + ph * 1.3 + u * 8) * 0.05 * u;
-        const wd = w * Math.pow(1 - u, 0.8) * (1 + 0.15 * Math.sin(u * 6 + A * 4 + ph));
-        L.push([x + sway - wd, y + u * hh]);
-        R.push([x + sway + wd, y + u * hh]);
-      }
-      g.shape(L.concat(R.reverse()), { fill, close: true, ...o });
-    };
-    const fl = 0.85 + 0.15 * Math.sin(A * 6);
-    if (A > 0.6) {
-      flame(cx - 0.36, topY, 0.22, 0.95 * fl, 0.4, CREAM, { d: 0.6 });
-      flame(cx + 0.36, topY, 0.22, 0.85 * fl, 2.1, CREAM, { d: 0.65 });
-      flame(cx, topY, 0.3, 1.35 * fl, 1.3, WHITE, { d: 0.55 });
-      flame(cx, topY, 0.18, 0.95 * fl, 3.0, PINK, { d: 0.7, w: 0, shadow: false });
-      flame(cx, topY, 0.09, 0.5 * fl, 4.2, '#f4e4dc', { d: 0.75, w: 0, shadow: false });
-    }
-    for (let s = 0; s < 14; s++) {
-      const life = (A * 0.28 + s * 0.137) % 1;
-      const px = cx + Math.sin(s * 3.1 + A * 0.8) * 0.55 * (0.3 + life);
-      const py = topY + 0.4 + life * 1.5;
-      g.shape(xf(rect(0, 0, 0.07, 0.07), px, py, A + s), { fill: CREAM, close: true, w: 0, a: (1 - life) * smooth(0, 0.08, life), shadow: false, d: 0.9 });
-    }
-    const fmt = (v) => Math.round(v) + ' %';
-    g.text(fmt(24 * out3((A - 0.8) / 2.2)), cx, -1.62, 44, { d: 0.5 });
-    g.text('des Bundeshaushalts für die Rente', cx, -1.98, 15, { weight: 600, d: 0.8 });
     /* Wippe */
-    const fx = 1.25, fy = -0.95;
+    const fx = 0, fy = -0.35;
     const C = A % 10;
     const leaveT = [3.0, 3.5, 4.0, 4.5];
     const heavy = smooth(3.2, 5.8, C) * (1 - smooth(9.2, 10, C));
@@ -777,77 +744,70 @@ if (pk) {
       g.shape([c0, c1, plank(1.04, 0.74)], { w: 4, d: 1.4 });
     }
     const showOld = 1 - smooth(3.2, 3.7, C) * (1 - smooth(9.3, 9.8, C));
-    g.text(showOld > 0.5 ? '1962 · 6 : 1' : 'heute · 2 : 1', fx, 1.25, 30, { d: 0.9, a: 1 });
-    g.text('Beitragszahler je Altersrentner', fx, 0.88, 14, { weight: 600, d: 1.1 });
+    g.text(showOld > 0.5 ? '1962' : 'heute', fx, 1.92, 34, { d: 0.9, a: 1 });
+    g.text(showOld > 0.5 ? '6 : 1' : '2 : 1', fx, 1.48, 34, { d: 0.9, a: 1 });
+    g.text('Beitragszahler je Altersrentner', fx, 1.02, 15, { weight: 600, d: 1.1 });
   }
 
-  /* 4 · Unternehmen: Der Formularberg (Bürokratie) wird weggeweht, die Fabrik läuft auf */
+  /* 4 · Unternehmen: Kettensäge schneidet den Aktenstapel „Bürokratie“ durch */
   function szeneFabrik() {
     const A = g.tm;
     const C = A % 9;
-    const px = -1.95, baseY = -1.0;
-    for (let i = 0; i < 7; i++) {
-      const ti = 0.8 + i * 0.3;
-      const tl = 4.0 + (6 - i) * 0.28;
-      const tt = C - ti;
-      if (tt < 0) continue;
-      let ox = (rnd(i) - 0.5) * 0.1, oy = baseY + 0.07 + i * 0.145 + (1 - back(tt / 0.55)) * 1.5, rot = (rnd(i + 9) - 0.5) * 0.06, al = 1;
-      if (C > tl) {
-        const u = (C - tl) / 1.3;
-        ox += u * (1.5 + rnd(i) * 0.8);
-        oy += u * (0.9 + rnd(i + 4) * 0.7) + 0.12 * Math.sin(u * 9);
-        rot += u * (2 + rnd(i + 2) * 2);
-        al = 1 - smooth(0.55, 1, u);
-      }
-      if (al <= 0.02) continue;
-      g.shape(xf(rect(0, 0, 1.0, 0.125), px + ox, oy, rot), { fill: CREAM, close: true, d: 0, a: al, w: 3.4 });
-      g.shape(xf([[-0.38, 0], [0.12, 0]], px + ox, oy, rot), { w: 2.2, color: DEEP, shadow: false, a: al * 0.8, d: 0 });
-      if (i % 2 === 0) g.shape(xf(circ(0.34, 0, 0.035, 8), px + ox, oy, rot), { fill: DEEP, close: true, w: 0, shadow: false, a: al, d: 0 });
-    }
-    g.text('Bürokratie', px, 0.55, 20, { d: 0.9 });
-    /* Fabrik */
-    const fx = 0.3, fy = -0.6;
-    const lit = smooth(4.5, 5.1, C) * (1 - smooth(8.3, 9, C));
-    g.shape(rect(fx, fy, 2.3, 0.86), { fill: CREAM, close: true, d: 0.3 });
-    for (let i = 0; i < 3; i++) {
-      const x0 = fx - 1.15 + i * 0.77;
-      g.shape([[x0, fy + 0.43], [x0, fy + 0.85], [x0 + 0.77, fy + 0.43]], { fill: CREAM, close: true, d: 0.4 + i * 0.1 });
-    }
-    g.shape([[fx + 0.55, fy + 0.43], [fx + 0.55, fy + 1.45], [fx + 0.9, fy + 1.45], [fx + 0.9, fy + 0.43]], { fill: CREAM, close: true, d: 0.5 });
-    g.shape([[fx + 0.49, fy + 1.45], [fx + 0.96, fy + 1.45]], { w: 6, d: 0.6 });
-    for (let s = 0; s < 4; s++) {
-      const life = (A * (0.2 + 0.1 * lit) + s / 4) % 1;
-      g.shape(circ(fx + 0.72 + life * 0.5 + Math.sin(A + s) * 0.04, fy + 1.58 + life * 0.8, 0.09 + life * 0.24, 22), { fill: CREAM, fillA: 0.7, close: true, w: 0, a: (1 - life) * 0.9, shadow: false, d: 0.9 });
-    }
-    for (let i = 0; i < 5; i++) {
-      const wx = fx - 0.95 + i * 0.5;
-      g.shape(rect(wx, fy + 0.14, 0.3, 0.28), { fill: lit > 0.5 ? '#f4e4dc' : '#1a0306', close: true, w: 3.2, d: 0.7 + i * 0.05, shadow: false });
-    }
-    g.shape([[fx + 0.1, fy - 0.43], [fx + 0.1, fy - 0.08], [fx + 0.55, fy - 0.08], [fx + 0.55, fy - 0.43]], { w: 3.4, color: DEEP, fill: '#1a0306', d: 0.9, shadow: false });
-    /* Zahnräder rechts, greifen ineinander */
-    const gear = (cx, cy, r, teeth, rot) => {
-      const p = [];
-      const n = teeth * 4;
-      for (let i = 0; i <= n; i++) {
-        const a = rot + (i / n) * TAU;
-        const rr = i % 4 === 1 || i % 4 === 2 ? r * 1.17 : r;
-        p.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
-      }
-      return p;
+    const drive = smooth(0.35, 3.15, C) * (1 - smooth(7.55, 8.45, C));
+    const toss = smooth(3.05, 4.5, C) * (1 - smooth(7.35, 8.3, C));
+    const stackX = 0.7;
+    const sw = 1.9;
+    const sh = 0.11;
+    const step = 0.14;
+    const buzz = drive > 0.05 && drive < 0.98 && toss < 0.4 ? Math.sin(A * 64) * 0.011 : 0;
+    const sx = lerp(-2.62, -0.4, drive);
+    const sy = -0.18 + buzz;
+    const blatt = (x, y, rot, d) => {
+      g.shape(xf(rrect(0, 0, sw, sh, 0.025), x, y, rot), { fill: CREAM, close: true, w: 2.6, d });
+      g.shape(xf([[-sw * 0.34, 0.012], [sw * 0.2, 0.012]], x, y, rot), { w: 1.5, color: DEEP, shadow: false, d, a: 0.8 });
+      g.shape(xf([[-sw * 0.34, -0.022], [-sw * 0.04, -0.022]], x, y, rot), { w: 1.3, color: DEEP, shadow: false, d, a: 0.5 });
     };
-    const spin = A * (0.5 + 0.9 * lit);
-    g.shape(gear(2.15, -0.42, 0.36, 10, spin), { fill: CREAM, close: true, d: 1.0 });
-    g.shape(circ(2.15, -0.42, 0.12, 14), { fill: DEEP, close: true, w: 2.6, d: 1.1, shadow: false });
-    g.shape(gear(1.95, 0.2, 0.26, 8, -spin * 1.25 + 0.2), { fill: PINK, close: true, d: 1.1 });
-    g.shape(circ(1.95, 0.2, 0.09, 12), { fill: DEEP, close: true, w: 2.4, d: 1.2, shadow: false });
-    /* Förderband */
-    const dist = C < 4.8 ? 0.12 * C : 0.12 * 4.8 + 0.9 * (C - 4.8);
-    g.shape([[-0.95, -1.24], [1.6, -1.24]], { w: 4.4, d: 1.0 });
-    for (let k = 0; k < 6; k++) g.shape(circ(-0.85 + k * 0.5, -1.3, 0.06, 10), { fill: CREAM, close: true, w: 2.6, d: 1.0, shadow: false });
-    for (let k = 0; k < 5; k++) {
-      const u = (dist * 0.35 + k / 5) % 1;
-      g.shape(rect(-0.9 + u * 2.4, -1.1, 0.24, 0.2), { fill: PINK, close: true, w: 3, d: 1.1, a: smooth(0, 0.08, u) * (1 - smooth(0.92, 1, u)) });
+    for (let i = 0; i < 4; i++) blatt(stackX + i * 0.012, -0.835 + i * step, 0, 0.04 + i * 0.04);
+    const saege = (x, y) => {
+      const B = (pts) => xf(pts, x, y, 0);
+      g.shape(B([[-0.5, -0.2], [-0.86, -0.22], [-1.0, -0.04], [-1.0, 0.24], [-0.8, 0.4], [-0.46, 0.26]]), { w: 5, d: 0.08 });
+      g.shape(B([[-0.5, 0], [-0.74, -0.02], [-0.74, 0.2], [-0.48, 0.16]]), { w: 3.2, color: DEEP, shadow: false, d: 0.14 });
+      g.shape(B(rrect(0.02, 0, 1.04, 0.56, 0.12)), { fill: CREAM, close: true, d: 0.05 });
+      g.shape(B([[-0.18, 0.22], [-0.24, 0.48], [-0.06, 0.64], [0.34, 0.66], [0.52, 0.46], [0.44, 0.22]]), { w: 5, d: 0.12 });
+      g.shape(B([[0.36, 0.16], [0.58, 0.5], [0.76, 0.1]]), { w: 4.2, d: 0.18 });
+      g.shape(B(circ(-0.2, -0.02, 0.12, 14)), { w: 2.4, color: DEEP, shadow: false, d: 0.2 });
+      g.shape(B(rrect(1.48, 0, 1.78, 0.15, 0.07)), { fill: CREAM, close: true, d: 0.1 });
+      g.shape(B(circ(2.3, 0, 0.095, 14)), { fill: CREAM, w: 2.6, close: true, d: 0.18 });
+      const phase = (A * 10) % 0.16;
+      for (let t = 0.72 + phase; t < 2.16; t += 0.16) {
+        g.shape(B([[t, 0.06], [t + 0.05, 0.15], [t + 0.1, 0.06]]), { w: 2.2, d: 0.22, shadow: false });
+        g.shape(B([[t + 0.04, -0.06], [t + 0.09, -0.15], [t + 0.14, -0.06]]), { w: 2.2, d: 0.22, shadow: false });
+      }
+      const chain = A * 72;
+      g.shape(B([[0.74, 0.034], [2.12, 0.034]]), { w: 1.8, color: '#f4f1ec', dash: [4, 6], dashOff: -chain, shadow: false, d: 0.24 });
+      g.shape(B([[0.74, -0.034], [2.12, -0.034]]), { w: 1.8, color: '#f4f1ec', dash: [4, 6], dashOff: chain, shadow: false, d: 0.24 });
+    };
+    saege(sx, sy);
+    for (let i = 0; i < 5; i++) {
+      blatt(
+        stackX + toss * (0.16 + i * 0.13),
+        0.04 + i * step + toss * (0.06 + i * 0.045),
+        toss * (0.06 + i * 0.055),
+        0.1 + i * 0.04,
+      );
     }
+    if (drive > 0.08 && drive < 0.98 && toss < 0.65) {
+      const tipx = sx + 2.3;
+      const tipy = sy;
+      for (let s = 0; s < 8; s++) {
+        const life = (A * 1.8 + s * 0.13) % 1;
+        const up = s % 2 ? 1 : -1;
+        g.shape(xf(rect(0, 0, 0.08, 0.038), tipx + life * 0.5, tipy + (rnd(s + 4) - 0.5) * 0.22 + up * life * 0.42, life * 4), {
+          fill: s % 2 ? '#f4f1ec' : CREAM, close: true, w: 0, a: (1 - life) * 0.9, shadow: false, d: 0,
+        });
+      }
+    }
+    g.text('Bürokratie', stackX, -1.16, 18, { weight: 600, d: 0.28 });
   }
 
   /* 5 · Wohnungsbau: Kran setzt Geschoss für Geschoss, Preissäulen 2005 gegen 2024 */
@@ -936,9 +896,9 @@ if (pk) {
   const SZENEN = [szeneSteuer, szeneTresor, szeneRente, szeneFabrik, szeneHaus];
   const FITS = [
     { x: [-2.65, 2.65], y: [-2.6, 1.75] },
-    { x: [-2.55, 2.5], y: [-1.5, 2.4] },
-    { x: [-2.2, 2.55], y: [-2.2, 1.55] },
-    { x: [-2.6, 2.7], y: [-1.45, 1.9] },
+    { x: [-2.6, 2.6], y: [-2.75, 1.85] },
+    { x: [-1.9, 1.9], y: [-0.9, 2.15] },
+    { x: [-1.7, 2.6], y: [-1.4, 1.32] },
     { x: [-2.55, 2.55], y: [-1.5, 1.8], v: 0.8 },
   ];
 
@@ -977,6 +937,8 @@ if (pk) {
     g.tm = g.age < 2.2 || staticFrame ? g.age : 2.2 + (g.age - 2.2) * 0.6;
     const b = FITS[i];
     g.S = Math.min((g.W * 0.96) / (b.x[1] - b.x[0]), (g.H * 0.95) / (b.y[1] - b.y[0]));
+    /* Auf dem Handy ist die Fläche kleiner: Striche und Schrift etwas feiner, Desktop bleibt unverändert */
+    g.k = desktop.matches ? 1 : Math.min(1, Math.max(0.75, r.width / 560));
     g.cu = (b.x[0] + b.x[1]) / 2;
     /* oben ausrichten (kleiner Rand), nicht mittig: sonst hängt die Szene unter dem Text */
     const sceneH = (b.y[1] - b.y[0]) * g.S;
@@ -995,10 +957,7 @@ if (pk) {
 
   function sync() {
     const i = rows.findIndex((r) => r.classList.contains('is-open'));
-    if (!desktop.matches || i === active) {
-      if (!desktop.matches) active = -1;
-      return;
-    }
+    if (i === active) return;
     active = i;
     if (frame) {
       cancelAnimationFrame(frame);

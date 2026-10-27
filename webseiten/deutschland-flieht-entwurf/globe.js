@@ -526,7 +526,7 @@ async function initStoriesGlobe(root) {
   function resize() {
     width = Math.max(1, stage.clientWidth);
     height = Math.max(1, stage.clientHeight);
-    radius = width * (mobileLayout() ? 0.76 : 0.66);
+    radius = width * (mobileLayout() ? 0.66 : 0.52);
     svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
     if (selected && !tweenFrame) {
       /* Zoom auf das Land neu rechnen, dann die Kreise neu legen. */

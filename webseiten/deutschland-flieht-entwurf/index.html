@@ -7,18 +7,18 @@
     <meta name="description" content="Deutschland flieht. Zahlen, Forderungen und Geschichten zur Abwanderung aus Deutschland." />
     <meta name="robots" content="noindex,nofollow" />
     <title>Deutschland flieht.</title>
-    <link rel="preload" href="./assets/hero-apokalypse.webp" as="image" fetchpriority="high" />
+    <link rel="preload" href="./assets/hero-apokalypse.webp" as="image" media="(min-width: 761px)" fetchpriority="high" />
+    <link rel="preload" href="./assets/hero-apokalypse-mobil.jpg?v=2" as="image" media="(max-width: 760px)" fetchpriority="high" />
     <link rel="preload" href="./assets/playfair-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=u49" />
-    <script src="./main.js?v=u49" type="module"></script>
-      <script src="./chapters.js?v=u49" type="module"></script>
+    <link rel="stylesheet" href="./styles.css?v=u103" />
+    <script src="./main.js?v=u93" type="module"></script>
+      <script src="./chapters.js?v=u60" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
     <header class="site-header" id="oben">
       <a class="brand" href="#oben" aria-label="Deutschland flieht, zum Anfang"><em class="wortmarke">Deutschland flieht<b>.</b></em></a>
       <nav class="header-actions" aria-label="Hauptnavigation">
-        <button class="credits-link" id="credits-open" type="button">Credits</button>
         <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="site-menu">
           <span></span><span></span><span></span>
         </button>
@@ -26,6 +26,7 @@
       <div class="menu-panel" id="site-menu" aria-hidden="true" hidden>
         <nav class="menu-panel__main" aria-label="Menüpunkte">
           <a href="#inhalt">Daten</a>
+          <a href="#und-dann">Und dann?</a>
           <a href="#forderungen">Forderungen</a>
           <a href="./petition/">Petition</a>
         </nav>
@@ -40,23 +41,30 @@
 
     <main>
       <section class="hero" aria-label="Deutschland flieht">
-        <img
-          class="hero__image"
-          src="./assets/hero-apokalypse.webp"
-          alt="Deutschland flieht. Der Schriftzug steht über einer dunklen, nebligen Szenerie mit Flugzeugsilhouette."
-          width="1916"
-          height="853"
-          fetchpriority="high"
-          decoding="async"
-        />
+        <picture>
+          <source media="(max-width: 760px)" srcset="./assets/hero-apokalypse-mobil.jpg?v=2" type="image/jpeg" />
+          <img
+            class="hero__image"
+            src="./assets/hero-apokalypse.webp"
+            alt="Deutschland flieht. Der Schriftzug steht über einer dunklen, nebligen Szenerie mit Flugzeugsilhouette."
+            width="1916"
+            height="853"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
+        <div class="hero__figure" aria-hidden="true">
+          <canvas class="hero__runner"></canvas>
+          <video class="hero__walk" src="./assets/hero-walk.mp4" muted playsinline preload="auto" width="640" height="360"></video>
+        </div>
         <div class="hero__shade" aria-hidden="true"></div>
         <canvas class="hero__blood" aria-hidden="true"></canvas>
-        <div class="petition-widget" aria-label="Geschätzte Fortzüge deutscher Staatsangehöriger 2026">
+        <div class="petition-widget" aria-label="288.579 Fortzüge deutscher Staatsangehöriger 2025">
           <a class="petition-widget__link" href="./petition/">Zur Petition <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
           <span class="petition-widget__rule" aria-hidden="true"></span>
           <span class="petition-widget__metric">
-            <span class="flip-counter" id="flip-counter" role="img" aria-label="Geschätzte Fortzüge deutscher Staatsangehöriger 2026">—</span>
-            <span class="petition-widget__caption">Fortzüge 2026 · Schätzung</span>
+            <span class="flip-counter" id="flip-counter" role="img" aria-label="288.579 Fortzüge deutscher Staatsangehöriger 2025">—</span>
+            <span class="petition-widget__caption">Fortzüge 2025<sup class="ref"><a href="./quellen/#q-z1">1</a></sup></span>
           </span>
         </div>
       </section>
@@ -73,18 +81,15 @@
               <em>blutet aus<span class="title-dot">.</span></em>
             </h1>
             <div class="emigration__text reveal">
-              <p class="emigration__lead">Immer mehr deutsche Staatsangehörige verlassen das Land. Darunter vor allem junge, gut ausgebildete und motivierte Menschen, die ihre Zukunft anderswo sehen. Sie fliehen vor erdrückenden Abgaben, absurder Bürokratie, zunehmender Staatsmacht, wachsender Leistungsfeindlichkeit, politischen Umverteilungsfantasien oder schlicht einer zunehmend pessimistischen Stimmung.</p>
-              <p class="emigration__lead">Besonders beliebte Ziele sind die hier abgebildeten Länder: die Schweiz, die USA und Spanien. Dort erhoffen sich viele geringere Abgaben, eine höhere Lebensqualität und bessere Perspektiven.</p>
+              <p class="emigration__lead">Immer mehr deutsche Staatsangehörige verlassen das Land.<sup class="ref"><a href="./quellen/#q-z1">1</a></sup> Darunter vor allem junge, gut ausgebildete und motivierte Menschen, die ihre Zukunft anderswo sehen. Sie fliehen vor erdrückenden Abgaben, absurder Bürokratie, zunehmender Staatsmacht, wachsender Leistungsfeindlichkeit, politischen Umverteilungsfantasien oder schlicht einer zunehmend pessimistischen Stimmung.</p>
+              <p class="emigration__lead">Besonders beliebte Ziele sind die hier abgebildeten Länder: die Schweiz, die USA und Spanien.<sup class="ref"><a href="./quellen/#q-globus">2</a></sup> Dort erhoffen sich viele geringere Abgaben, eine höhere Lebensqualität und bessere Perspektiven.</p>
               <p class="emigration__lead">Wir wollen diesen Trend umkehren und Deutschland mit unserer Initiative wieder auf Kurs bringen. Oder besser gesagt: <strong>Dem Land eine ordentliche freiheitliche Blutspende verpassen.</strong></p>
               <p class="emigration__lead">Sieh dir die Zahlen an, teile deine eigene Geschichte und sag uns deine Meinung.</p>
-            </div>
-            <div class="source reveal">
-              <a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Wanderungen/Tabellen/wanderungen-zwischen-deutschland-und-dem-ausland-jahr-02.html" target="_blank" rel="noopener noreferrer">Fortzüge deutscher Staatsangehöriger 2025 – Statistisches Bundesamt <span class="source__arrow" aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
             </div>
           </div>
           <figure class="map-figure reveal">
             <div class="map-figure__stage" id="germany-map" aria-label="Interaktive Deutschlandkarte mit Bundesländern und vier Zielländern"></div>
-            <p class="map-quelle">Fortzüge über die Grenzen Deutschlands je Bundesland 2025, alle Staatsangehörigkeiten (<a href="https://www.statistikportal.de/en/node/129" target="_blank" rel="noopener noreferrer">Statistische Ämter des Bundes und der Länder</a>; insgesamt rund 1,25 Mio., <a href="https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/06/PD26_184_12411.html" target="_blank" rel="noopener noreferrer">Destatis, Pressemitteilung vom 1. Juni 2026</a>). Raten je 10.000 Einwohner: eigene Berechnung. Pfeile: Fortzüge deutscher Staatsangehöriger 2025 in die vier häufigsten Zielländer, auf Hunderter gerundet (<a href="https://www-genesis.destatis.de/datenbank/online/table/12711-0008" target="_blank" rel="noopener noreferrer">Destatis, GENESIS 12711-0008</a>).</p>
+            <p class="map-quelle"><sup class="ref"><a href="./quellen/#q-karte">1</a></sup></p>
           </figure>
         </div>
       </section>
@@ -95,12 +100,41 @@
         <div class="sf-break" aria-hidden="true">
           <span class="sf-break__line"></span>
           <span class="sf-break__prev">01 — Das Land blutet aus.</span>
-          <span class="sf-break__next">02 — Sie nehmen die Zukunft mit.</span>
         </div>
         <div class="stories-globe__intro">
           <h2 class="stories-globe__title reveal" id="stories-title"><em>Sie nehmen die Zukunft mit.</em></h2>
           <p class="stories-globe__subtitle reveal">Lies ihre Geschichte. <a href="./petition/?teilnahme=geschichte" id="story-submit">Ergänze deine eigene.</a></p>
-          <p class="stories-globe__demo">Bewege die Weltkugel und klicke auf ein Land.</p>
+          <div class="faces" aria-roledescription="Karussell" aria-label="Zitate">
+            <button class="faces__nav faces__nav--prev" type="button" aria-label="Vorheriges Zitat"><svg class="ico ico--l" viewBox="0 0 16 12" aria-hidden="true" focusable="false"><path d="M15 6H2M6 2 2 6l4 4"/></svg></button>
+            <div class="faces__track" tabindex="0">
+              <figure class="faces__card">
+                <img src="./assets/postkarte-1.webp?v=4" alt="" width="512" height="512" decoding="async">
+                <blockquote class="faces__quote"><p>„Platzhalter. Hier kommt später ihre eigene Geschichte hin.“</p></blockquote>
+                <figcaption>Akademikerin · Beispiel</figcaption>
+              </figure>
+              <figure class="faces__card">
+                <img src="./assets/postkarte-2.webp?v=4" alt="" width="512" height="512" decoding="async">
+                <blockquote class="faces__quote"><p>„Platzhalter. Ein Satz darüber, warum sie gegangen ist.“</p></blockquote>
+                <figcaption>Ärztin · Beispiel</figcaption>
+              </figure>
+              <figure class="faces__card">
+                <img src="./assets/postkarte-3.webp?v=4" alt="" width="512" height="512" decoding="async">
+                <blockquote class="faces__quote"><p>„Platzhalter. Ein Satz über die Arbeit, die er woanders sucht.“</p></blockquote>
+                <figcaption>Anpacker · Beispiel</figcaption>
+              </figure>
+              <figure class="faces__card">
+                <img src="./assets/postkarte-4.webp?v=4" alt="" width="512" height="512" decoding="async">
+                <blockquote class="faces__quote"><p>„Platzhalter. Ein Satz darüber, warum er woanders gründet.“</p></blockquote>
+                <figcaption>Gründer · Beispiel</figcaption>
+              </figure>
+              <figure class="faces__card">
+                <img src="./assets/postkarte-5.webp?v=4" alt="" width="512" height="512" decoding="async">
+                <blockquote class="faces__quote"><p>„Platzhalter. Ein Satz über das, was sie mitnimmt.“</p></blockquote>
+                <figcaption>Fachkraft · Beispiel</figcaption>
+              </figure>
+            </div>
+            <button class="faces__nav faces__nav--next" type="button" aria-label="Nächstes Zitat"><svg class="ico ico--r" viewBox="0 0 16 12" aria-hidden="true" focusable="false"><path d="M1 6h13M10 2l4 4-4 4"/></svg></button>
+          </div>
         </div>
         <div class="globe-shell" id="globe-shell">
           <div class="globe-stage" id="stories-globe-map" aria-label="Drehbare Weltkugel mit Ländern und Geschichten">
@@ -118,10 +152,71 @@
             <div class="globe-empty" id="globe-empty" hidden><p>Noch keine Geschichten vorhanden.</p><a href="./petition/?teilnahme=geschichte" class="story-submit-duplicate">Eigene Geschichte ergänzen <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></a></div>
           </div>
           <p class="globe-hint" hidden>Ziehen, um die Welt zu drehen · Land antippen: Zahl und schwebende Geschichten</p>
-          <p class="globe-source">Fortzüge deutscher Staatsangehöriger 2025 · <a href="https://www-genesis.destatis.de/datenbank/online/table/12711-0008" target="_blank" rel="noopener noreferrer">Statistisches Bundesamt, GENESIS 12711-0008</a>. Bei 134.804 von 288.579 Fortzügen (46,7 %) ist das Zielland nicht angegeben, die Länderwerte sind Mindestwerte.</p>
+          <p class="globe-source"><sup class="ref"><a href="./quellen/#q-globus">1</a></sup></p>
+        </div>
+      </section>
+
+      <section class="cities" id="grossstaedte" aria-labelledby="cities-title">
+        <div class="cities__inner">
+          <div class="cities__copy">
+            <p class="cities__year reveal">2025</p>
+            <h2 id="cities-title" class="cities__title reveal">Zwei Großstädte<em>an Akademikern.</em></h2>
+            <p class="cities__text reveal">288.579 deutsche Staatsangehörige zogen 2025 fort.<sup class="ref"><a href="./quellen/#q-z1">1</a></sup> Legt man den Anteil aus der GERPS-Studie darauf, hatten 75,5 % einen akademischen Berufsabschluss.<sup class="ref"><a href="./quellen/#q-staedte">2</a></sup> Das sind 217.877 Menschen, mehr als zwei Städte an der Großstadtgrenze von 100.000 Einwohnern.</p>
+          </div>
+          <div class="cities__map" aria-hidden="true">
+                  <svg class="cities__svg" viewBox="-90 -100 180 280">
+                    <defs>
+                      <mask id="cities-holes" maskUnits="userSpaceOnUse" x="-160" y="-160" width="320" height="420">
+                        <rect x="-160" y="-160" width="320" height="420" fill="#fff"/>
+                      </mask>
+                    </defs>
+                    <g class="cities__bulb-fill" mask="url(#cities-holes)">
+                      <path class="cities__bulb-glass" d="M0,-81C40.5,-81 69,-49.5 69,-16.5C69,18 48.6,42.6 30.6,54.6L30.6,87L-30.6,87L-30.6,54.6C-48.6,42.6 -69,18 -69,-16.5C-69,-49.5 -40.5,-81 0,-81Z"/>
+                      <g class="cities__bulb-base">
+                        <rect x="-33.6" y="81.6" width="67.2" height="13.8" rx="1.5"/>
+                        <rect x="-38.4" y="97.8" width="76.8" height="11.1" rx="1.05"/>
+                        <rect x="-34.8" y="111" width="69.6" height="11.1"/>
+                        <rect x="-38.4" y="124.2" width="76.8" height="11.1" rx="1.05"/>
+                        <rect x="-34.8" y="137.4" width="69.6" height="10.8"/>
+                        <rect x="-24.6" y="150.6" width="49.2" height="12.6" rx="3.45"/>
+                      </g>
+                    </g>
+                    <g class="cities__bulb-line">
+                      <path d="M0,-81C40.5,-81 69,-49.5 69,-16.5C69,18 48.6,42.6 30.6,54.6L30.6,87L-30.6,87L-30.6,54.6C-48.6,42.6 -69,18 -69,-16.5C-69,-49.5 -40.5,-81 0,-81Z"/>
+                      <path class="cities__bulb-filament" d="M-18.6,21C-18.6,-3 -7.2,-18 -7.2,-37.8C-7.2,-57.6 7.2,-57.6 7.2,-37.8C7.2,-18 18.6,-3 18.6,21"/>
+                      <path class="cities__bulb-lead" d="M-13.8,21L-13.8,84M13.8,21L13.8,84"/>
+                      <rect x="-33.6" y="81.6" width="67.2" height="13.8" rx="1.5"/>
+                      <rect x="-38.4" y="97.8" width="76.8" height="11.1" rx="1.05"/>
+                      <rect x="-34.8" y="111" width="69.6" height="11.1"/>
+                      <rect x="-38.4" y="124.2" width="76.8" height="11.1" rx="1.05"/>
+                      <rect x="-34.8" y="137.4" width="69.6" height="10.8"/>
+                      <rect x="-24.6" y="150.6" width="49.2" height="12.6" rx="3.45"/>
+                    </g>
+                    <g class="cities__shreds"></g>
+                  </svg>
+          </div>
         </div>
       </section>
       <!--chapters:start-->
+
+      <!-- Und dann?: leeres Büro, direkt vor den Forderungen -->
+      <section class="und-dann" id="und-dann" aria-labelledby="und-dann-frage">
+        <div class="und-dann__bild">
+          <img src="./assets/buero-leer.png" alt="Leerstehendes Großraumbüro bei Nacht, unbesetzte Schreibtische und Stühle, die meisten Lichter sind aus" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+        <div class="und-dann__text">
+          <div class="reveal">
+            <h2 id="und-dann-frage" class="und-dann__frage">Und dann?</h2>
+            <p class="und-dann__voraussetzung">Ohne Unternehmen, ohne Köpfe, ohne Kapital gibt es</p>
+            <ul class="und-dann__folgen">
+              <li>keinen technischen Fortschritt</li>
+              <li>keine medizinische Entwicklung</li>
+              <li>keinen Wohlstand</li>
+            </ul>
+            <p class="und-dann__schluss">Irgendwann keine Perspektive mehr.</p>
+          </div>
+        </div>
+      </section>
 
       <!-- 03 · Forderungen: roter Keil mit schrägen Kanten, Zeilen zum Ausklappen -->
       <div class="chg-wrap" id="forderungen">
@@ -136,33 +231,60 @@
             <ol class="chg__list">
               <li class="chg__row" style="--i:0">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p1" id="chg-b1">
-                  <span class="chg__no">01</span><span class="chg__name">Leben günstiger machen.</span><span class="chg__short">Steuersystem ändern!</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">01</span><span class="chg__name">Leben günstiger machen.</span><span class="chg__short">Abgabensystem reformieren, Schuldenkurs beenden.</span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
-                <div class="chg__panel" id="chg-p1" role="region" aria-labelledby="chg-b1"><div class="chg__panel-in"><p>Junge Menschen, die Vollzeit arbeiten, zahlen schon bei Durchschnittsverdienst fast die Hälfte der Arbeitskosten als Steuern und Sozialabgaben: Der Abgabenkeil für Alleinstehende liegt in Deutschland bei 49,3 Prozent, im OECD-Schnitt bei 35,1 Prozent.<sup class="ref"><a href="#q1-1">1</a></sup> Dazu kommt ein Steueraufschlag von 19 Prozent auf viele Produkte<sup class="ref"><a href="#q1-2">2</a></sup>, bei Kraftstoffen machen Steuern und Abgaben über die Hälfte des Preises aus, bei Benzin rund 64 Prozent<sup class="ref"><a href="#q1-3">3</a></sup>, und 25 Prozent Abgeltungsteuer, wenn sie Geld für die Zukunft anlegen<sup class="ref"><a href="#q1-4">4</a></sup>, und so weiter. Das Steuersystem sollte komplett neu gestaltet werden. Wer arbeitet und unabhängig sein will, wird in Deutschland durch hohe Steuern bestraft. Besser wären niedrige Pauschalsätze. Zusammen mit der Tatsache, dass der Staat immer mehr Schulden aufnimmt und dadurch die Preise in den Supermärkten durch Inflation nach oben treibt, sind Steuern der Hauptpreistreiber für hohe Lebenshaltungskosten.</p><ol class="chg__src" aria-label="Quellen"><li id="q1-1"><a href="https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/executive-summary_abb40a1e.html" target="_blank" rel="noopener noreferrer">OECD, Taxing Wages 2026 (Daten 2025): Abgabenkeil Alleinstehender bei Durchschnittseinkommen, Deutschland 49,3 %, OECD-Schnitt 35,1 %</a></li><li id="q1-2"><a href="https://www.gesetze-im-internet.de/ustg_1980/__12.html" target="_blank" rel="noopener noreferrer">§ 12 Umsatzsteuergesetz: Regelsteuersatz 19 %</a></li><li id="q1-3"><a href="https://www.dihk.de/de/newsroom/wie-setzt-sich-in-deutschland-der-preis-von-kraftstoffen-wie-benzin-oder-diesel-zusammen--175846" target="_blank" rel="noopener noreferrer">DIHK, Spritpreis-Zusammensetzung (30.03.2026): Steuern und Abgaben 2025 bei Benzin rund 64 %, bei Diesel rund 56 % des Preises (Näherungswerte)</a></li><li id="q1-4"><a href="https://www.gesetze-im-internet.de/estg/__32d.html" target="_blank" rel="noopener noreferrer">§ 32d Einkommensteuergesetz: Abgeltungsteuer 25 % (zuzüglich Solidaritätszuschlag)</a></li></ol><a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a></div></div>
+                <div class="chg__panel" id="chg-p1" role="region" aria-labelledby="chg-b1"><div class="chg__panel-in">
+                    <p>Deutschland ist das Land mit der zweithöchsten Abgabenbelastung auf Arbeit in der OECD.<sup class="ref"><a href="./quellen/#q-f1-1">1</a></sup> Junge Menschen, die Vollzeit arbeiten, zahlen von ihrem Bruttolohn durchschnittlich 38,7 % an den Staat.<sup class="ref"><a href="./quellen/#q-f1-2">2</a></sup> Rechnet man den Arbeitgeberanteil mit ein, liegt dieser Wert bei fast 50 %.<sup class="ref"><a href="./quellen/#q-f1-1">1</a></sup> Junge Leute arbeiten damit teilweise ein halbes Jahr nur für den Staat.</p>
+                    <p>Hinzu kommt ein Steueraufschlag von 19 % auf viele Produkte,<sup class="ref"><a href="./quellen/#q-f1-3">3</a></sup> auf Kraftstoffe sogar um die 64 % bei Benzin und 56 % bei Diesel.<sup class="ref"><a href="./quellen/#q-f1-4">4</a></sup> Und wenn Leute eigenverantwortlich Geld für die Zukunft anlegen, wird der Ertrag noch einmal mit 25 % besteuert.<sup class="ref"><a href="./quellen/#q-f1-5">5</a></sup></p>
+                    <p>Viele junge Menschen empfinden dies als Bestrafung ihrer Produktivität. Das Steuersystem sollte darum radikal reformiert werden. Wir fordern eine niedrige Flat Tax.</p>
+                    <p>Zusätzlich steht die Zukunft der jungen Leute vor einem nie dagewesenen Schuldenberg. Durch das Aussetzen der Schuldenbremse ist die deutsche Verschuldung auf 2,84 Billionen Euro gestiegen.<sup class="ref"><a href="./quellen/#q-f1-6">6</a></sup> Doch nicht nur das Tilgen dieser Schulden belastet die junge Generation: Auch die damit zusammenhängende Inflation treibt die Lebenshaltungskosten stetig in die Höhe.</p>
+                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                  </div></div>
               </li>
               <li class="chg__row" style="--i:1">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p2" id="chg-b2">
-                  <span class="chg__no">02</span><span class="chg__name">Mehr Reichtum.</span><span class="chg__short">Sozialstaat privatisieren.</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">02</span><span class="chg__name">Mehr Eigenverantwortung.</span><span class="chg__short">Sozialstaat aufbrechen.</span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
-                <div class="chg__panel" id="chg-p2" role="region" aria-labelledby="chg-b2"><div class="chg__panel-in"><p>Der Sozialstaat trägt sein Übriges bei. Wer 60.000 Euro verdient (etwa Facharbeiterniveau), zahlt pro Jahr rund 35.000 Euro an Steuern und Sozialabgaben, davon etwa 26.000 Euro per Zwang an den „Sozialstaat“ (Arbeitnehmer- und Arbeitgeberanteil).<sup class="ref"><a href="#q2-1">1</a></sup><sup class="ref"><a href="#q2-2">2</a></sup> Dafür erhält er eine Rente, die ihn nicht versorgen kann, eine Krankenkasse, die weder Patienten noch Ärzte sinnvoll versorgt, und eine kollabierende Pflegeversicherung. Worauf er sich „freuen“ kann: eine Flatrate an Arbeitslosenleistungen. Was ist daran gut, was am Zwang „solidarisch“? Der Sozialstaat sollte privatisiert werden: Wer privat vorsorgt, darf nicht bestraft werden.</p><ol class="chg__src" aria-label="Quellen"><li id="q2-1"><a href="https://lohn-info.de/sozialversicherungsbeitraege2026.html" target="_blank" rel="noopener noreferrer">Sozialversicherungsbeiträge 2026: Rentenversicherung 18,6 %, Arbeitslosenversicherung 2,6 %, Krankenversicherung 14,6 % plus durchschnittlich 2,9 % Zusatzbeitrag, Pflegeversicherung 3,6 % (je hälftig, Kinderlose zahlen mehr)</a></li><li id="q2-2"><a href="https://www.bmf-steuerrechner.de/" target="_blank" rel="noopener noreferrer">Eigene Berechnung für 60.000 Euro Bruttojahresgehalt, Steuerklasse I, ohne Kinder: rund 26.000 Euro Sozialbeiträge (Arbeitnehmer- und Arbeitgeberanteil) plus rund 9.500 Euro Lohnsteuer. Nachrechnen mit dem BMF-Steuerrechner</a></li></ol><a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a></div></div>
+                <div class="chg__panel" id="chg-p2" role="region" aria-labelledby="chg-b2"><div class="chg__panel-in">
+                    <p>Der Sozialstaat ist mit Abstand der größte Geldschlucker der Staatskasse. Die Hälfte aller Staatsausgaben fließt in diesen Sektor.<sup class="ref"><a href="./quellen/#q-f2-1">1</a></sup> Deutsche arbeiten also einen großen Teil ihrer Zeit für diesen aufgeblähten Sozialstaat.</p>
+                    <p>Als Gegenleistung gibt es eine Rente, die nicht reicht, eine Krankenkasse, die weder Patienten noch Ärzte sinnvoll versorgt, und eine kollabierende Pflegeversicherung.</p>
+                    <p>Viele junge Leute fragen sich zu Recht, was an diesem auf Zwang basierenden System und der immer weiter fortschreitenden Aushebelung von Eigenverantwortung richtig und solidarisch sein soll.</p>
+                    <p>Der Sozialstaat muss darum stetig weiter verschlankt werden. Ziel sollte sein, dass Leute sich eigenverantwortlich vorsorgen. Die Migrationspolitik muss weiter so reformiert werden, dass eine Einwanderung in die Sozialsysteme unterbunden wird.</p>
+                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                  </div></div>
               </li>
               <li class="chg__row" style="--i:2">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p3" id="chg-b3">
                   <span class="chg__no">03</span><span class="chg__name">Geld verbrennen stoppen.</span><span class="chg__short">Rente auslaufen lassen.</span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
-                <div class="chg__panel" id="chg-p3" role="region" aria-labelledby="chg-b3"><div class="chg__panel-in"><p>Eine besondere Beachtung im Bereich Sozialstaat verdient die Rente. Die Finanzierung dieser ist mittlerweile mit Abstand der größte Posten im Haushalt der Bundesregierung. Rund 24 Prozent des Bundeshaushalts (122,5 von 502,55 Milliarden Euro im Haushalt 2025) werden in die Rentenversicherung gesteckt!<sup class="ref"><a href="#q3-1">1</a></sup> Anfang der 1960er-Jahre kamen auf einen Altersrentner noch sechs aktiv Versicherte – heute sind es rund zwei.<sup class="ref"><a href="#q3-2">2</a></sup> Die staatliche Rente muss dringend auslaufen: Die Pflicht zur Einzahlung muss jedes Jahr sinken, private Anlageformen dürfen nicht weiter durch Steuern bestraft werden.</p><ol class="chg__src" aria-label="Quellen"><li id="q3-1"><a href="https://www.bundestag.de/dokumente/textarchiv/2025/kw28-de-arbeit-1094304" target="_blank" rel="noopener noreferrer">Deutscher Bundestag zum Haushalt 2025 (Bereinigungssitzung): Gesamtausgaben 502,55 Mrd. Euro, Leistungen an die Rentenversicherung 122,5 Mrd. Euro (rechnerisch rund 24 %)</a></li><li id="q3-2"><a href="https://www.demografie-portal.de/DE/Fakten/altersrentner-beitragszahler.html" target="_blank" rel="noopener noreferrer">Demografieportal des Bundes und der Länder: aktiv Versicherte je Altersrentner, 1962 (Westdeutschland) sechs, heute rund zwei (2022: 39,9 Mio. zu 18,6 Mio.)</a></li></ol><a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a></div></div>
+                <div class="chg__panel" id="chg-p3" role="region" aria-labelledby="chg-b3"><div class="chg__panel-in">
+                    <p>Eine besondere Beachtung im Bereich Sozialstaat verdient die Rente. Die Finanzierung dieser ist mittlerweile mit Abstand der größte Posten im Haushalt der Bundesregierung: Neben den Rentenbeiträgen, die jeder Arbeitnehmer zahlen muss, flossen 2025 zusätzlich 25 % des Haushalts der Bundesregierung in diesen Posten.<sup class="ref"><a href="./quellen/#q-f3-1">1</a></sup></p>
+                    <p>Beim Rentenstart in den 1950er-Jahren haben sechs Einzahler einen Rentner finanziert, heute kommen auf einen Rentner zwei Einzahler.<sup class="ref"><a href="./quellen/#q-f3-2">2</a></sup> Junge Leute haben genug davon, die Folgen dieses verhängnisvollen Rentensystems zu büßen. Die staatliche Rente muss dringend auslaufen, und private Anlageformen dürfen nicht weiter durch Steuern bestraft werden.</p>
+                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                  </div></div>
               </li>
               <li class="chg__row" style="--i:3">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p4" id="chg-b4">
                   <span class="chg__no">04</span><span class="chg__name">Jobs für alle.</span><span class="chg__short">Unternehmen entfesseln.</span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
-                <div class="chg__panel" id="chg-p4" role="region" aria-labelledby="chg-b4"><div class="chg__panel-in"><p>Die Jobsuche in Deutschland wurde in den letzten Jahren deutlich schwieriger. Viele Unternehmen stellen nicht mehr ein, bauen Stellen ab oder gehen ins Ausland. Auch wenn es hierfür konjunkturelle Gründe gibt, ist die Ursache politisch hausgemacht. Deutsche Unternehmen leiden massiv an Bürokratie, Arbeitsrecht, Lohnnebenkosten (siehe Punkt zwei) sowie politischen Lenkungsversuchen wie der Klimapolitik. Hier ist einfach weniger mehr. Wir brauchen die Kettensäge beim bürokratischen Staat.</p><a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a></div></div>
+                <div class="chg__panel" id="chg-p4" role="region" aria-labelledby="chg-b4"><div class="chg__panel-in">
+                    <p>Die Jobsuche in Deutschland wurde in den letzten Jahren deutlich schwieriger. Viele Unternehmen stellen kein neues Personal an, bauen Stellen ab oder gehen ins Ausland. So erwägen gemäß einer Umfrage rund 20 % der befragten Unternehmen, wirtschaftliche Aktivitäten in Deutschland einzuschränken oder ins Ausland zu verlagern, oder haben dies bereits getan. In der Industrie liegt dieser Anteil bei 40 %.<sup class="ref"><a href="./quellen/#q-f4-1">1</a></sup></p>
+                    <p>Das Problem ist hausgemacht: Deutsche Unternehmen leiden massiv an Bürokratie, Arbeitsrecht, Lohnnebenkosten (siehe Punkt zwei), teurer Energie durch eine falsche Energiepolitik und fatalen politischen Lenkungsversuchen wie der Klimapolitik.</p>
+                    <p>Wir benötigen die Kettensäge, damit Unternehmen florieren und junge Leute wieder eine Perspektive haben.</p>
+                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                  </div></div>
               </li>
               <li class="chg__row" style="--i:4">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p5" id="chg-b5">
                   <span class="chg__no">05</span><span class="chg__name">Günstige Mieten.</span><span class="chg__short">Wohnungsbau wieder ermöglichen.</span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
-                <div class="chg__panel" id="chg-p5" role="region" aria-labelledby="chg-b5"><div class="chg__panel-in"><p>In Deutschland gibt es viel zu wenig Wohnungen, die Preise sind dadurch zu hoch. Der Hauptgrund dafür ist, dass Bauen in Deutschland sehr teuer geworden ist – leider erneut durch den Staat. 2005 hat es ca. 1.233 Euro gekostet, einen Quadratmeter zu bauen, 2024 waren es ca. 2.611 Euro.<sup class="ref"><a href="#q5-1">1</a></sup><sup class="ref"><a href="#q5-2">2</a></sup> Die höheren Baupreise müssen immer an die Mieter weitergegeben werden, sonst lohnt sich der Bau nicht. Ähnliches gilt für Instandhaltung und Immobilienkosten. Der Anstieg der Baukosten liegt maßgeblich daran, dass Gebäude heute sehr viele Auflagen erfüllen müssen: Es gibt rund 3.900 baurelevante Normen (davon sind etwa 350 für den Geschosswohnungsbau relevant)<sup class="ref"><a href="#q5-3">3</a></sup>, Gebäude dürfen kaum Energie verbrauchen, was nur mit teurer Dämmung möglich ist, etc. Dazu ist die Grunderwerbsteuer häufig gestiegen.<sup class="ref"><a href="#q5-4">4</a></sup> Klar ist: Alte Gebäude aus dem 19. oder 20. Jahrhundert sind nicht lebensgefährlich, wir sind jeden Tag in ihnen. Der Staat muss Bauen wieder günstiger machen, indem er es wieder erlaubt, günstige Gebäude zu bauen.</p><ol class="chg__src" aria-label="Quellen"><li id="q5-1"><a href="https://www.destatis.de/DE/Themen/Branchen-Unternehmen/Bauen/Publikationen/Downloads-Bautaetigkeit/baugenehmigungen-baukosten-pdf-5311103.pdf?__blob=publicationFile" target="_blank" rel="noopener noreferrer">Statistisches Bundesamt, Baugenehmigungen Baukosten 2021 (letzte Druckausgabe): Neubau-Wohngebäude Deutschland 2005 durchschnittlich 1.233 Euro je m² Wohnfläche, 2021 2.034 Euro (Kosten zum Zeitpunkt der Genehmigung, DIN 276 KG 300/400, inkl. MwSt)</a></li><li id="q5-2"><a href="https://www.schwaebisch-hall.de/ratgeber/immobilie-bauen/baupreise.html" target="_blank" rel="noopener noreferrer">Wert 2024 (2.611 Euro je m²) nach Destatis-Genehmigungsdaten, wiedergegeben von Schwäbisch Hall; den Primärwert in GENESIS (Themenbereich 311) haben wir noch nicht gegengeprüft</a></li><li id="q5-3"><a href="https://www.din.de/de/mitwirken/normenausschuesse/nabau/baukosten-normen" target="_blank" rel="noopener noreferrer">DIN, Baukosten und Normen: rund 3.900 baurelevante Normen, davon ca. 350 für den Geschosswohnungsbau; Normen sind nicht von sich aus bindend, rund 20 % werden durch Gesetze oder Verordnungen verbindlich</a></li><li id="q5-4"><a href="https://rechner-hub.de/grunderwerbsteuer/bundeslaender-vergleich/" target="_blank" rel="noopener noreferrer">Grunderwerbsteuer: bis 2006 bundeseinheitlich 3,5 %, seither setzen die Länder den Satz selbst fest (3,5 bis 6,5 %); Übersicht der Landessätze</a></li></ol><a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a></div></div>
+                <div class="chg__panel" id="chg-p5" role="region" aria-labelledby="chg-b5"><div class="chg__panel-in">
+                    <p>Gerade junge Leute leiden massiv an hohen Mieten. Der Grund dafür: In Deutschland gibt es viel zu wenig Wohnungen.</p>
+                    <p>Doch warum wird zu wenig gebaut? Das liegt daran, dass Bauen in Deutschland sehr teuer geworden ist, leider erneut durch den Staat. 2005 hat es ca. 1.200 Euro gekostet, einen Quadratmeter zu bauen,<sup class="ref"><a href="./quellen/#q-f5-1">1</a></sup> 2024 waren es ca. 2.600 Euro.<sup class="ref"><a href="./quellen/#q-f5-2">2</a></sup></p>
+                    <p>Damit sich das Bauen lohnt, ist es unausweichlich, dass die höheren Baupreise an die Mieter weitergegeben werden. Ähnliches gilt für Instandhaltung und Immobilienkosten. Der Anstieg der Baukosten liegt maßgeblich daran, dass Gebäude heute sehr viele Auflagen erfüllen müssen: Es gibt rund 3.900 Normen, die Gebäude erfüllen müssen,<sup class="ref"><a href="./quellen/#q-f5-3">3</a></sup> und die Anforderungen an die Energetik durch das Gebäudeenergiegesetz treiben zusätzlich die Kosten in die Höhe.<sup class="ref"><a href="./quellen/#q-f5-4">4</a></sup> Hinzu kommen eine gestiegene Grunderwerbsteuer<sup class="ref"><a href="./quellen/#q-f5-5">5</a></sup> und massive Auflagen durch den Denkmalschutz der Länder.<sup class="ref"><a href="./quellen/#q-f5-6">6</a></sup></p>
+                    <p>Der Staat muss es wieder erlauben, günstige Gebäude zu bauen, und sollte die bestehenden nicht künstlich verteuern.</p>
+                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                  </div></div>
               </li>
             </ol>
             <a class="chg__more" href="./petition/">Vollständigen Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
@@ -235,8 +357,46 @@
         <img class="atl__img" src="./assets/atlas.webp" alt="Bronzestatue des Atlas, der die Weltkugel auf seinen Schultern trägt" width="1086" height="1448" loading="lazy" decoding="async">
         <div class="atl__inner">
           <p class="atl__q" data-words>Wenn du Atlas sehen würdest, den Riesen, der die Welt auf seinen Schultern trägt, wenn du sehen würdest, wie er steht, Blut über seine Brust rinnend, seine Knie einknickend, seine Arme zitternd, mit letzter Kraft die Welt emporhaltend, die je mehr er sich anstrengt, desto schwerer auf seinen Schultern lastet –</p>
+          <p class="atl__src"><sup class="ref"><a href="./quellen/#q-atlas">1</a></sup></p>
           <h2 id="atl-ask" class="atl__ask"><span>was würdest du ihm raten?</span></h2>
-          <p class="atl__src">Atlas Shrugged — Ayn Rand</p>
+        </div>
+      </section>
+
+      <section class="sup" id="unterstuetzer" aria-labelledby="sup-title">
+        <div class="sup__inner">
+          <h2 id="sup-title" class="sup__title reveal">Unterstützer<b>.</b></h2>
+          <ul class="sup__orgs">
+            <li>
+              <a href="https://jlk-verband.de/" target="_blank" rel="noopener noreferrer">
+                <img class="sup__mark" src="./assets/logo-jlk.png" alt="" width="1080" height="1080">
+                <span class="sup__org">
+                  <strong>jung.liberal.<wbr>kapitalistisch.</strong>
+                  <small>jlk-verband.de <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></small>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="https://libertyrising.de/" target="_blank" rel="noopener noreferrer">
+                <img class="sup__mark" src="./assets/logo-lr.png" alt="" width="1000" height="1000">
+                <span class="sup__org">
+                  <strong>Liberty Rising</strong>
+                  <small>libertyrising.de <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></small>
+                </span>
+              </a>
+            </li>
+          </ul>
+          <div class="sup__people-head">
+            <h3 class="sup__sub">Einzelunterstützer</h3>
+            <p class="sup__note">Die Porträts sind vorerst Platzhalter.</p>
+          </div>
+          <ul class="sup__people">
+            <li><figure><img src="./assets/supporter-1.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
+            <li><figure><img src="./assets/supporter-2.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
+            <li><figure><img src="./assets/supporter-3.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
+            <li><figure><img src="./assets/supporter-4.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
+            <li><figure><img src="./assets/supporter-5.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
+            <li><figure><img src="./assets/supporter-6.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
+          </ul>
         </div>
       </section>
       <!--chapters:end-->
@@ -264,18 +424,5 @@
       <p id="story-dialog-text"></p>
     </dialog>
 
-    <dialog class="credits-dialog" id="credits-dialog" aria-labelledby="credits-title">
-      <div class="credits-dialog__top">
-        <h2 id="credits-title">Credits & Quellen</h2>
-        <button id="credits-close" type="button" aria-label="Credits schließen">×</button>
-      </div>
-      <p>Hero: vom Auftraggeber bereitgestelltes Motiv. Deutschlandkarte und Bundesland-Geometrien aus der bestehenden Kampagnenseite übernommen.</p>
-      <p>Weltkugel: vereinfachte Ländergrenzen aus <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener noreferrer">world-atlas / Natural Earth</a>, projiziert mit D3.</p>
-      <p>Zahlen zu Fortzügen 2025 und Zielländern: <a href="https://www-genesis.destatis.de/datenbank/online/table/12711-0008" target="_blank" rel="noopener noreferrer">Statistisches Bundesamt, GENESIS-Tabelle 12711-0008</a> (Fortzüge deutscher Staatsangehöriger je Zielland, abgerufen am 15.10.2026, Tabellenstand 21.09.2026) sowie <a href="https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_24_p002.html" target="_blank" rel="noopener noreferrer">Zahl der Woche 24/2026</a>. Die Bundeslandwerte der Deutschlandkarte umfassen alle Staatsangehörigkeiten.</p>
-      <p>Karte „Das Land blutet aus.“: Fortzüge je Bundesland 2025 (alle Staatsangehörigkeiten) nach <a href="https://www.statistikportal.de/en/node/129" target="_blank" rel="noopener noreferrer">Statistische Ämter des Bundes und der Länder, Wanderungen über die Grenzen Deutschlands</a>; Gesamtzahl rund 1,25 Mio. Fortzüge laut <a href="https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/06/PD26_184_12411.html" target="_blank" rel="noopener noreferrer">Destatis, Pressemitteilung 1. Juni 2026</a>. Die Raten je 10.000 Einwohner sind eine eigene Berechnung auf Basis der Bevölkerungszahlen der Länder.</p>
-      <p>Forderungen: Quellen stehen direkt unter dem jeweiligen Text (OECD Taxing Wages 2026, Bundestag zum Bundeshaushalt 2025, Demografieportal, Statistisches Bundesamt zu Baukosten, DIN zu Baunormen, Gesetze im Internet). Die Beispielrechnung zu 60.000 Euro Bruttogehalt ist eine eigene Berechnung (Steuerklasse I, ohne Kinder, Werte 2026) und lässt sich mit dem <a href="https://www.bmf-steuerrechner.de/" target="_blank" rel="noopener noreferrer">BMF-Steuerrechner</a> nachrechnen.</p>
-      <p>Atlas-Zitat: sinngemäße Übersetzung einer Passage aus „Atlas Shrugged“ (Ayn Rand, 1957).</p>
-      <p>Der Ticker für 2026 ist eine Hochrechnung, kein Live-Messwert: Destatis weist für Januar bis Juli 2026 vorläufig 172.096 Fortzüge deutscher Staatsangehöriger aus (Monatswerte 25.174, 22.872, 25.517, 22.286, 21.605, 24.641 und 30.001). Aus 172.096 Fortzügen in 212 Tagen folgt rechnerisch ein Fortzug etwa alle 106 Sekunden. Ab 1. August läuft der angezeigte Schätzwert in diesem Rhythmus weiter. <a href="https://www-genesis.destatis.de/datenbank/online/table/12711-0011" target="_blank" rel="noopener noreferrer">Quelle: Statistisches Bundesamt, GENESIS-Tabelle 12711-0011 (Stand 2. Oktober 2026)</a>.</p>
-    </dialog>
   </body>
 </html>

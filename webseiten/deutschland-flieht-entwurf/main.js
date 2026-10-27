@@ -1,9 +1,4 @@
-const CAMPAIGN = Object.freeze({
-  reported2026: 172096, // Destatis GENESIS 12711-0011: Fortzüge deutscher Staatsangehöriger Januar bis Juli 2026 (vorläufig)
-  reportedDays: 212, // 1. Januar bis 31. Juli
-  projectionStart: Date.parse('2026-07-31T22:00:00Z'), // 1. August, 00:00 MESZ
-  projectionEnd: Date.parse('2026-12-31T23:00:00Z'), // 1. Januar 2027, 00:00 MEZ
-});
+const FORTZUEGE_2025 = 288579; // Destatis GENESIS 12711-0005: Fortzüge deutscher Staatsangehöriger 2025
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -251,7 +246,7 @@ function setupBloodSeam() {
   }
 
   const cutY = (x) => 60 + (depth * x) / width; /* Schnittkante in den Koordinaten der Hero-Ebene */
-  const drained = (t) => (width < 761 ? 0 : Math.min(1, t / 18) * Math.min(depth * 0.82, 100));
+  const drained = (t) => (width < 761 ? 0 : Math.min(1, t / 11) * Math.min(depth * 0.82, 100));
   function surface(x, t) {
     return 22 + drained(t) + 2.2 * sin(x * 0.021 + t * 0.9) + 1.1 * sin(x * 0.057 - t * 1.4) + 0.5 * sin(x * 0.13 + t * 2.1);
   }
@@ -693,24 +688,11 @@ function setupMenu() {
   });
 }
 
-function setupCredits() {
-  const dialog = document.getElementById('credits-dialog');
-  document.getElementById('credits-open').addEventListener('click', () => dialog.showModal());
-  document.getElementById('credits-close').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) dialog.close();
-  });
-}
-
 function setupCounter() {
   const container = document.getElementById('flip-counter');
   if (!container) return;
-  const paceMs = CAMPAIGN.reportedDays * 86400000 / CAMPAIGN.reported2026;
-  const clock = () => Math.min(Math.max(Date.now(), CAMPAIGN.projectionStart), CAMPAIGN.projectionEnd);
-  const estimate = (time) => CAMPAIGN.reported2026 + Math.floor((time - CAMPAIGN.projectionStart) / paceMs);
   const digits = [];
   let displayed = -1;
-  let timer;
   let introTimer = 0;
   let introRunning = false;
 
@@ -764,23 +746,20 @@ function setupCounter() {
         } else digit.oldFace.textContent = character;
       });
     }
-    container.setAttribute('aria-label', `${number.toLocaleString('de-DE')} geschätzte Fortzüge deutscher Staatsangehöriger im Jahr 2026. Hochrechnung aus den vorläufigen Destatis-Zahlen für Januar und Februar.`);
+    container.setAttribute('aria-label', `${number.toLocaleString('de-DE')} Fortzüge deutscher Staatsangehöriger im Jahr 2025.`);
     displayed = number;
   }
 
-  function sync() {
-    clearTimeout(timer);
-    const time = clock();
-    const number = estimate(time);
-    if (number !== displayed) render(number, displayed >= 0 && !document.hidden);
-    if (time >= CAMPAIGN.projectionEnd) return;
-    const next = CAMPAIGN.projectionStart + (number - CAMPAIGN.reported2026 + 1) * paceMs;
-    timer = setTimeout(sync, Math.max(250, Math.min(60000, next - Date.now() + 20)));
+  function showFinal() {
+    clearTimeout(introTimer);
+    introRunning = false;
+    container.classList.remove('is-counting');
+    render(FORTZUEGE_2025);
   }
 
   function startCountUp() {
     if (reduceMotion.matches || document.hidden) {
-      sync();
+      render(FORTZUEGE_2025);
       return;
     }
     const steps = 12;
@@ -792,14 +771,12 @@ function setupCounter() {
     function advance() {
       if (!introRunning) return;
       step += 1;
-      const target = estimate(clock());
       const eased = 1 - (1 - step / steps) ** 2.5;
-      render(step === steps ? target : Math.min(target - 1, Math.floor(target * eased)), true);
+      render(step === steps ? FORTZUEGE_2025 : Math.min(FORTZUEGE_2025 - 1, Math.floor(FORTZUEGE_2025 * eased)), true);
       if (step < steps) introTimer = setTimeout(advance, 90);
       else introTimer = setTimeout(() => {
         introRunning = false;
         container.classList.remove('is-counting');
-        sync();
       }, 90);
     }
     introTimer = setTimeout(advance, 70);
@@ -807,16 +784,7 @@ function setupCounter() {
 
   startCountUp();
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && introRunning) {
-      clearTimeout(introTimer);
-      introRunning = false;
-      container.classList.remove('is-counting');
-      render(estimate(clock()));
-      sync();
-    }
-    if (!document.hidden) {
-      if (!introRunning) sync();
-    }
+    if (document.hidden && introRunning) showFinal();
   });
 }
 
@@ -906,7 +874,7 @@ async function setupMap() {
     const desktopDestinations = {
       us: { path: 'M 197 195 C 166 160 126 123 96 103', nameX: 75, nameY: 42, valueX: 75, valueY: 69, anchor: 'end', originX: 197, originY: 195 },
       ch: { path: 'M 474 182 C 511 160 545 144 578 130', nameX: 596, nameY: 90, valueX: 596, valueY: 117, anchor: 'start', originX: 474, originY: 182 },
-      es: { path: 'M 191 591 C 148 614 92 638 52 651', nameX: -15, nameY: 687, valueX: -15, valueY: 716, anchor: 'middle', originX: 191, originY: 591 },
+      es: { path: 'M 191 591 C 148 614 92 638 52 651', nameX: 48, nameY: 687, valueX: 48, valueY: 716, anchor: 'middle', originX: 191, originY: 591 },
       at: { path: 'M 443 628 C 488 640 528 642 548 636', nameX: 576, nameY: 642, valueX: 576, valueY: 674, anchor: 'start', originX: 443, originY: 628 },
     };
     const desktopMap = window.matchMedia('(min-width:761px)');
@@ -1051,7 +1019,7 @@ function setupStoriesGlobe() {
     if (started) return;
     started = true;
     try {
-      const { initStoriesGlobe } = await import('./globe.js?v=u35');
+      const { initStoriesGlobe } = await import('./globe.js?v=u62');
       await initStoriesGlobe(section);
     } catch {
       section.querySelector('.globe-hint').hidden = false;
@@ -1068,11 +1036,468 @@ function setupStoriesGlobe() {
   observer.observe(section);
 }
 
+function setupFaces() {
+  const root = document.querySelector('.faces');
+  const track = root?.querySelector('.faces__track');
+  if (!root || !track) return;
+  const cards = [...track.querySelectorAll('.faces__card')];
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mark = () => {
+    const mid = track.scrollLeft + track.clientWidth / 2;
+    let best = 0;
+    let bestDist = Infinity;
+    cards.forEach((card, i) => {
+      const center = card.offsetLeft + card.offsetWidth / 2;
+      const dist = Math.abs(center - mid);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = i;
+      }
+    });
+    const viewStart = track.scrollLeft;
+    const viewEnd = viewStart + track.clientWidth;
+    cards.forEach((card, i) => {
+      const start = card.offsetLeft;
+      const overlap = Math.min(start + card.offsetWidth, viewEnd) - Math.max(start, viewStart);
+      const visible = overlap > card.offsetWidth * 0.55;
+      card.classList.toggle('is-on', i === best);
+      card.toggleAttribute('aria-hidden', !visible);
+    });
+  };
+  track.addEventListener('scroll', mark, { passive: true });
+  mark();
+  const step = () => (cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0]?.offsetWidth || 280);
+  root.querySelector('.faces__nav--prev')?.addEventListener('click', () => {
+    track.scrollBy({ left: -step(), behavior: reduce ? 'auto' : 'smooth' });
+  });
+  root.querySelector('.faces__nav--next')?.addEventListener('click', () => {
+    track.scrollBy({ left: step(), behavior: reduce ? 'auto' : 'smooth' });
+  });
+}
+
+/* Zwei Großstädte: die ganze Glühbirne bricht auseinander, auch Kontur, Faden und Sockel. */
+function setupCityTear() {
+  const map = document.querySelector('.cities__map');
+  const fill = map?.querySelector('.cities__bulb-fill');
+  const glass = fill?.querySelector('.cities__bulb-glass');
+  const line = map?.querySelector('.cities__bulb-line');
+  const mask = map?.querySelector('#cities-holes');
+  const shreds = map?.querySelector('.cities__shreds');
+  const svg = map?.querySelector('svg');
+  if (!map || !fill || !glass || !line || !mask || !shreds || !svg) return;
+  const wound = { cx: 0, cy: -16, seed: 2.4 };
+
+  function unit(n, seed) {
+    const value = Math.sin(n * 127.1 + seed * 311.7) * 43758.5453;
+    return value - Math.floor(value);
+  }
+
+  function blob(cx, cy, r, seed) {
+    const count = 8;
+    const points = [];
+    const stretch = 0.5 + unit(2, seed) * 0.95;
+    const tilt = unit(3, seed) * Math.PI;
+    const cosT = Math.cos(tilt);
+    const sinT = Math.sin(tilt);
+    for (let i = 0; i < count; i += 1) {
+      const angle = (i / count) * Math.PI * 2;
+      const jag = 0.38 + unit(i + 5, seed) * 0.95;
+      const radius = r * jag;
+      const x = Math.cos(angle) * radius * stretch;
+      const y = Math.sin(angle) * radius / stretch;
+      points.push([cx + x * cosT - y * sinT, cy + x * sinT + y * cosT]);
+    }
+    return points;
+  }
+
+  const box = fill.getBBox();
+  const point = svg.createSVGPoint();
+  const baseRects = [...fill.querySelectorAll('.cities__bulb-base rect')];
+
+  function inside(x, y) {
+    point.x = x;
+    point.y = y;
+    if (glass.isPointInFill(point)) return true;
+    return baseRects.some((rect) => {
+      const bounds = rect.getBBox();
+      return x >= bounds.x && x <= bounds.x + bounds.width && y >= bounds.y && y <= bounds.y + bounds.height;
+    });
+  }
+
+  function scatter(attempts, minR, maxR, gap, taken, salt) {
+    const bites = [];
+    for (let i = 0; i < attempts; i += 1) {
+      const x = box.x + unit(i * 3 + 1, wound.seed + salt) * box.width;
+      const y = box.y + unit(i * 5 + 2, wound.seed + salt) * box.height;
+      const r = minR + unit(i * 7 + 4, wound.seed + salt) * (maxR - minR);
+      if (!inside(x, y)) continue;
+      const crowded = [...taken, ...bites].some((bite) => Math.hypot(bite.x - x, bite.y - y) < bite.r + r + gap);
+      if (crowded) continue;
+      bites.push({ x, y, r, seed: wound.seed + salt + i * 2.17 });
+    }
+    return bites;
+  }
+
+  function pathFrom(points) {
+    return `${points.map(([x, y], index) => `${index ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join('')}Z`;
+  }
+
+  const pieces = [];
+  /* Gleicher Ablauf, nur deutlich langsamer: Zeiten gegenüber dem Ausgang um das Dreifache gestreckt. */
+  const pace = 3;
+  const appear = 0.48 * pace;
+  const widen = 1.35 * pace;
+
+  function ease(progress) {
+    return 1 - (1 - progress) ** 3;
+  }
+
+  function place(piece, scale, leave) {
+    const { hole, shred, x, y, dx, dy, rot, end } = piece;
+    if (hole) hole.setAttribute('transform', `translate(${x} ${y}) scale(${scale.toFixed(4)}) translate(${-x} ${-y})`);
+    shred.style.transform = `translate(${(dx * leave).toFixed(1)}px, ${(dy * leave).toFixed(1)}px) rotate(${(rot * leave).toFixed(1)}deg) scale(${Math.min(scale, 1).toFixed(4)})`;
+    shred.style.opacity = String(1 + (end - 1) * leave);
+  }
+
+  function ribbon(x1, y1, x2, y2, width) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = (-dy / len) * width * 0.5;
+    const ny = (dx / len) * width * 0.5;
+    return `M${(x1 + nx).toFixed(2)} ${(y1 + ny).toFixed(2)}L${(x2 + nx).toFixed(2)} ${(y2 + ny).toFixed(2)}L${(x2 - nx).toFixed(2)} ${(y2 - ny).toFixed(2)}L${(x1 - nx).toFixed(2)} ${(y1 - ny).toFixed(2)}Z`;
+  }
+
+  function fray() {
+    const bites = scatter(460, 5.2, 9.6, 0.5, [], 1);
+    bites.push(...scatter(980, 2.3, 4.6, 0.4, bites, 11));
+    const reach = Math.max(box.width, box.height) * 0.62;
+    bites.forEach((bite, index) => {
+      const points = blob(bite.x, bite.y, bite.r, bite.seed);
+      const hole = svgElement('g', { class: 'cities__hole' });
+      hole.append(svgElement('path', { fill: '#000', d: pathFrom(points) }));
+      mask.append(hole);
+      const shred = svgElement('path', {
+        class: bite.r < 3.4 ? 'cities__shred cities__shred--dust' : 'cities__shred',
+        d: pathFrom(points),
+      });
+      shreds.append(shred);
+      const dist = Math.hypot(bite.x - wound.cx, bite.y - wound.cy);
+      const near = 1 - Math.min(1, dist / reach);
+      let angle = Math.atan2(bite.y - wound.cy, bite.x - wound.cx);
+      if (!angle) angle = unit(index, bite.seed) * Math.PI * 2;
+      const travel = 36 + near * 18 + unit(index + 2, bite.seed) * 28;
+      const piece = {
+        hole,
+        shred,
+        x: bite.x,
+        y: bite.y,
+        delay: ((dist / reach) * 0.8 + unit(index + 1, bite.seed) * 0.12) * pace,
+        grow: 2.35 + near * 0.5 + unit(index + 8, bite.seed) * 0.28,
+        dx: Math.cos(angle) * travel,
+        dy: Math.sin(angle) * travel * 0.7 + 14 + unit(index + 6, bite.seed) * 16,
+        rot: (unit(index + 4, bite.seed) - 0.5) * 54,
+        end: 0,
+      };
+      pieces.push(piece);
+      place(piece, 0, 0);
+    });
+
+    [...line.querySelectorAll('path, rect')].forEach((shape, index) => {
+      const fine = shape.classList.contains('cities__bulb-filament') || shape.classList.contains('cities__bulb-lead');
+      const width = fine ? 2.2 : 3.2;
+      const length = shape.getTotalLength();
+      const salt = 40 + index * 17;
+      let cursor = 0;
+      let n = 0;
+      while (cursor < length - 1.5) {
+        const span = 8 + unit(n * 3 + salt, wound.seed) * 9;
+        const end = Math.min(length, cursor + span);
+        if (end - cursor < 3.2) break;
+        const a = shape.getPointAtLength(cursor);
+        const b = shape.getPointAtLength(end);
+        cursor = end;
+        n += 1;
+        if (Math.hypot(b.x - a.x, b.y - a.y) > span * 1.8) continue;
+        const shred = svgElement('path', {
+          class: fine ? 'cities__shred cities__shred--dust' : 'cities__shred',
+          d: ribbon(a.x, a.y, b.x, b.y, width),
+        });
+        shreds.append(shred);
+        const x = (a.x + b.x) / 2;
+        const y = (a.y + b.y) / 2;
+        const dist = Math.hypot(x - wound.cx, y - wound.cy);
+        const near = 1 - Math.min(1, dist / reach);
+        let angle = Math.atan2(y - wound.cy, x - wound.cx);
+        if (!angle) angle = unit(n, wound.seed + salt) * Math.PI * 2;
+        const travel = 36 + near * 18 + unit(n + 2, wound.seed + salt) * 28;
+        const piece = {
+          hole: null,
+          shred,
+          rim: true,
+          x,
+          y,
+          delay: ((dist / reach) * 0.8 + unit(n + 1, wound.seed + salt) * 0.12) * pace,
+          grow: 1,
+          dx: Math.cos(angle) * travel,
+          dy: Math.sin(angle) * travel * 0.7 + 14 + unit(n + 6, wound.seed + salt) * 16,
+          rot: (unit(n + 4, wound.seed + salt) - 0.5) * 54,
+          end: 0,
+        };
+        pieces.push(piece);
+        place(piece, 1, 0);
+      }
+    });
+    line.style.opacity = '0';
+  }
+
+  function finish() {
+    pieces.forEach((piece) => place(piece, piece.rim ? 1 : piece.grow, 1));
+    fill.style.opacity = '0';
+    line.style.opacity = '0';
+  }
+
+  let frame = 0;
+
+  function tear() {
+    if (map.classList.contains('is-torn')) return;
+    map.classList.add('is-torn');
+    if (reduceMotion.matches || !pieces.length) {
+      finish();
+      return;
+    }
+    const started = performance.now();
+    const step = (now) => {
+      const time = (now - started) / 1000;
+      let running = false;
+      pieces.forEach((piece) => {
+        const local = time - piece.delay;
+        const resting = piece.rim ? 1 : 0;
+        if (local <= 0) {
+          place(piece, resting, 0);
+          running = true;
+          return;
+        }
+        if (local < appear) {
+          const opened = ease(local / appear);
+          place(piece, piece.rim ? 1 : opened, opened * 0.22);
+          running = true;
+          return;
+        }
+        if (local < appear + widen) {
+          const opened = ease((local - appear) / widen);
+          place(piece, piece.rim ? 1 : 1 + (piece.grow - 1) * opened, 0.22 + opened * 0.78);
+          running = true;
+          return;
+        }
+        place(piece, piece.rim ? 1 : piece.grow, 1);
+      });
+      const cleared = Math.min(1, Math.max(0, (time - 0.95 * pace) / (1.45 * pace)));
+      fill.style.opacity = String(1 - ease(cleared));
+      if (cleared < 1) running = true;
+      frame = running ? requestAnimationFrame(step) : 0;
+    };
+    frame = requestAnimationFrame(step);
+  }
+
+  map.classList.add('is-ready');
+  void map.offsetWidth;
+  fray();
+  if (reduceMotion.matches) finish();
+  if (reduceMotion.matches) {
+    tear();
+    return;
+  }
+  const observer = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting || entry.intersectionRatio < 0.4) return;
+    observer.disconnect();
+    requestAnimationFrame(tear);
+  }, { threshold: [0, 0.4, 0.7] });
+  observer.observe(map);
+  reduceMotion.addEventListener('change', () => {
+    if (!reduceMotion.matches) return;
+    cancelAnimationFrame(frame);
+    finish();
+    map.classList.add('is-torn');
+  });
+}
+
+function setupHeroWalk() {
+  const figure = document.querySelector('.hero__figure');
+  const canvas = figure?.querySelector('.hero__runner');
+  const video = figure?.querySelector('.hero__walk');
+  if (!figure || !canvas || !video) return;
+
+  const ctx = canvas.getContext('2d');
+  const frame = document.createElement('canvas');
+  let frameCtx = null;
+  let running = false;
+  let scheduled = false;
+
+  function size() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const width = Math.max(1, Math.round(figure.clientWidth * dpr));
+    const height = Math.max(1, Math.round(figure.clientHeight * dpr));
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+  }
+
+  function smoothstep(value) {
+    const t = Math.min(1, Math.max(0, value));
+    return t * t * (3 - 2 * t);
+  }
+
+  /* Erst Schwarz, dann Grau, dann löst sich die Silhouette im Nebel auf. */
+  function veil() {
+    const anim = figure.getAnimations().find((item) => item.animationName === 'hero-into');
+    if (!anim?.effect) return { tone: 0, alpha: 1 };
+    const duration = Number(anim.effect.getComputedTiming().duration);
+    if (!duration) return { tone: 0, alpha: 1 };
+    const t = Math.min(1, Math.max(0, anim.currentTime / duration));
+    return {
+      tone: smoothstep((t - 0.46) / 0.28),
+      alpha: 1 - smoothstep((t - 0.68) / 0.32),
+    };
+  }
+
+  function draw() {
+    if (!video.videoWidth || !canvas.width) return;
+    if (frame.width !== video.videoWidth) {
+      frame.width = video.videoWidth;
+      frame.height = video.videoHeight;
+      frameCtx = frame.getContext('2d', { willReadFrequently: true });
+    }
+    frameCtx.drawImage(video, 0, 0);
+    const image = frameCtx.getImageData(0, 0, frame.width, frame.height);
+    const data = image.data;
+    const width = frame.width;
+    const height = frame.height;
+    let minX = width;
+    let minY = height;
+    let maxX = 0;
+    let maxY = 0;
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const index = (y * width + x) * 4;
+        const lum = (data[index] * 77 + data[index + 1] * 150 + data[index + 2] * 29) >> 8;
+        let alpha = 0;
+        if (lum < 36) alpha = 255;
+        else if (lum < 150) alpha = ((150 - lum) * 255) / 114;
+        data[index] = 7;
+        data[index + 1] = 7;
+        data[index + 2] = 8;
+        data[index + 3] = alpha;
+        if (alpha > 48) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX <= minX || maxY <= minY) return;
+    frameCtx.putImageData(image, 0, 0);
+    const boundsWidth = maxX - minX + 1;
+    const boundsHeight = maxY - minY + 1;
+    let scale = canvas.height / boundsHeight;
+    if (boundsWidth * scale > canvas.width) scale = canvas.width / boundsWidth;
+    const destWidth = boundsWidth * scale;
+    const destHeight = boundsHeight * scale;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      frame,
+      minX,
+      minY,
+      boundsWidth,
+      boundsHeight,
+      (canvas.width - destWidth) / 2,
+      canvas.height - destHeight,
+      destWidth,
+      destHeight
+    );
+    const veilState = veil();
+    if (veilState.tone > 0 || veilState.alpha < 1) {
+      const gray = Math.round(7 + (164 - 7) * veilState.tone);
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = `rgba(${gray},${gray},${gray},${veilState.alpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.globalCompositeOperation = 'destination-out';
+    const fade = ctx.createLinearGradient(0, canvas.height * 0.97, 0, canvas.height);
+    fade.addColorStop(0, 'rgba(0,0,0,0)');
+    fade.addColorStop(1, 'rgba(0,0,0,.4)');
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, canvas.height * 0.97, canvas.width, canvas.height * 0.03);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function tick() {
+    scheduled = false;
+    if (!running) return;
+    draw();
+    scheduled = true;
+    if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(tick);
+    else requestAnimationFrame(tick);
+  }
+
+  function useStill() {
+    const paint = () => draw();
+    if (Math.abs(video.currentTime - 4) < 0.05 && video.readyState >= 2) paint();
+    else {
+      video.addEventListener('seeked', paint, { once: true });
+      video.currentTime = 4;
+    }
+  }
+
+  video.muted = true;
+  video.playsInline = true;
+  video.playbackRate = 1.45;
+  video.addEventListener('error', () => {
+    canvas.classList.add('is-fallback');
+    if (!reduceMotion.matches) figure.classList.add('is-walking');
+  });
+  video.addEventListener('loadeddata', () => {
+    size();
+    if (reduceMotion.matches) {
+      useStill();
+      return;
+    }
+    draw();
+    figure.classList.add('is-walking');
+    running = true;
+    tick();
+    video.play().catch(() => {
+      running = false;
+      figure.classList.remove('is-walking');
+      useStill();
+    });
+  });
+  figure.addEventListener('animationend', (event) => {
+    if (event.animationName !== 'hero-into') return;
+    running = false;
+    video.pause();
+    draw();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!running) return;
+    if (document.hidden) {
+      video.pause();
+      scheduled = false;
+    } else video.play().then(() => { if (running && !scheduled) tick(); }).catch(() => {});
+  });
+  new ResizeObserver(size).observe(figure);
+  if (video.readyState >= 2) video.dispatchEvent(new Event('loadeddata'));
+}
+
+setupHeroWalk();
+setupCityTear();
 setupMenu();
-setupCredits();
 setupCounter();
 setupReveal();
 setupMap();
 setupBloodSeam();
 setupSlideTransition();
 setupStoriesGlobe();
+setupFaces();
