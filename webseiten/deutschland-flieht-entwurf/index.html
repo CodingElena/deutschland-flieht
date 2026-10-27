@@ -10,7 +10,7 @@
     <link rel="preload" href="./assets/hero-apokalypse.webp" as="image" media="(min-width: 761px)" fetchpriority="high" />
     <link rel="preload" href="./assets/hero-apokalypse-mobil.jpg?v=2" as="image" media="(max-width: 760px)" fetchpriority="high" />
     <link rel="preload" href="./assets/playfair-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=u103" />
+    <link rel="stylesheet" href="./styles.css?v=u106" />
     <script src="./main.js?v=u93" type="module"></script>
       <script src="./chapters.js?v=u60" type="module"></script>
   </head>
@@ -40,6 +40,8 @@
     </header>
 
     <main>
+      <!-- Pin endet mit der Karte. Sonst bleibt der Hero sticky bis zum Seitenende und scheint am Atlas durch. -->
+      <div class="hero-pin">
       <section class="hero" aria-label="Deutschland flieht">
         <picture>
           <source media="(max-width: 760px)" srcset="./assets/hero-apokalypse-mobil.jpg?v=2" type="image/jpeg" />
@@ -93,6 +95,7 @@
           </figure>
         </div>
       </section>
+      </div>
 
       <section class="stories-globe" id="geschichten" aria-labelledby="stories-title">
         <div class="sf-dim" aria-hidden="true"></div>

@@ -103,8 +103,10 @@ html.menu-open{overflow:hidden}
   .emigration{margin-top:calc(-1 * var(--seam-depth));padding-top:calc(var(--seam-depth) + 20px)}
 }
 
-/* The second panel rises over a pinned hero as the reader scrolls. */
+/* The second panel rises over a pinned hero as the reader scrolls.
+   Der Pin endet mit der Karte (siehe .hero-pin), sonst klebt der Hero bis zum Seitenende. */
 body{overflow-x:clip}
+.hero-pin{display:flow-root}
 .hero{position:sticky;top:0;--slide-progress:0}
 .hero__image{transform:translate3d(0,calc(var(--slide-progress) * -18px),0) scale(calc(1 + var(--slide-progress) * .065));transform-origin:center 42%;will-change:transform}
 .hero__shade{opacity:calc(.65 + var(--slide-progress) * .35)}
@@ -570,7 +572,7 @@ html,body{overflow-x:clip;max-width:100%}
 /* ---------------------------------------------------------------------------
    06 · Atlas
    --------------------------------------------------------------------------- */
-.atl{position:relative;z-index:6;overflow:hidden;margin-top:calc(-1 * var(--dev-b));clip-path:polygon(0 var(--dev-b),100% 0,100% 100%,0 100%);min-height:min(100svh,56vw);background:#080706;display:flex;align-items:center;padding-top:var(--dev-b)}
+.atl{position:relative;z-index:6;isolation:isolate;overflow:hidden;margin-top:calc(-1 * var(--dev-b));clip-path:polygon(0 var(--dev-b),100% 0,100% 100%,0 100%);min-height:min(100svh,56vw);background:#080706;display:flex;align-items:center;padding-top:var(--dev-b)}
 .atl::before{content:"";position:absolute;inset:0;background:url('./assets/noise.svg') 0 0/200px;mix-blend-mode:screen;opacity:.05;pointer-events:none}
 .atl__img{position:absolute;right:2%;top:5vw;bottom:auto;height:112%;width:auto;max-width:64%;object-fit:cover;object-position:62% 0;mix-blend-mode:lighten;opacity:.95;transform:translateY(calc(var(--ap,0) * 5%)) scale(calc(1.12 - var(--ap,0) * .08));transform-origin:68% 62%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 40%),linear-gradient(0deg,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 40%),linear-gradient(0deg,transparent 0,#000 14%);mask-composite:intersect}
 .atl__inner{position:relative;z-index:2;width:100%;max-width:1700px;margin:0 auto;padding:clamp(44px,6vw,110px) var(--padx)}
@@ -1281,7 +1283,7 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
 .sup__note{margin:0;color:#8e8e93;font-size:13px}
 .sup__people{list-style:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(10px,1.15vw,16px);margin:0;padding:0}
 .sup__people figure{margin:0}
-.sup__people img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#111}
+.sup__people img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;background:#111}
 @media(max-width:900px){
   .sup__orgs{grid-template-columns:1fr}
   .sup__orgs li+li{border-left:0}
@@ -1289,9 +1291,18 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
   .sup__people{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:520px){
-  .sup__people{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sup__people{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .sup__org strong{font-size:26px}
 }
 @media(prefers-reduced-motion:reduce){
   .sup__mark{transition:none}
+}
+
+/* Handy: erst "Es gehen die Wertschöpfer", dann die Postkarten */
+@media(max-width:760px){
+  .pk{--pk-copy:clamp(236px,58vw,264px);padding-top:calc(var(--pk-up) + 20px)}
+  .pk__stage{margin-top:var(--pk-copy);margin-bottom:0}
+  .pk__copy{top:calc(-1 * var(--pk-copy))}
+  /* Fäden starten unter dem Text und blenden oben weich ein */
+  .pk__thread{top:0;height:var(--y);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16%);mask-image:linear-gradient(180deg,transparent 0,#000 16%)}
 }
