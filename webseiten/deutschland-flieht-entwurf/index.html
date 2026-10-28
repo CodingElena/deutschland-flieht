@@ -10,9 +10,9 @@
     <link rel="preload" href="./assets/hero-apokalypse.webp" as="image" media="(min-width: 761px)" fetchpriority="high" />
     <link rel="preload" href="./assets/hero-apokalypse-mobil.jpg?v=2" as="image" media="(max-width: 760px)" fetchpriority="high" />
     <link rel="preload" href="./assets/playfair-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=u106" />
-    <script src="./main.js?v=u93" type="module"></script>
-      <script src="./chapters.js?v=u60" type="module"></script>
+    <link rel="stylesheet" href="./styles.css?v=u138" />
+    <script src="./main.js?v=u97" type="module"></script>
+      <script src="./chapters.js?v=u75" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
@@ -25,16 +25,16 @@
       </nav>
       <div class="menu-panel" id="site-menu" aria-hidden="true" hidden>
         <nav class="menu-panel__main" aria-label="Menüpunkte">
-          <a href="#inhalt">Daten</a>
-          <a href="#und-dann">Und dann?</a>
-          <a href="#forderungen">Forderungen</a>
-          <a href="./petition/">Petition</a>
+          <a href="./petition/">Petition<span class="title-dot">.</span></a>
+          <a href="./entwicklungen/">Aktuelle Entwicklungen<span class="title-dot">.</span></a>
+          <a href="#inhalt">Die Lage<span class="title-dot">.</span></a>
+          <a href="#geschichten">Ihre Geschichten<span class="title-dot">.</span></a>
+          <a href="#und-dann">Und dann<span class="title-dot">?</span></a>
         </nav>
         <nav class="menu-panel__secondary" aria-label="Weitere Links">
-          <a href="./entwicklungen/">Aktuelle Entwicklungen</a>
-          <a href="./quellen/">Quellen</a>
-          <a href="./impressum/">Impressum</a>
-          <a href="./datenschutz/">Datenschutz</a>
+          <a href="./quellen/">Quellen<span class="title-dot">.</span></a>
+          <a href="./impressum/">Impressum<span class="title-dot">.</span></a>
+          <a href="./datenschutz/">Datenschutz<span class="title-dot">.</span></a>
         </nav>
       </div>
     </header>
@@ -57,7 +57,7 @@
         </picture>
         <div class="hero__figure" aria-hidden="true">
           <canvas class="hero__runner"></canvas>
-          <video class="hero__walk" src="./assets/hero-walk.mp4" muted playsinline preload="auto" width="640" height="360"></video>
+          <video class="hero__walk" src="./assets/hero-pull.mp4" muted playsinline preload="auto" width="640" height="360"></video>
         </div>
         <div class="hero__shade" aria-hidden="true"></div>
         <canvas class="hero__blood" aria-hidden="true"></canvas>
@@ -66,7 +66,7 @@
           <span class="petition-widget__rule" aria-hidden="true"></span>
           <span class="petition-widget__metric">
             <span class="flip-counter" id="flip-counter" role="img" aria-label="288.579 Fortzüge deutscher Staatsangehöriger 2025">—</span>
-            <span class="petition-widget__caption">Fortzüge 2025<sup class="ref"><a href="./quellen/#q-z1">1</a></sup></span>
+            <span class="petition-widget__caption">Fortzüge 2025</span>
           </span>
         </div>
       </section>
@@ -83,15 +83,15 @@
               <em>blutet aus<span class="title-dot">.</span></em>
             </h1>
             <div class="emigration__text reveal">
-              <p class="emigration__lead">Immer mehr deutsche Staatsangehörige verlassen das Land.<sup class="ref"><a href="./quellen/#q-z1">1</a></sup> Darunter vor allem junge, gut ausgebildete und motivierte Menschen, die ihre Zukunft anderswo sehen. Sie fliehen vor erdrückenden Abgaben, absurder Bürokratie, zunehmender Staatsmacht, wachsender Leistungsfeindlichkeit, politischen Umverteilungsfantasien oder schlicht einer zunehmend pessimistischen Stimmung.</p>
-              <p class="emigration__lead">Besonders beliebte Ziele sind die hier abgebildeten Länder: die Schweiz, die USA und Spanien.<sup class="ref"><a href="./quellen/#q-globus">2</a></sup> Dort erhoffen sich viele geringere Abgaben, eine höhere Lebensqualität und bessere Perspektiven.</p>
+              <p class="emigration__lead">Immer mehr deutsche Staatsangehörige verlassen das Land. Darunter vor allem junge, gut ausgebildete und motivierte Menschen, die ihre Zukunft anderswo sehen. Sie fliehen vor erdrückenden Abgaben, absurder Bürokratie, zunehmender Staatsmacht, wachsender Leistungsfeindlichkeit, politischen Umverteilungsfantasien oder schlicht einer zunehmend pessimistischen Stimmung.</p>
+              <p class="emigration__lead">Besonders beliebte Ziele sind die Schweiz, die USA und Spanien. Dort erhoffen sich viele geringere Abgaben, eine höhere Lebensqualität und bessere Perspektiven.</p>
               <p class="emigration__lead">Wir wollen diesen Trend umkehren und Deutschland mit unserer Initiative wieder auf Kurs bringen. Oder besser gesagt: <strong>Dem Land eine ordentliche freiheitliche Blutspende verpassen.</strong></p>
-              <p class="emigration__lead">Sieh dir die Zahlen an, teile deine eigene Geschichte und sag uns deine Meinung.</p>
+              <p class="emigration__lead">Sieh dir die Zahlen an, teile deine eigene Geschichte und sag uns deine Meinung.<span class="ref"><a href="./quellen/#q-zahlen" aria-label="Fußnote 1">1</a></span></p>
             </div>
           </div>
           <figure class="map-figure reveal">
             <div class="map-figure__stage" id="germany-map" aria-label="Interaktive Deutschlandkarte mit Bundesländern und vier Zielländern"></div>
-            <p class="map-quelle"><sup class="ref"><a href="./quellen/#q-karte">1</a></sup></p>
+            <p class="map-quelle"><span class="ref"><a href="./quellen/#q-karte" aria-label="Fußnote 2">2</a></span></p>
           </figure>
         </div>
       </section>
@@ -102,10 +102,9 @@
         <div class="sf-sheet" aria-hidden="true"><canvas class="stories-globe__grain"></canvas></div>
         <div class="sf-break" aria-hidden="true">
           <span class="sf-break__line"></span>
-          <span class="sf-break__prev">01 — Das Land blutet aus.</span>
         </div>
         <div class="stories-globe__intro">
-          <h2 class="stories-globe__title reveal" id="stories-title"><em>Sie nehmen die Zukunft mit.</em></h2>
+          <h2 class="stories-globe__title reveal" id="stories-title"><em>Sie nehmen die Zukunft mit<span class="title-dot">.</span></em></h2>
           <p class="stories-globe__subtitle reveal">Lies ihre Geschichte. <a href="./petition/?teilnahme=geschichte" id="story-submit">Ergänze deine eigene.</a></p>
           <div class="faces" aria-roledescription="Karussell" aria-label="Zitate">
             <button class="faces__nav faces__nav--prev" type="button" aria-label="Vorheriges Zitat"><svg class="ico ico--l" viewBox="0 0 16 12" aria-hidden="true" focusable="false"><path d="M15 6H2M6 2 2 6l4 4"/></svg></button>
@@ -155,16 +154,16 @@
             <div class="globe-empty" id="globe-empty" hidden><p>Noch keine Geschichten vorhanden.</p><a href="./petition/?teilnahme=geschichte" class="story-submit-duplicate">Eigene Geschichte ergänzen <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></a></div>
           </div>
           <p class="globe-hint" hidden>Ziehen, um die Welt zu drehen · Land antippen: Zahl und schwebende Geschichten</p>
-          <p class="globe-source"><sup class="ref"><a href="./quellen/#q-globus">1</a></sup></p>
+          <p class="globe-source"><span class="ref"><a href="./quellen/#q-globus" aria-label="Fußnote 3">3</a></span></p>
         </div>
       </section>
 
       <section class="cities" id="grossstaedte" aria-labelledby="cities-title">
+        <i class="edge edge--cities-top" aria-hidden="true"></i>
         <div class="cities__inner">
           <div class="cities__copy">
-            <p class="cities__year reveal">2025</p>
-            <h2 id="cities-title" class="cities__title reveal">Zwei Großstädte<em>an Akademikern.</em></h2>
-            <p class="cities__text reveal">288.579 deutsche Staatsangehörige zogen 2025 fort.<sup class="ref"><a href="./quellen/#q-z1">1</a></sup> Legt man den Anteil aus der GERPS-Studie darauf, hatten 75,5 % einen akademischen Berufsabschluss.<sup class="ref"><a href="./quellen/#q-staedte">2</a></sup> Das sind 217.877 Menschen, mehr als zwei Städte an der Großstadtgrenze von 100.000 Einwohnern.</p>
+            <h2 id="cities-title" class="cities__title reveal">Zwei Großstädte<em>an Akademikern<span class="title-dot">.</span></em></h2>
+            <p class="cities__text reveal">288.579 deutsche Staatsangehörige zogen 2025 fort. Legt man den Anteil aus der GERPS-Studie darauf, hatten 75,5 % einen akademischen Berufsabschluss. Das sind 217.877 Menschen, mehr als zwei Städte an der Großstadtgrenze von 100.000 Einwohnern.<span class="ref"><a href="./quellen/#q-staedte" aria-label="Fußnote 4">4</a></span></p>
           </div>
           <div class="cities__map" aria-hidden="true">
                   <svg class="cities__svg" viewBox="-90 -100 180 280">
@@ -209,7 +208,7 @@
         </div>
         <div class="und-dann__text">
           <div class="reveal">
-            <h2 id="und-dann-frage" class="und-dann__frage">Und dann?</h2>
+            <h2 id="und-dann-frage" class="und-dann__frage">Und dann<span class="title-dot">?</span></h2>
             <p class="und-dann__voraussetzung">Ohne Unternehmen, ohne Köpfe, ohne Kapital gibt es</p>
             <ul class="und-dann__folgen">
               <li>keinen technischen Fortschritt</li>
@@ -219,6 +218,7 @@
             <p class="und-dann__schluss">Irgendwann keine Perspektive mehr.</p>
           </div>
         </div>
+        <i class="edge edge--und-dann-top" aria-hidden="true"></i>
       </section>
 
       <!-- 03 · Forderungen: roter Keil mit schrägen Kanten, Zeilen zum Ausklappen -->
@@ -227,65 +227,65 @@
           <div class="chg__sheet" aria-hidden="true"></div>
           <div class="chg__inner">
             <h2 id="chg-title" class="chg__title">
-              <span class="ln"><span>Es muss sich</span></span>
-              <span class="ln"><em>etwas ändern.</em></span>
+              <span class="ln"><span>Wir können</span></span>
+              <span class="ln"><em>das ändern<span class="title-dot">.</span></em></span>
             </h2>
             <p class="chg__lead">Fünf Forderungen. Damit Bleiben sich lohnt.</p>
             <ol class="chg__list">
               <li class="chg__row" style="--i:0">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p1" id="chg-b1">
-                  <span class="chg__no">01</span><span class="chg__name">Leben günstiger machen.</span><span class="chg__short">Abgabensystem reformieren, Schuldenkurs beenden.</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">01</span><span class="chg__name">Leben günstiger machen<span class="title-dot">.</span></span><span class="chg__short">Abgabensystem reformieren, Schuldenkurs beenden<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p1" role="region" aria-labelledby="chg-b1"><div class="chg__panel-in">
-                    <p>Deutschland ist das Land mit der zweithöchsten Abgabenbelastung auf Arbeit in der OECD.<sup class="ref"><a href="./quellen/#q-f1-1">1</a></sup> Junge Menschen, die Vollzeit arbeiten, zahlen von ihrem Bruttolohn durchschnittlich 38,7 % an den Staat.<sup class="ref"><a href="./quellen/#q-f1-2">2</a></sup> Rechnet man den Arbeitgeberanteil mit ein, liegt dieser Wert bei fast 50 %.<sup class="ref"><a href="./quellen/#q-f1-1">1</a></sup> Junge Leute arbeiten damit teilweise ein halbes Jahr nur für den Staat.</p>
-                    <p>Hinzu kommt ein Steueraufschlag von 19 % auf viele Produkte,<sup class="ref"><a href="./quellen/#q-f1-3">3</a></sup> auf Kraftstoffe sogar um die 64 % bei Benzin und 56 % bei Diesel.<sup class="ref"><a href="./quellen/#q-f1-4">4</a></sup> Und wenn Leute eigenverantwortlich Geld für die Zukunft anlegen, wird der Ertrag noch einmal mit 25 % besteuert.<sup class="ref"><a href="./quellen/#q-f1-5">5</a></sup></p>
+                    <p>Deutschland ist das Land mit der zweithöchsten Abgabenbelastung auf Arbeit in der OECD. Junge Menschen, die Vollzeit arbeiten, zahlen von ihrem Bruttolohn durchschnittlich 38,7 % an den Staat. Rechnet man den Arbeitgeberanteil mit ein, liegt dieser Wert bei fast 50 %. Junge Leute arbeiten damit teilweise ein halbes Jahr nur für den Staat.</p>
+                    <p>Hinzu kommt ein Steueraufschlag von 19 % auf viele Produkte, auf Kraftstoffe sogar um die 64 % bei Benzin und 56 % bei Diesel. Und wenn Leute eigenverantwortlich Geld für die Zukunft anlegen, wird der Ertrag noch einmal mit 25 % besteuert.</p>
                     <p>Viele junge Menschen empfinden dies als Bestrafung ihrer Produktivität. Das Steuersystem sollte darum radikal reformiert werden. Wir fordern eine niedrige Flat Tax.</p>
-                    <p>Zusätzlich steht die Zukunft der jungen Leute vor einem nie dagewesenen Schuldenberg. Durch das Aussetzen der Schuldenbremse ist die deutsche Verschuldung auf 2,84 Billionen Euro gestiegen.<sup class="ref"><a href="./quellen/#q-f1-6">6</a></sup> Doch nicht nur das Tilgen dieser Schulden belastet die junge Generation: Auch die damit zusammenhängende Inflation treibt die Lebenshaltungskosten stetig in die Höhe.</p>
+                    <p>Zusätzlich steht die Zukunft der jungen Leute vor einem nie dagewesenen Schuldenberg. Durch das Aussetzen der Schuldenbremse ist die deutsche Verschuldung auf 2,84 Billionen Euro gestiegen. Doch nicht nur das Tilgen dieser Schulden belastet die junge Generation: Auch die damit zusammenhängende Inflation treibt die Lebenshaltungskosten stetig in die Höhe.<span class="ref"><a href="./quellen/#q-f1" aria-label="Fußnote 5">5</a></span></p>
                     <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:1">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p2" id="chg-b2">
-                  <span class="chg__no">02</span><span class="chg__name">Mehr Eigenverantwortung.</span><span class="chg__short">Sozialstaat aufbrechen.</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">02</span><span class="chg__name">Mehr Eigenverantwortung<span class="title-dot">.</span></span><span class="chg__short">Sozialstaat aufbrechen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p2" role="region" aria-labelledby="chg-b2"><div class="chg__panel-in">
-                    <p>Der Sozialstaat ist mit Abstand der größte Geldschlucker der Staatskasse. Die Hälfte aller Staatsausgaben fließt in diesen Sektor.<sup class="ref"><a href="./quellen/#q-f2-1">1</a></sup> Deutsche arbeiten also einen großen Teil ihrer Zeit für diesen aufgeblähten Sozialstaat.</p>
+                    <p>Der Sozialstaat ist mit Abstand der größte Geldschlucker der Staatskasse. Die Hälfte aller Staatsausgaben fließt in diesen Sektor. Deutsche arbeiten also einen großen Teil ihrer Zeit für diesen aufgeblähten Sozialstaat.</p>
                     <p>Als Gegenleistung gibt es eine Rente, die nicht reicht, eine Krankenkasse, die weder Patienten noch Ärzte sinnvoll versorgt, und eine kollabierende Pflegeversicherung.</p>
                     <p>Viele junge Leute fragen sich zu Recht, was an diesem auf Zwang basierenden System und der immer weiter fortschreitenden Aushebelung von Eigenverantwortung richtig und solidarisch sein soll.</p>
-                    <p>Der Sozialstaat muss darum stetig weiter verschlankt werden. Ziel sollte sein, dass Leute sich eigenverantwortlich vorsorgen. Die Migrationspolitik muss weiter so reformiert werden, dass eine Einwanderung in die Sozialsysteme unterbunden wird.</p>
+                    <p>Der Sozialstaat muss darum stetig weiter verschlankt werden. Ziel sollte sein, dass Leute sich eigenverantwortlich vorsorgen. Die Migrationspolitik muss weiter so reformiert werden, dass eine Einwanderung in die Sozialsysteme unterbunden wird.<span class="ref"><a href="./quellen/#q-f2" aria-label="Fußnote 6">6</a></span></p>
                     <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:2">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p3" id="chg-b3">
-                  <span class="chg__no">03</span><span class="chg__name">Geld verbrennen stoppen.</span><span class="chg__short">Rente auslaufen lassen.</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">03</span><span class="chg__name">Geld verbrennen stoppen<span class="title-dot">.</span></span><span class="chg__short">Rente auslaufen lassen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p3" role="region" aria-labelledby="chg-b3"><div class="chg__panel-in">
-                    <p>Eine besondere Beachtung im Bereich Sozialstaat verdient die Rente. Die Finanzierung dieser ist mittlerweile mit Abstand der größte Posten im Haushalt der Bundesregierung: Neben den Rentenbeiträgen, die jeder Arbeitnehmer zahlen muss, flossen 2025 zusätzlich 25 % des Haushalts der Bundesregierung in diesen Posten.<sup class="ref"><a href="./quellen/#q-f3-1">1</a></sup></p>
-                    <p>Beim Rentenstart in den 1950er-Jahren haben sechs Einzahler einen Rentner finanziert, heute kommen auf einen Rentner zwei Einzahler.<sup class="ref"><a href="./quellen/#q-f3-2">2</a></sup> Junge Leute haben genug davon, die Folgen dieses verhängnisvollen Rentensystems zu büßen. Die staatliche Rente muss dringend auslaufen, und private Anlageformen dürfen nicht weiter durch Steuern bestraft werden.</p>
+                    <p>Eine besondere Beachtung im Bereich Sozialstaat verdient die Rente. Die Finanzierung dieser ist mittlerweile mit Abstand der größte Posten im Haushalt der Bundesregierung: Neben den Rentenbeiträgen, die jeder Arbeitnehmer zahlen muss, flossen 2025 zusätzlich 25 % des Haushalts der Bundesregierung in diesen Posten.</p>
+                    <p>Beim Rentenstart in den 1950er-Jahren haben sechs Einzahler einen Rentner finanziert, heute kommen auf einen Rentner zwei Einzahler. Junge Leute haben genug davon, die Folgen dieses verhängnisvollen Rentensystems zu büßen. Die staatliche Rente muss dringend auslaufen, und private Anlageformen dürfen nicht weiter durch Steuern bestraft werden.<span class="ref"><a href="./quellen/#q-f3" aria-label="Fußnote 7">7</a></span></p>
                     <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:3">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p4" id="chg-b4">
-                  <span class="chg__no">04</span><span class="chg__name">Jobs für alle.</span><span class="chg__short">Unternehmen entfesseln.</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">04</span><span class="chg__name">Jobs für alle<span class="title-dot">.</span></span><span class="chg__short">Unternehmen entfesseln<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p4" role="region" aria-labelledby="chg-b4"><div class="chg__panel-in">
-                    <p>Die Jobsuche in Deutschland wurde in den letzten Jahren deutlich schwieriger. Viele Unternehmen stellen kein neues Personal an, bauen Stellen ab oder gehen ins Ausland. So erwägen gemäß einer Umfrage rund 20 % der befragten Unternehmen, wirtschaftliche Aktivitäten in Deutschland einzuschränken oder ins Ausland zu verlagern, oder haben dies bereits getan. In der Industrie liegt dieser Anteil bei 40 %.<sup class="ref"><a href="./quellen/#q-f4-1">1</a></sup></p>
+                    <p>Die Jobsuche in Deutschland wurde in den letzten Jahren deutlich schwieriger. Viele Unternehmen stellen kein neues Personal an, bauen Stellen ab oder gehen ins Ausland. So erwägen gemäß einer Umfrage rund 20 % der befragten Unternehmen, wirtschaftliche Aktivitäten in Deutschland einzuschränken oder ins Ausland zu verlagern, oder haben dies bereits getan. In der Industrie liegt dieser Anteil bei 40 %.</p>
                     <p>Das Problem ist hausgemacht: Deutsche Unternehmen leiden massiv an Bürokratie, Arbeitsrecht, Lohnnebenkosten (siehe Punkt zwei), teurer Energie durch eine falsche Energiepolitik und fatalen politischen Lenkungsversuchen wie der Klimapolitik.</p>
-                    <p>Wir benötigen die Kettensäge, damit Unternehmen florieren und junge Leute wieder eine Perspektive haben.</p>
+                    <p>Wir benötigen die Kettensäge, damit Unternehmen florieren und junge Leute wieder eine Perspektive haben.<span class="ref"><a href="./quellen/#q-f4" aria-label="Fußnote 8">8</a></span></p>
                     <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:4">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p5" id="chg-b5">
-                  <span class="chg__no">05</span><span class="chg__name">Günstige Mieten.</span><span class="chg__short">Wohnungsbau wieder ermöglichen.</span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">05</span><span class="chg__name">Günstige Mieten<span class="title-dot">.</span></span><span class="chg__short">Wohnungsbau wieder ermöglichen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p5" role="region" aria-labelledby="chg-b5"><div class="chg__panel-in">
                     <p>Gerade junge Leute leiden massiv an hohen Mieten. Der Grund dafür: In Deutschland gibt es viel zu wenig Wohnungen.</p>
-                    <p>Doch warum wird zu wenig gebaut? Das liegt daran, dass Bauen in Deutschland sehr teuer geworden ist, leider erneut durch den Staat. 2005 hat es ca. 1.200 Euro gekostet, einen Quadratmeter zu bauen,<sup class="ref"><a href="./quellen/#q-f5-1">1</a></sup> 2024 waren es ca. 2.600 Euro.<sup class="ref"><a href="./quellen/#q-f5-2">2</a></sup></p>
-                    <p>Damit sich das Bauen lohnt, ist es unausweichlich, dass die höheren Baupreise an die Mieter weitergegeben werden. Ähnliches gilt für Instandhaltung und Immobilienkosten. Der Anstieg der Baukosten liegt maßgeblich daran, dass Gebäude heute sehr viele Auflagen erfüllen müssen: Es gibt rund 3.900 Normen, die Gebäude erfüllen müssen,<sup class="ref"><a href="./quellen/#q-f5-3">3</a></sup> und die Anforderungen an die Energetik durch das Gebäudeenergiegesetz treiben zusätzlich die Kosten in die Höhe.<sup class="ref"><a href="./quellen/#q-f5-4">4</a></sup> Hinzu kommen eine gestiegene Grunderwerbsteuer<sup class="ref"><a href="./quellen/#q-f5-5">5</a></sup> und massive Auflagen durch den Denkmalschutz der Länder.<sup class="ref"><a href="./quellen/#q-f5-6">6</a></sup></p>
-                    <p>Der Staat muss es wieder erlauben, günstige Gebäude zu bauen, und sollte die bestehenden nicht künstlich verteuern.</p>
+                    <p>Doch warum wird zu wenig gebaut? Das liegt daran, dass Bauen in Deutschland sehr teuer geworden ist, leider erneut durch den Staat. 2005 hat es ca. 1.200 Euro gekostet, einen Quadratmeter zu bauen, 2024 waren es ca. 2.600 Euro.</p>
+                    <p>Damit sich das Bauen lohnt, ist es unausweichlich, dass die höheren Baupreise an die Mieter weitergegeben werden. Ähnliches gilt für Instandhaltung und Immobilienkosten. Der Anstieg der Baukosten liegt maßgeblich daran, dass Gebäude heute sehr viele Auflagen erfüllen müssen: Es gibt rund 3.900 Normen, die Gebäude erfüllen müssen, und die Anforderungen an die Energetik durch das Gebäudeenergiegesetz treiben zusätzlich die Kosten in die Höhe. Hinzu kommen eine gestiegene Grunderwerbsteuer und massive Auflagen durch den Denkmalschutz der Länder.</p>
+                    <p>Der Staat muss es wieder erlauben, günstige Gebäude zu bauen, und sollte die bestehenden nicht künstlich verteuern.<span class="ref"><a href="./quellen/#q-f5" aria-label="Fußnote 9">9</a></span></p>
                     <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
@@ -309,25 +309,20 @@
           <div class="pk__unit pk__unit--bg" style="--dx:56.5%;--dy:6%;--dw:10;--dt:6deg;--rx:.5;--mx:50%;--my:60%;--mw:0;--mt:6deg;--p:1;--n:9"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-3.webp?v=4" alt="" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
 
           <!-- die fünf Postkarten -->
-          <div class="pk__unit" style="--dx:26.5%;--dy:7.2%;--dw:22;--dt:14deg;--rx:.2;--mx:27%;--my:11%;--mw:44;--mt:-5deg;--n:0"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-1.webp?v=4" alt="Porträt einer Absolventin mit Doktorhut" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Akademiker.</b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
-          <div class="pk__unit" style="--dx:60.8%;--dy:25%;--dw:23;--dt:-9deg;--rx:.5;--mx:73%;--my:17%;--mw:44;--mt:4deg;--n:1"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-2.webp?v=4" alt="Porträt einer Ärztin mit Stethoskop" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Mediziner.</b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
-          <div class="pk__unit" style="--dx:86.2%;--dy:14.5%;--dw:24;--dt:20deg;--rx:.2;--mx:27%;--my:52%;--mw:44;--mt:4deg;--n:2"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-3.webp?v=4" alt="Porträt eines Bauarbeiters mit Schutzhelm" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Anpacker.</b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
-          <div class="pk__unit" style="--dx:47.6%;--dy:55.5%;--dw:22.4;--dt:26deg;--rx:.1;--mx:73%;--my:58%;--mw:44;--mt:-5deg;--n:3"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-4.webp?v=4" alt="Porträt eines jungen Gründers" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Gründer.</b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
-          <div class="pk__unit pk__unit--5" style="--dx:72.2%;--dy:52.8%;--dw:23;--dt:-16deg;--rx:.13;--mx:50%;--my:70%;--mw:46;--mt:2deg;--n:4"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-5.webp?v=4" alt="Porträt einer internationalen Fachkraft" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>internationalen Fachkräfte.</b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
+          <div class="pk__unit" style="--dx:26.5%;--dy:7.2%;--dw:22;--dt:14deg;--rx:.2;--mx:27%;--my:11%;--mw:44;--mt:-5deg;--n:0"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-1.webp?v=4" alt="Porträt einer Absolventin mit Doktorhut" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Akademiker<span class="title-dot">.</span></b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
+          <div class="pk__unit" style="--dx:60.8%;--dy:25%;--dw:23;--dt:-9deg;--rx:.5;--mx:73%;--my:17%;--mw:44;--mt:4deg;--n:1"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-2.webp?v=4" alt="Porträt einer Ärztin mit Stethoskop" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Mediziner<span class="title-dot">.</span></b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
+          <div class="pk__unit" style="--dx:86.2%;--dy:14.5%;--dw:24;--dt:20deg;--rx:.2;--mx:27%;--my:52%;--mw:44;--mt:4deg;--n:2"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-3.webp?v=4" alt="Porträt eines Bauarbeiters mit Schutzhelm" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Anpacker<span class="title-dot">.</span></b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
+          <div class="pk__unit" style="--dx:47.6%;--dy:55.5%;--dw:22.4;--dt:26deg;--rx:.1;--mx:73%;--my:58%;--mw:44;--mt:-5deg;--n:3"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-4.webp?v=4" alt="Porträt eines jungen Gründers" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>Gründer<span class="title-dot">.</span></b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
+          <div class="pk__unit pk__unit--5" style="--dx:72.2%;--dy:52.8%;--dw:23;--dt:-16deg;--rx:.13;--mx:50%;--my:70%;--mw:46;--mt:2deg;--n:4"><span class="pk__thread"></span><div class="pk__item"><div class="pk__swing"><div class="pk__card"><span class="pk__ring"></span><figure class="pk__photo"><img src="./assets/postkarte-5.webp?v=4" alt="Porträt einer internationalen Fachkraft" loading="lazy" decoding="async"></figure><div class="pk__back"><span class="pk__post"></span><span class="pk__cap">Es gehen die<b>internationalen Fachkräfte<span class="title-dot">.</span></b></span><span class="pk__stamp"></span><i></i><i></i><i></i><i></i></div></div></div></div></div>
 
           <div class="pk__copy">
-            <h2 id="pk-title" class="pk__title"><span class="ln"><em>Es gehen die</em></span><span class="ln"><em>Wertschöpfer.</em></span></h2>
+            <h2 id="pk-title" class="pk__title"><span class="ln"><em>Unterschreibe</em></span><span class="ln"><em>&amp; schicke eine</em></span><span class="ln"><em>Postkarte<span class="title-dot">.</span></em></span></h2>
             <p class="pk__lead">Unterschreibe die Petition und wir schicken eine Postkarte für dich. An die Politik.</p>
-            <a class="pk__cta" href="./petition/"><span>Petition unterschreiben, Postkarte schicken</span><i aria-hidden="true"><svg class="ico ico--r" viewBox="0 0 16 12" aria-hidden="true" focusable="false"><path d="M1 6h13M10 2l4 4-4 4"/></svg></i></a>
           </div>
         </div>
-        <ol class="pk__steps" aria-label="So funktioniert es">
-          <li><span>01</span>Unterschreiben</li>
-          <li class="pk__arrow" aria-hidden="true"><svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0 4H39M34 .6 39 4 34 7.4" fill="none" stroke="currentColor" stroke-width="1"/></svg></li>
-          <li><span>02</span>E-Mail bestätigen</li>
-          <li class="pk__arrow" aria-hidden="true"><svg viewBox="0 0 40 8" preserveAspectRatio="none"><path d="M0 4H39M34 .6 39 4 34 7.4" fill="none" stroke="currentColor" stroke-width="1"/></svg></li>
-          <li><span>03</span>Postkarte versenden</li>
-        </ol>
+        <div class="pk__action">
+          <a class="pk__cta" href="./petition/"><span>Petition unterschreiben &amp; Postkarte schicken</span><i aria-hidden="true"><svg class="ico ico--r" viewBox="0 0 16 12" aria-hidden="true" focusable="false"><path d="M1 6h13M10 2l4 4-4 4"/></svg></i></a>
+        </div>
       </section>
 
       <!-- 05 · Aktuelle Entwicklungen / Papier (Keil auf Berliner Skyline) -->
@@ -336,17 +331,17 @@
           <div class="dev__bg" aria-hidden="true"></div>
           <div class="dev__grid">
             <div class="dev__left">
-              <h2 id="dev-title" class="dev__title"><span class="ln"><span>Aktuelle <em>Entwicklungen</em><b class="dev__dot">.</b></span></span></h2>
+              <h2 id="dev-title" class="dev__title"><span class="ln"><span>Aktuelle <em>Entwicklungen</em><b class="dev__dot title-dot">.</b></span></span></h2>
               <ul class="dev__list">
-                <li style="--i:0"><a href="./entwicklungen/"><span><strong>Wer geht wirklich?</strong><small>Qualifikation und Motive der Fortziehenden.</small></span><svg class="dev__arrow" viewBox="0 0 28 10" aria-hidden="true"><path d="M0 5H27M22 1 27 5 22 9" fill="none" stroke="currentColor" stroke-width="1"/></svg></a></li>
-                <li style="--i:1"><a href="./entwicklungen/"><span><strong>Was Auswanderer bewegt<b class="dev__dot">.</b></strong><small>Forschung und Hintergründe zur Abwanderung.</small></span><svg class="dev__arrow" viewBox="0 0 28 10" aria-hidden="true"><path d="M0 5H27M22 1 27 5 22 9" fill="none" stroke="currentColor" stroke-width="1"/></svg></a></li>
-                <li style="--i:2"><a href="./entwicklungen/"><span><strong>Schweiz, Österreich, Spanien.</strong><small>Die wichtigsten Zielländer 2025.</small></span><svg class="dev__arrow" viewBox="0 0 28 10" aria-hidden="true"><path d="M0 5H27M22 1 27 5 22 9" fill="none" stroke="currentColor" stroke-width="1"/></svg></a></li>
+                <li style="--i:0"><a href="https://web.de/magazine/politik/rekord-auswanderung-akademiker-verlassen-deutschland-42535082" target="_blank" rel="noopener noreferrer"><span><strong>Wer geht wirklich<span class="title-dot">?</span></strong><small>Qualifikation und Motive der Fortziehenden.</small></span><svg class="dev__arrow" viewBox="0 0 28 10" aria-hidden="true"><path d="M0 5H27M22 1 27 5 22 9" fill="none" stroke="currentColor" stroke-width="1"/></svg></a></li>
+                <li style="--i:1"><a href="https://iab.de/presseinfo/ein-drittel-der-abgewanderten-nennt-buerokratie-als-abwanderungsgrund/" target="_blank" rel="noopener noreferrer"><span><strong>Was Auswanderer bewegt<span class="title-dot">.</span></strong><small>Forschung und Hintergründe zur Abwanderung.</small></span><svg class="dev__arrow" viewBox="0 0 28 10" aria-hidden="true"><path d="M0 5H27M22 1 27 5 22 9" fill="none" stroke="currentColor" stroke-width="1"/></svg></a></li>
+                <li style="--i:2"><a href="https://www.destatis.de/DE/Presse/Pressemitteilungen/Zahl-der-Woche/2026/PD26_24_p002.html" target="_blank" rel="noopener noreferrer"><span><strong>Schweiz, Österreich, Spanien<span class="title-dot">.</span></strong><small>Die wichtigsten Zielländer 2025.</small></span><svg class="dev__arrow" viewBox="0 0 28 10" aria-hidden="true"><path d="M0 5H27M22 1 27 5 22 9" fill="none" stroke="currentColor" stroke-width="1"/></svg></a></li>
               </ul>
               <a class="dev__more" href="./entwicklungen/">Weitere Entwicklungen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
             </div>
             <aside class="dev__right">
               <p class="dev__tag">In Vorbereitung</p>
-              <h3 class="dev__big">Ein Papier <em>folgt</em><b class="dev__dot">.</b></h3>
+              <h3 class="dev__big">Ein Papier <em>folgt</em><b class="dev__dot title-dot">.</b></h3>
               <p class="dev__text">Zu den Gründen, warum Menschen gehen – und zu dem, was sich ändern muss.</p>
             </aside>
           </div>
@@ -355,37 +350,45 @@
         <i class="edge edge--dev-bottom" aria-hidden="true"></i>
       </div>
 
-      <!-- 06 · Atlas -->
-      <section class="atl" id="atlas" aria-labelledby="atl-ask">
-        <img class="atl__img" src="./assets/atlas.webp" alt="Bronzestatue des Atlas, der die Weltkugel auf seinen Schultern trägt" width="1086" height="1448" loading="lazy" decoding="async">
-        <div class="atl__inner">
-          <p class="atl__q" data-words>Wenn du Atlas sehen würdest, den Riesen, der die Welt auf seinen Schultern trägt, wenn du sehen würdest, wie er steht, Blut über seine Brust rinnend, seine Knie einknickend, seine Arme zitternd, mit letzter Kraft die Welt emporhaltend, die je mehr er sich anstrengt, desto schwerer auf seinen Schultern lastet –</p>
-          <p class="atl__src"><sup class="ref"><a href="./quellen/#q-atlas">1</a></sup></p>
-          <h2 id="atl-ask" class="atl__ask"><span>was würdest du ihm raten?</span></h2>
-        </div>
-      </section>
-
       <section class="sup" id="unterstuetzer" aria-labelledby="sup-title">
         <div class="sup__inner">
-          <h2 id="sup-title" class="sup__title reveal">Unterstützer<b>.</b></h2>
+          <h2 id="sup-title" class="sup__title reveal">Unterstützer<b class="title-dot">.</b></h2>
           <ul class="sup__orgs">
             <li>
-              <a href="https://jlk-verband.de/" target="_blank" rel="noopener noreferrer">
-                <img class="sup__mark" src="./assets/logo-jlk.png" alt="" width="1080" height="1080">
-                <span class="sup__org">
-                  <strong>jung.liberal.<wbr>kapitalistisch.</strong>
-                  <small>jlk-verband.de <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></small>
-                </span>
-              </a>
-            </li>
-            <li>
-              <a href="https://libertyrising.de/" target="_blank" rel="noopener noreferrer">
+              <a class="sup__row" href="https://libertyrising.de/" target="_blank" rel="noopener noreferrer">
                 <img class="sup__mark" src="./assets/logo-lr.png" alt="" width="1000" height="1000">
                 <span class="sup__org">
                   <strong>Liberty Rising</strong>
                   <small>libertyrising.de <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></small>
                 </span>
               </a>
+            </li>
+            <li>
+              <div class="sup__row sup__row--ph">
+                <span class="sup__mark sup__mark--ph" aria-hidden="true"></span>
+                <span class="sup__org">
+                  <strong>Platzhalter</strong>
+                  <small>folgt</small>
+                </span>
+              </div>
+            </li>
+            <li>
+              <div class="sup__row sup__row--ph">
+                <span class="sup__mark sup__mark--ph" aria-hidden="true"></span>
+                <span class="sup__org">
+                  <strong>Platzhalter</strong>
+                  <small>folgt</small>
+                </span>
+              </div>
+            </li>
+            <li>
+              <div class="sup__row sup__row--ph">
+                <span class="sup__mark sup__mark--ph" aria-hidden="true"></span>
+                <span class="sup__org">
+                  <strong>Platzhalter</strong>
+                  <small>folgt</small>
+                </span>
+              </div>
             </li>
           </ul>
           <div class="sup__people-head">
@@ -401,6 +404,68 @@
             <li><figure><img src="./assets/supporter-6.jpg" alt="Platzhalter-Porträt" width="1024" height="1024" loading="lazy" decoding="async"></figure></li>
           </ul>
         </div>
+      </section>
+
+      <!-- Social-Media-Feed: nach den Unterstützern, vor dem Atlas-Schluss -->
+      <section class="soc" id="netz" aria-labelledby="soc-title">
+        <div class="soc__inner">
+          <div class="soc__head">
+            <h2 id="soc-title" class="soc__title">Im Netz<b class="title-dot">.</b></h2>
+            <p class="soc__note">Platzhalter. Hier kommen später Beiträge aus den sozialen Medien.</p>
+          </div>
+          <ul class="soc__grid">
+            <li>
+              <article class="soc__card">
+                <div class="soc__media" aria-hidden="true"><span>Bild</span></div>
+                <div class="soc__body">
+                  <p class="soc__meta"><span class="soc__net">Instagram</span><time>folgt</time></p>
+                  <p class="soc__text">Hier steht ein Bild einer Aktion.</p>
+                  <p class="soc__handle">@platzhalter</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="soc__card">
+                <div class="soc__media" aria-hidden="true"><span>Reel</span></div>
+                <div class="soc__body">
+                  <p class="soc__meta"><span class="soc__net">Instagram</span><time>folgt</time></p>
+                  <p class="soc__text">Hier ist ein Kooperations-Reel zu den Gründen der Auswanderung einer Person.</p>
+                  <p class="soc__handle">@platzhalter</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="soc__card">
+                <div class="soc__media" aria-hidden="true"><span>Reel</span></div>
+                <div class="soc__body">
+                  <p class="soc__meta"><span class="soc__net">Instagram</span><time>folgt</time></p>
+                  <p class="soc__text">Hier ist ein Reel dazu, wie wir die Postkarten verschicken.</p>
+                  <p class="soc__handle">@platzhalter</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="soc__card">
+                <div class="soc__media" aria-hidden="true"><span>Beitrag</span></div>
+                <div class="soc__body">
+                  <p class="soc__meta"><span class="soc__net">Instagram</span><time>folgt</time></p>
+                  <p class="soc__text">Hier steht ein Beitrag, in dem jemand die eigene Geschichte erzählt.</p>
+                  <p class="soc__handle">@platzhalter</p>
+                </div>
+              </article>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Atlas, ganz am Ende nach dem Feed -->
+      <section class="atl" id="atlas" aria-labelledby="atl-ask">
+        <img class="atl__img" src="./assets/atlas.webp" alt="Bronzestatue des Atlas, der die Weltkugel auf seinen Schultern trägt" width="1086" height="1448" loading="lazy" decoding="async">
+        <div class="atl__inner">
+          <p class="atl__q" data-words>Wenn du Atlas sehen würdest, den Riesen, der die Welt auf seinen Schultern trägt, wenn du sehen würdest, wie er steht, Blut über seine Brust rinnend, seine Knie einknickend, seine Arme zitternd, mit letzter Kraft die Welt emporhaltend, die je mehr er sich anstrengt, desto schwerer auf seinen Schultern lastet –</p>
+          <h2 id="atl-ask" class="atl__ask"><span>was würdest du ihm raten<span class="title-dot">?</span></span></h2>
+        </div>
+        <p class="atl__src"><span class="ref"><a href="./quellen/#q-atlas" aria-label="Fußnote 10">10</a></span></p>
       </section>
       <!--chapters:end-->
     </main>

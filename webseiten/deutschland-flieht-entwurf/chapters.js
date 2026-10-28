@@ -8,7 +8,7 @@
  * Bewegung zeigt ein Standbild.
  * ======================================================================== */
 (function koernung() {
-  const FLAECHEN = ['.emigration', '.sf-sheet', '.pk', '.dev', '.atl', '.foot', '.sh', '.sec', '.cta-band'];
+  const FLAECHEN = ['.emigration', '.sf-sheet', '.pk', '.dev', '.soc', '.atl', '.foot', '.sh', '.sec', '.cta-band', '.und-dann__bild'];
   if (document.documentElement.dataset.koernung) return;
   document.documentElement.dataset.koernung = '1';
 
@@ -48,8 +48,8 @@
     const k = document.createElement('i');
     k.className = 'koernung';
     k.setAttribute('aria-hidden', 'true');
-    /* .dev hat ein Hintergrundbild als Kind: Körnung kommt darüber (später im DOM), sonst davor */
-    if (el.matches('.dev')) el.append(k);
+    /* Hintergrundbild als Kind: Körnung kommt darüber (später im DOM), sonst davor */
+    if (el.matches('.dev, .und-dann__bild')) el.append(k);
     else el.prepend(k);
     if (io) io.observe(k);
   }
@@ -65,6 +65,8 @@ const smooth = (x) => x * x * (3 - 2 * x);
 
 const hero = $('.hero');
 const globe = $('.stories-globe');
+const cities = $('.cities');
+const undDann = $('.und-dann');
 const chgWrap = $('.chg-wrap');
 const chg = $('.chg');
 const pk = $('.pk');
@@ -150,9 +152,9 @@ if (quote) {
  *  - Nur transform/opacity/clip-path/scale/translate werden darüber animiert.
  *  - Reduzierte Bewegung: alle Variablen stehen sofort auf dem Endwert.
  *
- *  Namen:  --ov2  Globus wird überdeckt   --rw   roter Keil rollt auf
+ *  Namen:  --ov2  Globus wird überdeckt   --rw   roter Keil rollt auf   --kw  Großstädte/„Und dann?“ schieben sich hoch
  *          --chx  Rot weicht zurück       --pkx  Postkarten weichen zurück
- *          --dve  Papier-Keil kommt       --dvp  Skyline-Parallax   --dvx  Papier weicht
+ *          --dve  Papier-Keil kommt       --dvp  Skyline-Parallax   --dvx  Papier weicht vor den Unterstützern
  *          --ae   Atlas kommt             --ap   Atlas-Parallax     --ed   Kantenlinie zeichnet sich
  * ======================================================================== */
 const easeOut = (x) => 1 - Math.pow(1 - x, 3);
@@ -165,7 +167,7 @@ const progress = (el, from, to) => {
 const tracks = [];
 /* Handy: nur Einblendungen (--rw, --ae, --ln) laufen mit; Zurückweichen, Parallax und Abdunkeln entfallen (spart Arbeit pro Bild) */
 const MOBILE = matchMedia('(max-width: 760px)').matches;
-const MOBILE_OK = ['--rw', '--ae', '--ln'];
+const MOBILE_OK = ['--rw', '--kw', '--ae', '--ln'];
 function track(el, name, get, final = 1, extra = null, snap = false) {
   if (MOBILE && !MOBILE_OK.includes(name)) return;
   const els = extra || (el ? [el] : []);
@@ -173,7 +175,7 @@ function track(el, name, get, final = 1, extra = null, snap = false) {
 }
 
 track(hero, '--hp', () => clamp(window.scrollY / (hero.offsetHeight * 0.9)), 0);
-track(globe, '--ov2', () => smooth(progress(chgWrap, 0.98, 0.36)), 0, [$('.stories-globe__intro'), $('.globe-shell'), $('.sf-dim')].filter(Boolean));
+track(globe, '--ov2', () => smooth(progress(cities || chgWrap, 0.98, 0.36)), 0, [$('.stories-globe__intro'), $('.globe-shell'), $('.sf-dim')].filter(Boolean));
 /* Karte -> Globus (vorher in main.js): --ov nur auf den Verbrauchern, --ln auf dem Trenner */
 const mapSec = $('.emigration');
 const trenner = $('.sf-break');
@@ -183,11 +185,14 @@ if (mapSec && globe) {
   track(globe, '--ov', () => { const r = clamp((vh0() - globe.getBoundingClientRect().top) / (vh0() * 0.95)); return smooth(r); }, 0, ovEls, true);
   if (trenner) track(globe, '--ln', () => smooth(clamp((vh0() * 0.94 - globe.getBoundingClientRect().top) / (vh0() * 0.5))), 1, [trenner], true);
 }
+track(cities, '--kw', () => easeOut(progress(cities, 1.0, 0.4)), 1);
+track(undDann, '--kw', () => easeOut(progress(undDann, 1.0, 0.4)), 1);
 track(chgWrap, '--rw', () => easeOut(progress(chgWrap, 1.0, 0.4)), 1);
 track(chg, '--chx', () => smooth(progress(pk, 1.0, 0.45)), 0);
 track(pk, '--pkx', () => smooth(progress(devWrap, 1.0, 0.45)), 0);
 track(devWrap, '--dve', () => easeOut(progress(devWrap, 1.0, 0.45)), 1);
-track(devWrap, '--dvx', () => smooth(progress(atl, 1.0, 0.45)), 0);
+const nachPapier = $('.sup') || atl;
+if (nachPapier) track(devWrap, '--dvx', () => smooth(progress(nachPapier, 1.0, 0.45)), 0);
 track(
   devWrap,
   '--dvp',
@@ -315,7 +320,7 @@ if (pk) {
  * Ein kleiner eigener Renderer (Canvas 2D, ohne Bibliothek) für flache, kräftige
  * Illustrationen: dicke weiße Linien, cremefarbene Flächen, tiefroter Versatzschatten
  * (kein Leuchten). Jede Forderung erzählt eine kleine Geschichte als Endlosschleife
- * (Münzen fließen, Papier stapelt sich und wird zersägt, ein Haus wächst ...).
+ * (Münzen fließen, eine Kettensäge fällt auf Aktenkoffer, Preissäulen wachsen ...).
  * Beim Aufklappen zeichnet sich die Szene, danach läuft die Handlung.
  * Desktop: links neben dem Text. Handy: über dem Text, etwas feiner gezeichnet.
  * Läuft nur, solange die Zeile offen ist. Reduzierte Bewegung: Standbild.
@@ -517,13 +522,15 @@ if (pk) {
     const A = g.tm;
     const CYCLE = 7.2;
     const C = A < 0.75 ? 0 : (A - 0.75) % CYCLE;
-    const R = 0.98;
+    /* Handy: höheres Feld, Münze größer, Zahlen und Balken weiter auseinander */
+    const mobil = !desktop.matches;
+    const R = mobil ? 1.12 : 0.98;
     const crackP = smooth(0.35, 1.2, C) * (1 - smooth(6.85, 7.15, C));
     const splitT = smooth(1.12, 1.78, C) * (1 - smooth(6.35, 6.85, C));
     const intro = A < 1.1 ? back((A - 0.02) / 0.68) : 1;
     const shake = C > 1.12 && C < 1.7 ? Math.sin(C * 86) * 0.03 * (1 - (C - 1.12) / 0.58) : 0;
     const cx = 0.04 + shake;
-    const cy = -0.22;
+    const cy = mobil ? 0.33 : -0.22;
     const yTip = R - Math.min(1, crackP) * 2 * R;
     const jagN = [
       [0, 1], [-0.06, 0.72], [0.08, 0.46], [-0.09, 0.18], [0.05, -0.08],
@@ -604,7 +611,7 @@ if (pk) {
         if (crackP > 0.03) tear(revealed().map(([x, y]) => [cx + x * (rad / R), cy + y * (rad / R)]));
       }
     } else {
-      const gap = splitT * 0.5;
+      const gap = splitT * 0.5 * (R / 0.98);
       const wob = splitT > 0.9 ? Math.sin(A * 20) * 0.012 : 0;
       const pose = (side) => ({
         ox: side * (gap + wob),
@@ -666,12 +673,17 @@ if (pk) {
 
     const cu = (to, d, dur) => (to * out3((A - d) / dur));
     const fmt = (v) => v.toFixed(1).replace('.', ',');
-    g.text(fmt(cu(49.3, 1.15, 1.5)) + ' %', -1.2, 1.38, 40, { d: 1.05 });
-    g.text('Steuern und Abgaben', -1.2, 1.0, 15, { weight: 600, d: 1.2 });
-    g.text(fmt(cu(50.7, 1.15, 1.5)) + ' %', 1.22, 1.38, 40, { d: 1.15 });
-    g.text('bleiben netto', 1.22, 1.0, 15, { weight: 600, d: 1.3 });
+    const numY = mobil ? 2.55 : 1.38;
+    const capY = mobil ? 1.9 : 1.0;
+    g.text(fmt(cu(49.3, 1.15, 1.5)) + ' %', -1.2, numY, 40, { d: 1.05 });
+    g.text('Steuern und Abgaben', -1.2, capY, 15, { weight: 600, d: 1.2 });
+    g.text(fmt(cu(50.7, 1.15, 1.5)) + ' %', 1.22, numY, 40, { d: 1.15 });
+    g.text('bleiben netto', 1.22, capY, 15, { weight: 600, d: 1.3 });
     /* Vergleich: Abgabenkeil DE gegen OECD-Schnitt */
-    const bars = [{ y: -1.82, v: 49.3, l: 'Abgabenkeil Deutschland', d: 1.45 }, { y: -2.36, v: 35.1, l: 'OECD-Schnitt', d: 1.65 }];
+    const bars = [
+      { y: mobil ? -1.77 : -1.82, v: 49.3, l: 'Abgabenkeil Deutschland', d: 1.45 },
+      { y: mobil ? -2.57 : -2.36, v: 35.1, l: 'OECD-Schnitt', d: 1.65 },
+    ];
     const bx0 = -2.55, bw = 5.1;
     for (const b of bars) {
       g.shape(rrect(bx0 + bw / 2, b.y, bw, 0.24, 0.12), { w: 3.2, close: true, a: 0.7, d: b.d, shadow: false });
@@ -682,29 +694,125 @@ if (pk) {
     }
   }
 
-  /* 2 · Sozialstaat: etwa 52 % der Staatsausgaben 2025 sind Sozialleistungen (Destatis, vorläufig) */
+  /* 2 · Sozialstaat: Kuchen der Staatsausgaben, anfangs voll, läuft bis zur Hälfte leer.
+     Rente, Pflege und Krankenkasse fliegen als einzelne Buchstaben aus der leeren Hälfte. */
   function szeneTresor() {
     const A = g.tm;
-    const x0 = -2.45, bw = 4.9, by = 0.12, bh = 0.56;
-    const share = 0.52;
-    const grow = back((A - 0.45) / 1.35);
-    const shown = Math.min(share * Math.max(grow, 0), 0.96);
-    const p = out3((A - 0.4) / 1.5);
-    g.text(Math.round(52 * p) + ' %', 0, 1.5, 48, { d: 0.15 });
-    g.text('der Staatsausgaben', 0, 1.02, 16, { weight: 600, d: 0.35 });
-    g.text('für Sozialleistungen', 0, 0.7, 16, { weight: 600, d: 0.48 });
-    g.shape(rrect(x0 + bw / 2, by, bw, bh, 0.18), { w: 3.2, close: true, a: 0.75, d: 0.2, shadow: false });
-    const f = bw * shown;
-    if (f > 0.08) g.shape(rrect(x0 + f / 2, by, f, bh, Math.min(0.18, f / 2)), { fill: CREAM, close: true, w: 2.4, d: 0 });
-    const mid = x0 + bw * 0.5;
-    g.shape([[mid, by - bh / 2 - 0.07], [mid, by + bh / 2 + 0.07]], { w: 1.7, color: '#f4f1ec', shadow: false, d: 0.75, a: 0.95 });
-    g.text('Sozialleistungen', x0, by - 0.55, 14, { align: 'left', weight: 600, d: 0.9 });
-    g.text('übrige Ausgaben', x0 + bw, by - 0.55, 14, { align: 'right', weight: 600, d: 1.0 });
-    const items = ['Renten und Pensionen', 'Arbeitslosengeld I', 'Bürgergeld', 'soziale Sachleistungen'];
-    items.forEach((label, i) => {
-      g.text(label, x0, -0.95 - i * 0.36, 15, { align: 'left', weight: 600, d: 1.05 + i * 0.1 });
-    });
-    g.text('2.249 Mrd. € · 2025, vorläufig', 0, -2.52, 14, { weight: 600, d: 1.5 });
+    const CYCLE = 8.8;
+    const INTRO = 0.55;
+    const C = A < INTRO ? 0 : (A - INTRO) % CYCLE;
+    const cx = -0.48;
+    const cy = 0.2;
+    const R = 1.2;
+    const D0 = 1.15;
+    const D1 = 3.05;
+    const R0 = 6.45;
+    const R1 = 7.45;
+    const opened = smooth(D0, D1, C) * (1 - smooth(R0, R1, C));
+    const slosh = C > D1 && C < D1 + 1.2 ? Math.sin((C - D1) * 11) * 0.014 * (1 - (C - D1) / 1.2) : 0;
+    const empty = clamp(opened * 0.5 + (opened > 0.92 ? slosh : 0), 0, 0.53);
+    const sweep = empty * TAU;
+    const aStart = Math.PI / 2;
+    const aEdge = aStart - sweep;
+    const filledSpan = TAU - sweep;
+
+    const wedge = (rad) => {
+      const pts = [[cx, cy]];
+      const steps = Math.max(20, Math.round(58 * filledSpan / TAU));
+      for (let i = 0; i <= steps; i++) {
+        const a = aEdge - (filledSpan * i) / steps;
+        pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]);
+      }
+      pts.push([cx, cy]);
+      return pts;
+    };
+    const arcOf = (rad) => {
+      const pts = [];
+      const steps = Math.max(14, Math.round(42 * filledSpan / TAU));
+      for (let i = 0; i <= steps; i++) {
+        const a = aEdge - (filledSpan * i) / steps;
+        pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]);
+      }
+      return pts;
+    };
+    const rim = (a, rad) => [cx + Math.cos(a) * rad, cy + Math.sin(a) * rad];
+
+    if (sweep < 0.05) {
+      g.shape(circ(cx, cy, R, 68), { fill: CREAM, close: true, d: 0.04 });
+      g.shape(circ(cx, cy, R * 0.68, 48), { w: 2.3, color: DEEP, shadow: false, d: 0.22 });
+    } else {
+      g.shape(circ(cx, cy, R, 68), { w: 3.3, d: 0, shadow: false });
+      g.shape(wedge(R), { fill: CREAM, close: true, w: 3.3, d: 0 });
+      g.shape(arcOf(R * 0.68), { w: 2.3, color: DEEP, shadow: false, d: 0 });
+      g.shape([rim(aStart, 0.02), rim(aStart, R)], { w: 2.3, color: '#f4f1ec', shadow: false, d: 0 });
+      g.shape([rim(aEdge, 0.02), rim(aEdge, R)], { w: 2.3, color: '#f4f1ec', shadow: false, d: 0 });
+    }
+
+    const edgeAt = (time) => {
+      const op = smooth(D0, D1, time) * (1 - smooth(R0, R1, time));
+      return aStart - clamp(op, 0, 1) * Math.PI;
+    };
+    const glyph = (ch, x, y, size, rot, alpha) => {
+      if (alpha < 0.03) return;
+      const ctx = g.ctx;
+      const q = g.proj(x, y);
+      ctx.save();
+      ctx.translate(q[0], q[1]);
+      ctx.rotate(rot);
+      ctx.font = '700 ' + size * g.dpr * g.k + 'px ' + SANS;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.globalAlpha = alpha * 0.4;
+      ctx.fillStyle = SHADOW + '1)';
+      ctx.fillText(ch, 2.2 * g.dpr * g.k, 3 * g.dpr * g.k);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#f4f1ec';
+      ctx.fillText(ch, 0, 0);
+      ctx.restore();
+    };
+    const burst = (word, spawn, size) => {
+      const life = 1.55;
+      const t = C - spawn;
+      if (t <= 0 || t > life) return;
+      const chars = [...word];
+      const n = chars.length;
+      const ang = edgeAt(spawn);
+      const ox = cx + Math.cos(ang) * (R + 0.06);
+      const oy = cy + Math.sin(ang) * (R + 0.02);
+      const xMax = g.cu + (g.W * 0.47) / Math.max(1, g.S);
+      let px = size * g.dpr * g.k;
+      const measure = () => {
+        g.ctx.font = '700 ' + px + 'px ' + SANS;
+        const gap = px * 0.045 / Math.max(1, g.S);
+        const widths = chars.map((ch) => g.ctx.measureText(ch).width / Math.max(1, g.S));
+        const total = widths.reduce((sum, w) => sum + w, 0) + gap * (n - 1);
+        return { gap, widths, total };
+      };
+      let layout = measure();
+      const room = Math.max(0.35, xMax - ox - 0.08);
+      while (layout.total > room && px > 13 * g.dpr * g.k) {
+        px *= 0.88;
+        layout = measure();
+      }
+      const u = t / life;
+      const shoot = out3(Math.min(1, t / 0.6));
+      const fly = shoot * Math.min(0.42, Math.max(0, room - layout.total));
+      const alpha = smooth(0, 0.06, t) * (1 - smooth(0.7, 1, u));
+      let cursor = 0;
+      chars.forEach((ch, i) => {
+        const center = cursor + layout.widths[i] / 2;
+        cursor += layout.widths[i] + layout.gap;
+        const rot = (i % 2 ? 1 : -1) * smooth(0.55, 1, u) * 0.16;
+        glyph(ch, ox + center + fly, oy + shoot * 0.03, px / (g.dpr * g.k), rot, alpha);
+      });
+    };
+    burst('Rente', 1.78, 30);
+    burst('Pflege', 2.22, 28);
+    burst('Krankenkasse', 2.58, 22);
+
+    const cap = smooth(D1 - 0.1, D1 + 0.5, C) * (1 - smooth(R0 - 0.4, R0 + 0.2, C));
+    g.text('die Hälfte', cx, cy - R - 0.46, 32, { a: cap, d: 0 });
+    g.text('der Staatsausgaben', cx, cy - R - 0.84, 16, { weight: 600, a: cap, d: 0 });
   }
 
   /* 3 · Rente: Wippe, 1962 sechs Beitragszahler je Rentner, heute zwei */
@@ -749,165 +857,337 @@ if (pk) {
     g.text('Beitragszahler je Altersrentner', fx, 1.02, 15, { weight: 600, d: 1.1 });
   }
 
-  /* 4 · Unternehmen: Kettensäge schneidet den Aktenstapel „Bürokratie“ durch */
+  /* 4 · Unternehmen: Kettensäge fällt von oben und zersägt den Stapel Aktenkoffer */
   function szeneFabrik() {
     const A = g.tm;
     const C = A % 9;
-    const drive = smooth(0.35, 3.15, C) * (1 - smooth(7.55, 8.45, C));
-    const toss = smooth(3.05, 4.5, C) * (1 - smooth(7.35, 8.3, C));
-    const stackX = 0.7;
-    const sw = 1.9;
-    const sh = 0.11;
-    const step = 0.14;
-    const buzz = drive > 0.05 && drive < 0.98 && toss < 0.4 ? Math.sin(A * 64) * 0.011 : 0;
-    const sx = lerp(-2.62, -0.4, drive);
-    const sy = -0.18 + buzz;
-    const blatt = (x, y, rot, d) => {
-      g.shape(xf(rrect(0, 0, sw, sh, 0.025), x, y, rot), { fill: CREAM, close: true, w: 2.6, d });
-      g.shape(xf([[-sw * 0.34, 0.012], [sw * 0.2, 0.012]], x, y, rot), { w: 1.5, color: DEEP, shadow: false, d, a: 0.8 });
-      g.shape(xf([[-sw * 0.34, -0.022], [-sw * 0.04, -0.022]], x, y, rot), { w: 1.3, color: DEEP, shadow: false, d, a: 0.5 });
-    };
-    for (let i = 0; i < 4; i++) blatt(stackX + i * 0.012, -0.835 + i * step, 0, 0.04 + i * 0.04);
-    const saege = (x, y) => {
-      const B = (pts) => xf(pts, x, y, 0);
-      g.shape(B([[-0.5, -0.2], [-0.86, -0.22], [-1.0, -0.04], [-1.0, 0.24], [-0.8, 0.4], [-0.46, 0.26]]), { w: 5, d: 0.08 });
-      g.shape(B([[-0.5, 0], [-0.74, -0.02], [-0.74, 0.2], [-0.48, 0.16]]), { w: 3.2, color: DEEP, shadow: false, d: 0.14 });
-      g.shape(B(rrect(0.02, 0, 1.04, 0.56, 0.12)), { fill: CREAM, close: true, d: 0.05 });
-      g.shape(B([[-0.18, 0.22], [-0.24, 0.48], [-0.06, 0.64], [0.34, 0.66], [0.52, 0.46], [0.44, 0.22]]), { w: 5, d: 0.12 });
-      g.shape(B([[0.36, 0.16], [0.58, 0.5], [0.76, 0.1]]), { w: 4.2, d: 0.18 });
-      g.shape(B(circ(-0.2, -0.02, 0.12, 14)), { w: 2.4, color: DEEP, shadow: false, d: 0.2 });
-      g.shape(B(rrect(1.48, 0, 1.78, 0.15, 0.07)), { fill: CREAM, close: true, d: 0.1 });
-      g.shape(B(circ(2.3, 0, 0.095, 14)), { fill: CREAM, w: 2.6, close: true, d: 0.18 });
-      const phase = (A * 10) % 0.16;
-      for (let t = 0.72 + phase; t < 2.16; t += 0.16) {
-        g.shape(B([[t, 0.06], [t + 0.05, 0.15], [t + 0.1, 0.06]]), { w: 2.2, d: 0.22, shadow: false });
-        g.shape(B([[t + 0.04, -0.06], [t + 0.09, -0.15], [t + 0.14, -0.06]]), { w: 2.2, d: 0.22, shadow: false });
+    const hh = 0.22;
+    const step = 0.48;
+    const y0 = -1.14;
+    const cases = [
+      { x: -0.02, y: y0, w: 1.72, lean: -0.018 },
+      { x: 0.03, y: y0 + step, w: 1.58, lean: 0.014 },
+      { x: -0.025, y: y0 + step * 2, w: 1.46, lean: -0.01 },
+      { x: 0.02, y: y0 + step * 3, w: 1.32, lean: 0.016 },
+    ];
+    const TIP = 2.95;
+    const tipStart = 2.78;
+    const tipHit = cases[cases.length - 1].y + hh + 0.2;
+    const tipEnd = y0 - hh - 0.2;
+    const approach = smooth(0.42, 1.15, C);
+    const through = smooth(1.05, 3.55, C);
+    const tipPath = lerp(lerp(tipStart, tipHit, approach), tipEnd, through);
+    const rise = smooth(4.85, 6.15, C);
+    const reform = smooth(6.4, 8.05, C);
+    const biting = through > 0.03 && through < 0.99 && rise < 0.08;
+    const buzz = biting ? Math.sin(A * 68) * 0.016 : 0;
+    const shudder = biting ? Math.sin(A * 68) * 0.007 : 0;
+    const sy = lerp(tipPath, tipStart, rise) + TIP + (biting ? Math.sin(A * 84) * 0.006 : 0);
+    const sx = buzz;
+
+    const arc = (p, cx, cy, a0, a1, r, n = 4) => {
+      for (let i = 0; i <= n; i++) {
+        const a = a0 + ((a1 - a0) * i) / n;
+        p.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
       }
-      const chain = A * 72;
-      g.shape(B([[0.74, 0.034], [2.12, 0.034]]), { w: 1.8, color: '#f4f1ec', dash: [4, 6], dashOff: -chain, shadow: false, d: 0.24 });
-      g.shape(B([[0.74, -0.034], [2.12, -0.034]]), { w: 1.8, color: '#f4f1ec', dash: [4, 6], dashOff: chain, shadow: false, d: 0.24 });
     };
-    saege(sx, sy);
-    for (let i = 0; i < 5; i++) {
-      blatt(
-        stackX + toss * (0.16 + i * 0.13),
-        0.04 + i * step + toss * (0.06 + i * 0.045),
-        toss * (0.06 + i * 0.055),
-        0.1 + i * 0.04,
-      );
-    }
-    if (drive > 0.08 && drive < 0.98 && toss < 0.65) {
-      const tipx = sx + 2.3;
-      const tipy = sy;
+    const halfBody = (side, hw) => {
+      const r = 0.06;
+      const p = [];
+      if (side < 0) {
+        p.push([0, hh]);
+        arc(p, -hw + r, hh - r, Math.PI / 2, Math.PI, r);
+        arc(p, -hw + r, -hh + r, Math.PI, Math.PI * 1.5, r);
+        p.push([0, -hh]);
+      } else {
+        p.push([0, -hh]);
+        arc(p, hw - r, -hh + r, -Math.PI / 2, 0, r);
+        arc(p, hw - r, hh - r, 0, Math.PI / 2, r);
+        p.push([0, hh]);
+      }
+      p.push(p[0]);
+      return p;
+    };
+    const details = (x, y, rot, hw, side, d) => {
+      const seam = hh * 0.34;
+      const outer = side === 0 ? hw - 0.1 : side * (hw - 0.1);
+      const inner = side === 0 ? -hw + 0.1 : side * 0.05;
+      g.shape(xf([[inner, seam], [outer, seam]], x, y, rot), { w: 2.2, color: DEEP, shadow: false, d, a: 0.9 });
+      const clasps = side === 0 ? [-1, 1] : [side];
+      for (const s of clasps) {
+        g.shape(xf(rrect(s * hw * 0.46, seam, 0.14, 0.1, 0.03), x, y, rot), { fill: CREAM, close: true, w: 2.4, d });
+      }
+      const grip = side === 0
+        ? [[-0.28, hh - 0.02], [-0.3, hh + 0.07], [-0.1, hh + 0.16], [0.1, hh + 0.16], [0.3, hh + 0.07], [0.28, hh - 0.02]]
+        : side < 0
+          ? [[-0.28, hh - 0.02], [-0.3, hh + 0.07], [-0.1, hh + 0.16], [0, hh + 0.13]]
+          : [[0, hh + 0.13], [0.1, hh + 0.16], [0.3, hh + 0.07], [0.28, hh - 0.02]];
+      g.shape(xf(grip, x, y, rot), { w: 4.2, d });
+      if (side !== 0) {
+        g.shape(xf([[0, hh * 0.72], [0, -hh * 0.78]], x, y, rot), { w: 1.7, color: '#f4f1ec', shadow: false, d, a: 0.75 });
+      }
+    };
+
+    /* Schwert hinter den Koffern, damit die Schneide in der Schnittfuge sichtbar bleibt */
+    const saege = (x, y, part) => {
+      const B = (pts) => xf(pts, x, y, -Math.PI / 2);
+      if (part === 'bar') {
+        g.shape(B(rrect(1.78, 0, 2.34, 0.15, 0.07)), { fill: CREAM, close: true, d: 0.02 });
+        g.shape(B(circ(TIP, 0, 0.1, 14)), { fill: CREAM, w: 2.6, close: true, d: 0.08 });
+        const phase = (A * 11) % 0.16;
+        for (let t = 0.78 + phase; t < TIP - 0.16; t += 0.16) {
+          g.shape(B([[t, 0.055], [t + 0.05, 0.15], [t + 0.1, 0.055]]), { w: 2.2, d: 0.1, shadow: false });
+          g.shape(B([[t + 0.04, -0.055], [t + 0.09, -0.15], [t + 0.14, -0.055]]), { w: 2.2, d: 0.1, shadow: false });
+        }
+        const chain = A * 78;
+        g.shape(B([[0.78, 0.034], [TIP - 0.16, 0.034]]), { w: 1.8, color: '#f4f1ec', dash: [4, 6], dashOff: -chain, shadow: false, d: 0.12 });
+        g.shape(B([[0.78, -0.034], [TIP - 0.16, -0.034]]), { w: 1.8, color: '#f4f1ec', dash: [4, 6], dashOff: chain, shadow: false, d: 0.12 });
+      } else {
+        g.shape(B([[-0.5, -0.2], [-0.86, -0.22], [-1.0, -0.04], [-1.0, 0.24], [-0.8, 0.4], [-0.46, 0.26]]), { w: 5, d: 0.05 });
+        g.shape(B([[-0.5, 0], [-0.74, -0.02], [-0.74, 0.2], [-0.48, 0.16]]), { w: 3.2, color: DEEP, shadow: false, d: 0.1 });
+        g.shape(B(rrect(0.02, 0, 1.04, 0.56, 0.12)), { fill: CREAM, close: true, d: 0.02 });
+        g.shape(B([[-0.18, 0.22], [-0.24, 0.48], [-0.06, 0.64], [0.34, 0.66], [0.52, 0.46], [0.44, 0.22]]), { w: 5, d: 0.08 });
+        g.shape(B([[0.36, 0.16], [0.58, 0.5], [0.76, 0.1]]), { w: 4.2, d: 0.12 });
+        g.shape(B(circ(-0.2, -0.02, 0.12, 14)), { w: 2.4, color: DEEP, shadow: false, d: 0.14 });
+      }
+    };
+
+    g.shape([[-1.4, y0 - hh - 0.1], [1.4, y0 - hh - 0.1]], { w: 4.4, d: 0.02 });
+    saege(sx, sy, 'bar');
+    cases.forEach((c, i) => {
+      const passed = 1 - smooth(c.y - hh * 0.2, c.y + hh + 0.06, tipPath);
+      const open = passed * (1 - reform);
+      const d = 0.06 + i * 0.07;
+      const x = c.x + shudder;
+      if (open < 0.04) {
+        g.shape(xf(rrect(0, 0, c.w, hh * 2, 0.06), x, c.y, c.lean), { fill: CREAM, close: true, w: 3.6, d });
+        details(x, c.y, c.lean, c.w / 2, 0, d);
+        return;
+      }
+      const slide = open * (0.2 + i * 0.07);
+      const fall = open * (0.02 + i * 0.06);
+      const spin = open * (0.06 + i * 0.1);
+      for (const side of [-1, 1]) {
+        const hx = x + side * slide;
+        const hy = c.y - fall;
+        const rot = c.lean + side * spin;
+        g.shape(xf(halfBody(side, c.w / 2), hx, hy, rot), { fill: CREAM, close: true, w: 3.6, d });
+        details(hx, hy, rot, c.w / 2, side, d);
+      }
+    });
+    saege(sx, sy, 'body');
+    const tipY = sy - TIP;
+    const stackTop = cases[cases.length - 1].y + hh;
+    const stackBot = y0 - hh;
+    if (biting && tipY < stackTop + 0.05 && tipY > stackBot - 0.08) {
       for (let s = 0; s < 8; s++) {
-        const life = (A * 1.8 + s * 0.13) % 1;
-        const up = s % 2 ? 1 : -1;
-        g.shape(xf(rect(0, 0, 0.08, 0.038), tipx + life * 0.5, tipy + (rnd(s + 4) - 0.5) * 0.22 + up * life * 0.42, life * 4), {
-          fill: s % 2 ? '#f4f1ec' : CREAM, close: true, w: 0, a: (1 - life) * 0.9, shadow: false, d: 0,
+        const life = (A * 2.2 + s * 0.13) % 1;
+        const side = s % 2 ? 1 : -1;
+        g.shape(xf(rect(0, 0, 0.07, 0.032), sx + side * (0.04 + life * 0.58), tipY + (rnd(s + 2) - 0.5) * 0.14 - life * life * 0.45, life * 4 * side), {
+          fill: s % 2 ? '#f4f1ec' : CREAM, close: true, w: 0, a: (1 - life) * 0.92, shadow: false, d: 0,
         });
       }
     }
-    g.text('Bürokratie', stackX, -1.16, 18, { weight: 600, d: 0.28 });
+    g.text('Bürokratie', 0, y0 - hh - 0.42, 18, { weight: 600, d: 0.36 });
   }
 
-  /* 5 · Wohnungsbau: Kran setzt Geschoss für Geschoss, Preissäulen 2005 gegen 2024 */
+  /* 5 · Mieten: die Platten landen auf dem Mieter. Je mehr, desto tiefer geht er in die Knie — Atlas */
   function szeneHaus() {
-    const A = g.tm;
+    /* Stapeln etwas zügiger als das allgemeine Tempo 0,6 */
+    const A = g.tm < g.age ? 2.2 + (g.age - 2.2) * 0.85 : g.tm;
     const C = A % 13;
-    const bx = -0.25, bw = 1.7, fh = 0.34, fl = 6, by0 = -1.2;
-    const kx = -1.85;
-    const tIn = 1.0, per = 1.4;
-    /* Kran */
-    const topY = 1.42;
-    for (const dx of [-0.11, 0.11]) g.shape([[kx + dx, by0], [kx + dx, topY]], { w: 4, d: 0.1 });
-    for (let i = 0; i < 12; i++) g.shape([[kx - 0.11, by0 + (i * (topY - by0)) / 12], [kx + 0.11, by0 + ((i + 1) * (topY - by0)) / 12]], { w: 2.4, a: 0.7, d: 0.1 + i * 0.03, shadow: false });
-    g.shape([[kx - 0.7, topY], [kx + 2.1, topY]], { w: 4.4, d: 0.3 });
-    g.shape([[kx - 0.7, topY], [kx, topY + 0.35], [kx + 2.1, topY]], { w: 2.6, a: 0.8, d: 0.4, shadow: false });
-    g.shape(rect(kx - 0.55, topY - 0.14, 0.34, 0.26), { fill: DEEP, close: true, w: 3, d: 0.5, shadow: false });
-    g.shape(rect(kx, topY + 0.1, 0.34, 0.26), { fill: CREAM, close: true, d: 0.4 });
-    /* Geschosse und Last */
-    let hookX = bx, hookY = 1.4, carrying = false, carryFloor = -1, sway = 0;
-    for (let k = 0; k < fl; k++) {
-      const t0 = tIn + k * per;
-      const tl = C - t0;
-      const landY = by0 + (k + 1) * fh;
-      const y0 = by0 + k * fh;
-      if (tl >= 0.9 || (A >= 13 && C > t0 + 0.9)) {
-        const lt = C - t0 - 0.9;
-        const pop = lt < 0.4 ? 1 + 0.06 * Math.sin(lt * 14) * (1 - lt / 0.4) : 1;
-        const al = C > 12 ? 1 - smooth(12, 13, C) : 1;
-        g.shape(rect(bx, y0 + (fh * pop) / 2, bw, fh * pop), { fill: CREAM, close: true, d: 0, a: al });
-        for (let i = 0; i < 4; i++) {
-          const wl = smooth(t0 + 1.1 + i * 0.1, t0 + 1.5 + i * 0.1, C);
-          g.shape(rect(bx - bw / 2 + 0.24 + i * 0.4, y0 + fh * 0.5, 0.2, 0.17), { fill: wl > 0.5 && (i + k) % 3 !== 0 ? '#f4e4dc' : '#1a0306', close: true, w: 2.6, d: 0, a: al, shadow: false });
-        }
-        if (lt >= 0 && lt < 0.5) {
-          for (let s = 0; s < 6; s++) g.shape(xf(rect(0, 0, 0.05, 0.05), bx + (rnd(s + k) - 0.5) * bw, landY - 0.05 + lt * 0.6 * rnd(s), s + lt * 8), { fill: CREAM, close: true, w: 0, a: 1 - lt / 0.5, shadow: false, d: 0 });
-        }
-      } else if (tl >= -0.3) {
-        carrying = true;
-        carryFloor = k;
-        const u = clamp(tl / 0.9);
-        hookY = lerp(1.02, landY + 0.17, smooth(0, 1, u));
-        sway = 0.22 * Math.sin(Math.max(0, tl) * 5) * (1 - u);
-        hookX = bx + sway;
-      }
-    }
-    if (carrying) {
-      const s = out3((C - (tIn + carryFloor * per) + 0.3) / 0.3);
-      g.shape([[hookX, topY], [hookX, hookY + 0.17]], { w: 2.8, d: 0, shadow: false });
-      g.shape(rect(hookX, hookY, bw, fh), { fill: CREAM, close: true, d: 0, a: s });
-    } else {
-      g.shape([[bx, topY], [bx, 1.0]], { w: 2.8, d: 0, shadow: false });
-      g.shape(rect(bx, 0.92, 0.2, 0.14), { fill: CREAM, close: true, w: 3, d: 0 });
-    }
-    {
-      const done = tIn + fl * per;
-      const f = back((C - done) / 0.6);
-      if (C > done && C < 12.2) {
-        const top = by0 + fl * fh;
-        g.shape([[bx - bw / 2 - 0.1, top], [bx, top + 0.45 * f], [bx + bw / 2 + 0.1, top]], { fill: PINK, close: true, d: 0 });
-        g.shape([[bx + 0.45, top + 0.2], [bx + 0.45, top + 0.5 * f]], { w: 4, d: 0 });
-      }
-    }
-    g.shape([[-2.3, by0], [2.45, by0]], { w: 5, d: 0.1 });
-    /* Preissäulen */
-    const barBase = by0;
-    const bars = [{ x: 1.4, h: 0.62, v: 1233, y: '2005', d: 0.8 }, { x: 2.05, h: 1.31, v: 2611, y: '2024', d: 1.1 }];
+    const ground = -1.02;
+    const px = -0.06;
+    const nOld = 3;
+    const n = 6;
+    const bw = 1.32;
+    const bh = 0.158;
+    const ph = 0.132;
+    const kx = -2.05;
+    const topY = 1.7;
+    const tIn = 0.48;
+    const per = 1.02;
+    const drop = 0.58;
+    const lead = 0.2;
+    const fade0 = 11.25;
+    const fade = 1 - smooth(fade0, 12.45, C);
     const fmt = (v) => Math.round(v).toLocaleString('de-DE') + ' €';
-    for (const b of bars) {
-      const grow = out3((A - b.d - 0.4) / 1.4);
-      const h = b.h * grow;
-      if (h > 0.02) g.shape(rect(b.x, barBase + h / 2, 0.52, h), { fill: b.v > 2000 ? CREAM : PINK, close: true, d: b.d + 0.4 });
-      g.text(fmt(b.v * grow), b.x, barBase + h + 0.3, 17, { d: b.d + 0.4 });
-      g.text(b.y, b.x, barBase - 0.3, 15, { weight: 600, d: b.d });
-    }
-    {
-      const p = back((A - 3.2) / 0.6);
-      if (A > 3.2) {
-        g.shape(xf(rrect(0, 0, 0.9, 0.4, 0.2), 1.72, 0.8, 0, p), { fill: CREAM, close: true, d: 0 });
-        g.text('+112 %', 1.72, 0.8, 20 * p, { color: DEEP, d: 0 });
+    const fillOf = (k) => (k < nOld ? PINK : CREAM);
+
+    /* Kopf bleibt unter der Last sichtbar, die Knie knicken nach außen */
+    const pose = (s) => {
+      const t = clamp(s);
+      const hipY = ground + lerp(0.9, 0.58, t);
+      const shoY = hipY + lerp(0.48, 0.38, t);
+      const headR = 0.17;
+      const headY = shoY + lerp(0.36, 0.32, t);
+      return {
+        hipY,
+        shoY,
+        headY,
+        headR,
+        plateBottom: headY + headR + 0.035,
+        foot: lerp(0.22, 0.46, t),
+        knee: lerp(0.2, 0.52, t),
+        kneeY: ground + lerp(0.5, 0.26, t),
+      };
+    };
+
+    let placed = 0;
+    let carry = null;
+    for (let i = 0; i < n; i++) {
+      const tl = C - (tIn + i * per);
+      if (tl >= drop) placed += 1;
+      else if (tl >= -lead) {
+        carry = { i, tl };
+        break;
       }
     }
-    g.text('Baukosten je m²', 1.72, 1.2, 17, { weight: 600, d: 0.9 });
+    let dip = 0;
+    if (placed > 0) {
+      const lt = C - (tIn + (placed - 1) * per + drop);
+      if (lt >= 0 && lt < 0.4) dip = Math.sin((lt / 0.4) * Math.PI) * (0.035 + placed * 0.008);
+    }
+    const anticipate = carry && carry.tl > 0 ? smooth(drop * 0.32, drop, carry.tl) / n : 0;
+    const load = placed / n;
+    const squat = clamp(load + anticipate + dip + Math.sin(C * 8.2) * 0.01 * smooth(0.4, 1, load));
+    const P = pose(squat);
+    const lean = Math.sin(C * 1.2) * 0.011 * (0.25 + squat);
+    const plateX = (k) => px + lean * k * 1.15;
+    const plateY = (k) => P.plateBottom + ph / 2 + k * bh;
+
+    /* Kran setzt die Last ab, der Mieter trägt sie */
+    for (const dx of [-0.08, 0.08]) g.shape([[kx + dx, ground], [kx + dx, topY]], { w: 3.6, d: 0.08, a: fade });
+    for (let i = 0; i < 7; i++) {
+      const y0 = ground + (i * (topY - ground)) / 7;
+      const y1 = ground + ((i + 1) * (topY - ground)) / 7;
+      g.shape([[kx - 0.08, y0], [kx + 0.08, y1]], { w: 2, a: fade * 0.7, d: 0.1 + i * 0.03, shadow: false });
+    }
+    g.shape([[kx - 0.42, topY], [px + 0.7, topY]], { w: 4.2, d: 0.2, a: fade });
+    g.shape([[kx - 0.42, topY], [kx + 0.28, topY + 0.22], [px + 0.7, topY]], { w: 2.2, a: fade * 0.8, d: 0.28, shadow: false });
+    g.shape(rect(kx - 0.28, topY - 0.12, 0.26, 0.2), { fill: DEEP, close: true, w: 2.8, d: 0.32, shadow: false, a: fade });
+    g.shape(rect(kx + 0.12, topY + 0.1, 0.24, 0.16), { fill: CREAM, close: true, d: 0.3, a: fade });
+    g.shape([[kx - 0.55, ground], [1.7, ground]], { w: 4.6, d: 0.05, a: fade });
+
+    /* Beine knicken mit jeder Lage weiter ein, der Rumpf bleibt ein Körper */
+    for (const side of [-1, 1]) {
+      const footX = px + side * P.foot;
+      const kneeX = px + side * P.knee;
+      const hipX = px + side * 0.1;
+      g.shape([[footX - 0.07, ground], [footX + 0.09, ground]], { w: 3.8, d: 0.1, a: fade });
+      g.shape([[footX, ground + 0.01], [kneeX, P.kneeY], [hipX, P.hipY]], { w: 4.6, d: 0.12, a: fade });
+    }
+    const torsoH = P.shoY - P.hipY + 0.08;
+    g.shape(rrect(px, (P.hipY + P.shoY) / 2, 0.38, torsoH, 0.11), { fill: PINK, close: true, w: 3.6, d: 0.16, a: fade });
+    g.shape([[px, P.shoY + 0.02], [px, P.headY - P.headR + 0.02]], { w: 3.6, d: 0.18, a: fade, shadow: false });
+    g.shape(circ(px, P.headY, P.headR, 18), { fill: CREAM, w: 3.5, close: true, d: 0.2, a: fade });
+
+    for (let k = 0; k < placed; k++) {
+      const x = plateX(k);
+      const y = plateY(k);
+      g.shape(rrect(x, y, bw, ph, 0.03), { fill: fillOf(k), close: true, w: 3, d: 0, a: fade });
+      g.shape([[x - bw / 2 + 0.08, y + ph * 0.22], [x + bw / 2 - 0.08, y + ph * 0.22]], {
+        w: 1.7, color: '#f4f1ec', shadow: false, d: 0, a: fade * 0.55,
+      });
+    }
+    if (placed > 0) {
+      const lt = C - (tIn + (placed - 1) * per + drop);
+      if (lt >= 0 && lt < 0.42 && fade > 0.04) {
+        const y0 = P.plateBottom + (placed - 1) * bh;
+        for (let s = 0; s < 6; s++) {
+          const side = s % 2 ? 1 : -1;
+          g.shape(xf(rect(0, 0, 0.05, 0.035), plateX(placed - 1) + side * (0.2 + lt * 0.7), y0 + lt * 0.35 * rnd(s + 3), s + lt * 6), {
+            fill: s % 2 ? '#f4e4dc' : fillOf(placed - 1), close: true, w: 0, a: (1 - lt / 0.42) * fade, shadow: false, d: 0,
+          });
+        }
+      }
+    }
+
+    /* Arme rahmen den Kopf und stemmen die unterste Platte an den Ecken */
+    const handY = P.plateBottom + 0.012;
+    for (const side of [-1, 1]) {
+      const sho = [px + side * 0.15, P.shoY + 0.04];
+      const elbow = [px + side * lerp(0.46, 0.58, squat), P.headY - 0.02];
+      const hand = [px + side * (bw / 2 - 0.02), handY];
+      g.shape([sho, elbow, hand], { w: 4.4, d: 0.22, a: fade });
+      g.shape(circ(hand[0], hand[1], 0.045, 8), { fill: CREAM, w: 2.5, close: true, d: 0.26, a: fade });
+    }
+
+    const doneAt = tIn + (n - 1) * per + drop;
+    let hookX;
+    let hookY;
+    if (carry && fade > 0.8) {
+      const prevX = carry.i === 0 ? kx + 0.28 : plateX(carry.i - 1);
+      const u = clamp((carry.tl + lead) / (drop + lead));
+      const travel = smooth(0, 0.4, u);
+      const descend = smooth(0.3, 1, u);
+      const sway = 0.04 * Math.sin(Math.max(0, carry.tl) * 6.5) * (1 - descend);
+      hookX = lerp(prevX, plateX(carry.i), travel) + sway;
+      hookY = lerp(1.08, plateY(carry.i), descend);
+    } else {
+      const sway = 0.025 * Math.sin(C * 1.6);
+      const parked = placed === n ? smooth(doneAt, doneAt + 0.65, C) : 0;
+      /* Haken zurück unter den Ausleger, weg von der Jahreszahl */
+      hookX = lerp(px, kx + 0.18, parked) + sway;
+      hookY = lerp(1.18, topY - 0.32, parked);
+    }
+    g.shape(rect(hookX, topY, 0.15, 0.08), { fill: CREAM, close: true, w: 2.2, d: 0.34, shadow: false, a: fade });
+    if (carry && fade > 0.8) {
+      const s = out3((carry.tl + lead) / 0.18) * fade;
+      g.shape([[hookX, topY], [hookX, hookY + ph / 2]], { w: 2.4, d: 0, shadow: false, a: fade });
+      g.shape(rrect(hookX, hookY, bw, ph, 0.03), { fill: fillOf(carry.i), close: true, w: 3, d: 0, a: s });
+    } else {
+      g.shape([[hookX, topY], [hookX, hookY]], { w: 2.4, d: 0, shadow: false, a: fade });
+      g.shape(rect(hookX, hookY, 0.14, 0.08), { fill: CREAM, close: true, w: 2.6, d: 0, a: fade });
+    }
+
+    /* 2005 ist die Last, die noch zu stemmen war; darüber wächst 2024 */
+    const markY = P.plateBottom + nOld * bh;
+    const top = P.plateBottom + placed * bh;
+    const oldA = fade * (placed >= nOld ? out3((C - (tIn + (nOld - 1) * per + drop)) / 0.35) : 0);
+    if (oldA > 0.04) {
+      g.shape([[plateX(nOld - 1) - bw / 2 - 0.05, markY], [-1.0, markY]], {
+        w: 1.8, dash: [4, 5], color: '#f4f1ec', shadow: false, d: 0, a: oldA * 0.8,
+      });
+      g.text('2005', -1.28, markY - 0.02, 14, { weight: 600, d: 0, a: oldA });
+      g.text(fmt(1233), -1.28, markY - 0.26, 16, { d: 0, a: oldA });
+    }
+    const fullA = fade * (placed === n ? Math.min(1, back((C - doneAt) / 0.4)) : 0);
+    const rx = px + bw / 2 + 0.82;
+    if (fullA > 0.04) {
+      g.text('2024', rx, top + 0.18, 13, { weight: 600, d: 0, a: fullA });
+      g.text(fmt(2611), rx, top - 0.06, 16, { d: 0, a: fullA });
+    }
+    g.text('Mieter', px, ground - 0.24, 15, { weight: 600, d: 0.32, a: fade });
+    g.text('Baukosten je m²', px, ground - 0.48, 14, { weight: 600, d: 0.4, a: fade });
+
+    {
+      const ready = doneAt + 0.18;
+      const p = back((C - ready) / 0.48) * (1 - smooth(fade0, fade0 + 0.7, C));
+      if (p > 0.04) {
+        const pillY = P.plateBottom + (nOld + 0.55) * bh;
+        g.shape(xf(rrect(0, 0, 0.92, 0.34, 0.17), rx, pillY, 0, Math.min(1.08, p)), { fill: CREAM, close: true, d: 0 });
+        g.text('+112 %', rx, pillY, 15 * Math.min(1, p), { color: DEEP, d: 0, a: Math.min(1, p) });
+      }
+    }
   }
 
-  const STAT = [4, 6, 4, 7.6, 10.5];
+  const STAT = [4, 6, 4, 4.15, 10.5];
   const SZENEN = [szeneSteuer, szeneTresor, szeneRente, szeneFabrik, szeneHaus];
   const FITS = [
     { x: [-2.65, 2.65], y: [-2.6, 1.75] },
-    { x: [-2.6, 2.6], y: [-2.75, 1.85] },
+    { x: [-1.95, 2.85], y: [-2.0, 1.7] },
     { x: [-1.9, 1.9], y: [-0.9, 2.15] },
-    { x: [-1.7, 2.6], y: [-1.4, 1.32] },
-    { x: [-2.55, 2.55], y: [-1.5, 1.8], v: 0.8 },
+    { x: [-1.85, 1.85], y: [-1.95, 2.62] },
+    { x: [-2.55, 2.15], y: [-1.62, 1.88], v: 0.2 },
   ];
 
   /* ------------------------------------------------------------ Steuerung */
-  const canvases = rows.map((row) => {
+  const canvases = rows.map((row, i) => {
     const panel = row.querySelector('.chg__panel');
     if (!panel) return null;
     const c = document.createElement('canvas');
-    c.className = 'chg__scene';
+    c.className = 'chg__scene' + (i === 0 ? ' chg__scene--steuer' : '');
     c.setAttribute('aria-hidden', 'true');
     panel.prepend(c);
     return c;
@@ -935,7 +1215,7 @@ if (pk) {
     g.age = staticFrame ? STAT[i] : (now - openedAt) / 1000;
     /* Handlung läuft nach dem Aufbau ruhiger (Tempo 0,6) */
     g.tm = g.age < 2.2 || staticFrame ? g.age : 2.2 + (g.age - 2.2) * 0.6;
-    const b = FITS[i];
+    const b = i === 0 && !desktop.matches ? { x: [-2.65, 2.65], y: [-3.15, 2.95] } : FITS[i];
     g.S = Math.min((g.W * 0.96) / (b.x[1] - b.x[0]), (g.H * 0.95) / (b.y[1] - b.y[0]));
     /* Auf dem Handy ist die Fläche kleiner: Striche und Schrift etwas feiner, Desktop bleibt unverändert */
     g.k = desktop.matches ? 1 : Math.min(1, Math.max(0.75, r.width / 560));

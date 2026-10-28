@@ -1075,7 +1075,7 @@ function setupFaces() {
   });
 }
 
-/* Zwei Großstädte: die ganze Glühbirne bricht auseinander, auch Kontur, Faden und Sockel. */
+/* Zwei Großstädte: die Fläche der Glühbirne zerfällt. Die Fetzen bleiben liegen und halten die Silhouette. */
 function setupCityTear() {
   const map = document.querySelector('.cities__map');
   const fill = map?.querySelector('.cities__bulb-fill');
@@ -1186,7 +1186,8 @@ function setupCityTear() {
       const near = 1 - Math.min(1, dist / reach);
       let angle = Math.atan2(bite.y - wound.cy, bite.x - wound.cx);
       if (!angle) angle = unit(index, bite.seed) * Math.PI * 2;
-      const travel = 36 + near * 18 + unit(index + 2, bite.seed) * 28;
+      const low = Math.min(1, Math.max(0, (bite.y - 36) / 110));
+      const travel = 12 + near * 6 + unit(index + 2, bite.seed) * 10 + low * 34;
       const piece = {
         hole,
         shred,
@@ -1195,9 +1196,9 @@ function setupCityTear() {
         delay: ((dist / reach) * 0.8 + unit(index + 1, bite.seed) * 0.12) * pace,
         grow: 2.35 + near * 0.5 + unit(index + 8, bite.seed) * 0.28,
         dx: Math.cos(angle) * travel,
-        dy: Math.sin(angle) * travel * 0.7 + 14 + unit(index + 6, bite.seed) * 16,
-        rot: (unit(index + 4, bite.seed) - 0.5) * 54,
-        end: 0,
+        dy: Math.sin(angle) * travel * 0.65 + 5 + low * 16 + unit(index + 6, bite.seed) * 8,
+        rot: (unit(index + 4, bite.seed) - 0.5) * (28 + low * 24),
+        end: bite.r < 3.4 ? 0.26 : 0.38,
       };
       pieces.push(piece);
       place(piece, 0, 0);
@@ -1230,7 +1231,8 @@ function setupCityTear() {
         const near = 1 - Math.min(1, dist / reach);
         let angle = Math.atan2(y - wound.cy, x - wound.cx);
         if (!angle) angle = unit(n, wound.seed + salt) * Math.PI * 2;
-        const travel = 36 + near * 18 + unit(n + 2, wound.seed + salt) * 28;
+        const low = Math.min(1, Math.max(0, (y - 36) / 110));
+        const travel = 8 + near * 5 + unit(n + 2, wound.seed + salt) * 7 + low * 24;
         const piece = {
           hole: null,
           shred,
@@ -1240,9 +1242,9 @@ function setupCityTear() {
           delay: ((dist / reach) * 0.8 + unit(n + 1, wound.seed + salt) * 0.12) * pace,
           grow: 1,
           dx: Math.cos(angle) * travel,
-          dy: Math.sin(angle) * travel * 0.7 + 14 + unit(n + 6, wound.seed + salt) * 16,
-          rot: (unit(n + 4, wound.seed + salt) - 0.5) * 54,
-          end: 0,
+          dy: Math.sin(angle) * travel * 0.55 + 2 + low * 12 + unit(n + 6, wound.seed + salt) * 5,
+          rot: (unit(n + 4, wound.seed + salt) - 0.5) * (18 + low * 20),
+          end: fine ? 0.32 : 0.5,
         };
         pieces.push(piece);
         place(piece, 1, 0);
@@ -1333,6 +1335,9 @@ function setupHeroWalk() {
   let frameCtx = null;
   let running = false;
   let scheduled = false;
+  let started = false;
+  let finished = false;
+  let seenFigure = false;
 
   function size() {
     const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -1344,26 +1349,10 @@ function setupHeroWalk() {
     }
   }
 
-  function smoothstep(value) {
-    const t = Math.min(1, Math.max(0, value));
-    return t * t * (3 - 2 * t);
-  }
-
-  /* Erst Schwarz, dann Grau, dann löst sich die Silhouette im Nebel auf. */
-  function veil() {
-    const anim = figure.getAnimations().find((item) => item.animationName === 'hero-into');
-    if (!anim?.effect) return { tone: 0, alpha: 1 };
-    const duration = Number(anim.effect.getComputedTiming().duration);
-    if (!duration) return { tone: 0, alpha: 1 };
-    const t = Math.min(1, Math.max(0, anim.currentTime / duration));
-    return {
-      tone: smoothstep((t - 0.46) / 0.28),
-      alpha: 1 - smoothstep((t - 0.68) / 0.32),
-    };
-  }
-
+  /* Das Video zieht die Figur selbst nach hinten und lässt sie ausblenden.
+     Der Ausschnitt bleibt deshalb fest, sonst würde das Zurückweichen wieder aufgeblasen. */
   function draw() {
-    if (!video.videoWidth || !canvas.width) return;
+    if (finished || !video.videoWidth || !canvas.width) return;
     if (frame.width !== video.videoWidth) {
       frame.width = video.videoWidth;
       frame.height = video.videoHeight;
@@ -1372,58 +1361,23 @@ function setupHeroWalk() {
     frameCtx.drawImage(video, 0, 0);
     const image = frameCtx.getImageData(0, 0, frame.width, frame.height);
     const data = image.data;
-    const width = frame.width;
-    const height = frame.height;
-    let minX = width;
-    let minY = height;
-    let maxX = 0;
-    let maxY = 0;
-    for (let y = 0; y < height; y += 1) {
-      for (let x = 0; x < width; x += 1) {
-        const index = (y * width + x) * 4;
-        const lum = (data[index] * 77 + data[index + 1] * 150 + data[index + 2] * 29) >> 8;
-        let alpha = 0;
-        if (lum < 36) alpha = 255;
-        else if (lum < 150) alpha = ((150 - lum) * 255) / 114;
-        data[index] = 7;
-        data[index + 1] = 7;
-        data[index + 2] = 8;
-        data[index + 3] = alpha;
-        if (alpha > 48) {
-          if (x < minX) minX = x;
-          if (x > maxX) maxX = x;
-          if (y < minY) minY = y;
-          if (y > maxY) maxY = y;
-        }
-      }
+    let opaque = 0;
+    for (let index = 0; index < data.length; index += 4) {
+      const lum = (data[index] * 77 + data[index + 1] * 150 + data[index + 2] * 29) >> 8;
+      let alpha = 0;
+      if (lum < 28) alpha = 255;
+      else if (lum < 132) alpha = ((132 - lum) * 255) / 104;
+      const tone = lum < 28 ? 0 : Math.min(1, (lum - 28) / 80);
+      const gray = Math.round(7 + 148 * tone);
+      data[index] = gray;
+      data[index + 1] = gray;
+      data[index + 2] = gray;
+      data[index + 3] = alpha;
+      if (alpha > 40) opaque += 1;
     }
-    if (maxX <= minX || maxY <= minY) return;
     frameCtx.putImageData(image, 0, 0);
-    const boundsWidth = maxX - minX + 1;
-    const boundsHeight = maxY - minY + 1;
-    let scale = canvas.height / boundsHeight;
-    if (boundsWidth * scale > canvas.width) scale = canvas.width / boundsWidth;
-    const destWidth = boundsWidth * scale;
-    const destHeight = boundsHeight * scale;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(
-      frame,
-      minX,
-      minY,
-      boundsWidth,
-      boundsHeight,
-      (canvas.width - destWidth) / 2,
-      canvas.height - destHeight,
-      destWidth,
-      destHeight
-    );
-    const veilState = veil();
-    if (veilState.tone > 0 || veilState.alpha < 1) {
-      const gray = Math.round(7 + (164 - 7) * veilState.tone);
-      ctx.globalCompositeOperation = 'source-in';
-      ctx.fillStyle = `rgba(${gray},${gray},${gray},${veilState.alpha})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+    ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
     ctx.globalCompositeOperation = 'destination-out';
     const fade = ctx.createLinearGradient(0, canvas.height * 0.97, 0, canvas.height);
     fade.addColorStop(0, 'rgba(0,0,0,0)');
@@ -1431,61 +1385,73 @@ function setupHeroWalk() {
     ctx.fillStyle = fade;
     ctx.fillRect(0, canvas.height * 0.97, canvas.width, canvas.height * 0.03);
     ctx.globalCompositeOperation = 'source-over';
+    if (opaque > 800) seenFigure = true;
+    if (seenFigure && opaque < 40) finish();
   }
 
   function tick() {
     scheduled = false;
-    if (!running) return;
+    if (!running || finished) return;
     draw();
+    if (!running || finished) return;
     scheduled = true;
     if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(tick);
     else requestAnimationFrame(tick);
   }
 
   function useStill() {
-    const paint = () => draw();
-    if (Math.abs(video.currentTime - 4) < 0.05 && video.readyState >= 2) paint();
+    if (finished) return;
+    const paint = () => { if (!finished) draw(); };
+    if (video.currentTime < 0.05 && video.readyState >= 2) paint();
     else {
       video.addEventListener('seeked', paint, { once: true });
-      video.currentTime = 4;
+      video.currentTime = 0;
     }
+  }
+
+  /* Nach dem Ausblenden nichts mehr zeichnen. Sonst landet danach wieder die erste Silhouette auf der Leinwand. */
+  function finish() {
+    if (finished) return;
+    finished = true;
+    running = false;
+    video.pause();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   video.muted = true;
   video.playsInline = true;
-  video.playbackRate = 1.45;
+  video.loop = false;
+  video.playbackRate = 1;
   video.addEventListener('error', () => {
-    canvas.classList.add('is-fallback');
-    if (!reduceMotion.matches) figure.classList.add('is-walking');
+    if (!seenFigure) canvas.classList.add('is-fallback');
   });
   video.addEventListener('loadeddata', () => {
+    if (started) return;
+    started = true;
     size();
     if (reduceMotion.matches) {
       useStill();
       return;
     }
     draw();
-    figure.classList.add('is-walking');
     running = true;
     tick();
     video.play().catch(() => {
+      if (finished) return;
       running = false;
-      figure.classList.remove('is-walking');
       useStill();
     });
   });
-  figure.addEventListener('animationend', (event) => {
-    if (event.animationName !== 'hero-into') return;
-    running = false;
-    video.pause();
-    draw();
+  video.addEventListener('ended', finish);
+  video.addEventListener('playing', () => {
+    if (finished) video.pause();
   });
   document.addEventListener('visibilitychange', () => {
-    if (!running) return;
+    if (!running || finished) return;
     if (document.hidden) {
       video.pause();
       scheduled = false;
-    } else video.play().then(() => { if (running && !scheduled) tick(); }).catch(() => {});
+    } else video.play().then(() => { if (running && !finished && !scheduled) tick(); }).catch(() => {});
   });
   new ResizeObserver(size).observe(figure);
   if (video.readyState >= 2) video.dispatchEvent(new Event('loadeddata'));

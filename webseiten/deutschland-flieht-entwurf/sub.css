@@ -283,8 +283,8 @@ textarea.eingabe{min-height:120px;resize:vertical}
 .pt__ford .chg__src li::before{content:counter(q);position:absolute;left:0;top:0;padding:0;font:500 11px Inter,Arial,sans-serif;color:#d9d4d0;letter-spacing:0}
 .pt__ford .chg__src a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .pt__ford .chg__src a:hover{color:#fff}
-.ref{font-size:.68em;line-height:0;vertical-align:super;margin-left:1px}
-.ref a{color:#fff;text-decoration:none;font-weight:600}
+.pt__ford .ref a{color:#ed1018;text-decoration:none;font-weight:600}
+.pt__ford .ref a:hover{text-decoration:underline;text-underline-offset:2px}
 
 /* Rechtstexte (Impressum, Datenschutz) */
 .recht{position:relative;padding:clamp(8px,2vw,30px) var(--padx) clamp(70px,9vw,150px)}
