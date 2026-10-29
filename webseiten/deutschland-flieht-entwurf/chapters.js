@@ -1141,7 +1141,7 @@ if (pk) {
       g.shape(rect(hookX, hookY, 0.14, 0.08), { fill: CREAM, close: true, w: 2.6, d: 0, a: fade });
     }
 
-    /* 2005 ist die Last, die noch zu stemmen war; darüber wächst 2024 */
+    /* 2005 ist die Last, die noch zu stemmen war; darüber wächst 2025 */
     const markY = P.plateBottom + nOld * bh;
     const top = P.plateBottom + placed * bh;
     const oldA = fade * (placed >= nOld ? out3((C - (tIn + (nOld - 1) * per + drop)) / 0.35) : 0);
@@ -1155,8 +1155,8 @@ if (pk) {
     const fullA = fade * (placed === n ? Math.min(1, back((C - doneAt) / 0.4)) : 0);
     const rx = px + bw / 2 + 0.82;
     if (fullA > 0.04) {
-      g.text('2024', rx, top + 0.18, 13, { weight: 600, d: 0, a: fullA });
-      g.text(fmt(2611), rx, top - 0.06, 16, { d: 0, a: fullA });
+      g.text('2025', rx, top + 0.18, 13, { weight: 600, d: 0, a: fullA });
+      g.text(fmt(2637), rx, top - 0.06, 16, { d: 0, a: fullA });
     }
     g.text('Mieter', px, ground - 0.24, 15, { weight: 600, d: 0.32, a: fade });
     g.text('Baukosten je m²', px, ground - 0.48, 14, { weight: 600, d: 0.4, a: fade });
@@ -1167,7 +1167,7 @@ if (pk) {
       if (p > 0.04) {
         const pillY = P.plateBottom + (nOld + 0.55) * bh;
         g.shape(xf(rrect(0, 0, 0.92, 0.34, 0.17), rx, pillY, 0, Math.min(1.08, p)), { fill: CREAM, close: true, d: 0 });
-        g.text('+112 %', rx, pillY, 15 * Math.min(1, p), { color: DEEP, d: 0, a: Math.min(1, p) });
+        g.text('+114 %', rx, pillY, 15 * Math.min(1, p), { color: DEEP, d: 0, a: Math.min(1, p) });
       }
     }
   }

@@ -10,9 +10,9 @@
     <link rel="preload" href="./assets/hero-apokalypse.webp" as="image" media="(min-width: 761px)" fetchpriority="high" />
     <link rel="preload" href="./assets/hero-apokalypse-mobil.jpg?v=2" as="image" media="(max-width: 760px)" fetchpriority="high" />
     <link rel="preload" href="./assets/playfair-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=u138" />
-    <script src="./main.js?v=u97" type="module"></script>
-      <script src="./chapters.js?v=u75" type="module"></script>
+    <link rel="stylesheet" href="./styles.css?v=u143" />
+    <script src="./main.js?v=u104" type="module"></script>
+      <script src="./chapters.js?v=u76" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
@@ -61,11 +61,11 @@
         </div>
         <div class="hero__shade" aria-hidden="true"></div>
         <canvas class="hero__blood" aria-hidden="true"></canvas>
-        <div class="petition-widget" aria-label="288.579 Fortzüge deutscher Staatsangehöriger 2025">
+        <div class="petition-widget" aria-label="288.579 Fortzüge Deutscher 2025">
           <a class="petition-widget__link" href="./petition/">Zur Petition <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
           <span class="petition-widget__rule" aria-hidden="true"></span>
           <span class="petition-widget__metric">
-            <span class="flip-counter" id="flip-counter" role="img" aria-label="288.579 Fortzüge deutscher Staatsangehöriger 2025">—</span>
+            <span class="flip-counter" id="flip-counter" role="img" aria-label="288.579 Fortzüge Deutscher 2025">—</span>
             <span class="petition-widget__caption">Fortzüge 2025</span>
           </span>
         </div>
@@ -83,15 +83,15 @@
               <em>blutet aus<span class="title-dot">.</span></em>
             </h1>
             <div class="emigration__text reveal">
-              <p class="emigration__lead">Immer mehr deutsche Staatsangehörige verlassen das Land. Darunter vor allem junge, gut ausgebildete und motivierte Menschen, die ihre Zukunft anderswo sehen. Sie fliehen vor erdrückenden Abgaben, absurder Bürokratie, zunehmender Staatsmacht, wachsender Leistungsfeindlichkeit, politischen Umverteilungsfantasien oder schlicht einer zunehmend pessimistischen Stimmung.</p>
-              <p class="emigration__lead">Besonders beliebte Ziele sind die Schweiz, die USA und Spanien. Dort erhoffen sich viele geringere Abgaben, eine höhere Lebensqualität und bessere Perspektiven.</p>
+              <p class="emigration__lead">Immer mehr Deutsche verlassen das Land. Darunter vor allem junge, gut ausgebildete und motivierte Menschen, die ihre Zukunft anderswo sehen. Sie fliehen vor erdrückenden Abgaben, absurder Bürokratie, zunehmender Staatsmacht, wachsender Leistungsfeindlichkeit, politischen Umverteilungsfantasien oder schlicht einer zunehmend pessimistischen Stimmung.</p>
+              <p class="emigration__lead">Besonders beliebte Ziele sind die Schweiz und die USA. Dort erhoffen sich viele geringere Abgaben, eine höhere Lebensqualität und bessere Perspektiven.</p>
               <p class="emigration__lead">Wir wollen diesen Trend umkehren und Deutschland mit unserer Initiative wieder auf Kurs bringen. Oder besser gesagt: <strong>Dem Land eine ordentliche freiheitliche Blutspende verpassen.</strong></p>
-              <p class="emigration__lead">Sieh dir die Zahlen an, teile deine eigene Geschichte und sag uns deine Meinung.<span class="ref"><a href="./quellen/#q-zahlen" aria-label="Fußnote 1">1</a></span></p>
+              <p class="emigration__lead">Sieh dir die Zahlen an, <a href="./petition/">unterschreib die Petition</a> und sag uns deine Meinung.</p>
             </div>
           </div>
           <figure class="map-figure reveal">
             <div class="map-figure__stage" id="germany-map" aria-label="Interaktive Deutschlandkarte mit Bundesländern und vier Zielländern"></div>
-            <p class="map-quelle"><span class="ref"><a href="./quellen/#q-karte" aria-label="Fußnote 2">2</a></span></p>
+            <p class="map-quelle"><span class="ref"><a href="./quellen/#q-karte" aria-label="Fußnote 1">1</a></span></p>
           </figure>
         </div>
       </section>
@@ -105,7 +105,7 @@
         </div>
         <div class="stories-globe__intro">
           <h2 class="stories-globe__title reveal" id="stories-title"><em>Sie nehmen die Zukunft mit<span class="title-dot">.</span></em></h2>
-          <p class="stories-globe__subtitle reveal">Lies ihre Geschichte. <a href="./petition/?teilnahme=geschichte" id="story-submit">Ergänze deine eigene.</a></p>
+          <p class="stories-globe__subtitle reveal">Du bist ausgewandert oder denkst darüber nach? <a href="./petition/?teilnahme=geschichte" id="story-submit">Ergänze deine eigene.</a></p>
           <div class="faces" aria-roledescription="Karussell" aria-label="Zitate">
             <button class="faces__nav faces__nav--prev" type="button" aria-label="Vorheriges Zitat"><svg class="ico ico--l" viewBox="0 0 16 12" aria-hidden="true" focusable="false"><path d="M15 6H2M6 2 2 6l4 4"/></svg></button>
             <div class="faces__track" tabindex="0">
@@ -154,7 +154,7 @@
             <div class="globe-empty" id="globe-empty" hidden><p>Noch keine Geschichten vorhanden.</p><a href="./petition/?teilnahme=geschichte" class="story-submit-duplicate">Eigene Geschichte ergänzen <svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></a></div>
           </div>
           <p class="globe-hint" hidden>Ziehen, um die Welt zu drehen · Land antippen: Zahl und schwebende Geschichten</p>
-          <p class="globe-source"><span class="ref"><a href="./quellen/#q-globus" aria-label="Fußnote 3">3</a></span></p>
+          <p class="globe-source"><span class="ref"><a href="./quellen/#q-globus" aria-label="Fußnote 2">2</a></span></p>
         </div>
       </section>
 
@@ -163,7 +163,7 @@
         <div class="cities__inner">
           <div class="cities__copy">
             <h2 id="cities-title" class="cities__title reveal">Zwei Großstädte<em>an Akademikern<span class="title-dot">.</span></em></h2>
-            <p class="cities__text reveal">288.579 deutsche Staatsangehörige zogen 2025 fort. Legt man den Anteil aus der GERPS-Studie darauf, hatten 75,5 % einen akademischen Berufsabschluss. Das sind 217.877 Menschen, mehr als zwei Städte an der Großstadtgrenze von 100.000 Einwohnern.<span class="ref"><a href="./quellen/#q-staedte" aria-label="Fußnote 4">4</a></span></p>
+            <p class="cities__text reveal">288.579 Deutsche zogen 2025 fort. Legt man den Anteil aus der GERPS-Studie darauf, hatten 75,5 % einen akademischen Berufsabschluss. Das sind 217.877 Menschen, mehr als zwei Städte an der Großstadtgrenze von 100.000 Einwohnern.<span class="ref"><a href="./quellen/#q-staedte" aria-label="Fußnote 3">3</a></span></p>
           </div>
           <div class="cities__map" aria-hidden="true">
                   <svg class="cities__svg" viewBox="-90 -100 180 280">
@@ -234,36 +234,35 @@
             <ol class="chg__list">
               <li class="chg__row" style="--i:0">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p1" id="chg-b1">
-                  <span class="chg__no">01</span><span class="chg__name">Leben günstiger machen<span class="title-dot">.</span></span><span class="chg__short">Abgabensystem reformieren, Schuldenkurs beenden<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">01</span><span class="chg__name">Leben günstiger machen<span class="title-dot">.</span></span><span class="chg__short">Abgabensystem radikal reformieren, Schuldenpolitik stoppen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p1" role="region" aria-labelledby="chg-b1"><div class="chg__panel-in">
-                    <p>Deutschland ist das Land mit der zweithöchsten Abgabenbelastung auf Arbeit in der OECD. Junge Menschen, die Vollzeit arbeiten, zahlen von ihrem Bruttolohn durchschnittlich 38,7 % an den Staat. Rechnet man den Arbeitgeberanteil mit ein, liegt dieser Wert bei fast 50 %. Junge Leute arbeiten damit teilweise ein halbes Jahr nur für den Staat.</p>
-                    <p>Hinzu kommt ein Steueraufschlag von 19 % auf viele Produkte, auf Kraftstoffe sogar um die 64 % bei Benzin und 56 % bei Diesel. Und wenn Leute eigenverantwortlich Geld für die Zukunft anlegen, wird der Ertrag noch einmal mit 25 % besteuert.</p>
-                    <p>Viele junge Menschen empfinden dies als Bestrafung ihrer Produktivität. Das Steuersystem sollte darum radikal reformiert werden. Wir fordern eine niedrige Flat Tax.</p>
-                    <p>Zusätzlich steht die Zukunft der jungen Leute vor einem nie dagewesenen Schuldenberg. Durch das Aussetzen der Schuldenbremse ist die deutsche Verschuldung auf 2,84 Billionen Euro gestiegen. Doch nicht nur das Tilgen dieser Schulden belastet die junge Generation: Auch die damit zusammenhängende Inflation treibt die Lebenshaltungskosten stetig in die Höhe.<span class="ref"><a href="./quellen/#q-f1" aria-label="Fußnote 5">5</a></span></p>
-                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                    <p>Junge Leute arbeiten nicht selten ein halbes Jahr nur für den Staat anstatt für sich selbst. Der Grund dafür: Deutschland ist das Land mit der zweithöchsten OECD-Abgabenquote. Junge Menschen, die Vollzeit arbeiten, zahlen in einigen Fällen fast 50 Prozent Abgaben an den Staat. Hinzu kommt ein Steueraufschlag von 19 Prozent auf viele Produkte, auf Kraftstoffe sogar über 50 Prozent. Und wenn junge Leute eigenverantwortlich Geld für die Zukunft anlegen, gängelt sie der Staat zusätzlich mit einer Kapitalertragsteuer von 25 Prozent.<span class="ref"><a href="./quellen/#q-f1a" aria-label="Fußnote 4">4</a></span></p>
+                    <p>Damit bestraft der Staat die Produktivität junger Menschen, die sich darum zu Recht Gedanken machen, ob sie hier ihre Zukunft sehen. Das Steuersystem muss darum radikal reformiert werden. Das Problem sind vor allem die progressiven Steuern und jene, die langfristiges ökonomisches Denken bestrafen, wie die Kapitalertragsteuer. Denkbar wäre beispielsweise eine Flat Tax.</p>
+                    <p>Zusätzlich steht die Zukunft der jungen Leute vor einem nie dagewesenen Schuldenberg. Durch das regelmäßige Aussetzen der Schuldenbremse sowie zahlreiche „Sondervermögen“ (bei denen es sich um Sonderschulden handelt) ist die deutsche Verschuldung auf 2,84 Billionen Euro gestiegen. Diese Schulden werden über die nächsten Jahrzehnte von den jungen Menschen mit hohen Zinsen zurückgezahlt werden müssen. Doch nicht nur das Tilgen dieser Schulden belastet die junge Generation: Auch die damit zusammenhängende Inflation treibt die Lebenshaltungskosten stetig in die Höhe.<span class="ref"><a href="./quellen/#q-f1b" aria-label="Fußnote 5">5</a></span></p>
+                    <a href="./petition/#pt-text">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:1">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p2" id="chg-b2">
-                  <span class="chg__no">02</span><span class="chg__name">Mehr Eigenverantwortung<span class="title-dot">.</span></span><span class="chg__short">Sozialstaat aufbrechen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">02</span><span class="chg__name">Eigenverantwortung gewinnen<span class="title-dot">.</span></span><span class="chg__short">Sozialstaat aufbrechen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p2" role="region" aria-labelledby="chg-b2"><div class="chg__panel-in">
-                    <p>Der Sozialstaat ist mit Abstand der größte Geldschlucker der Staatskasse. Die Hälfte aller Staatsausgaben fließt in diesen Sektor. Deutsche arbeiten also einen großen Teil ihrer Zeit für diesen aufgeblähten Sozialstaat.</p>
-                    <p>Als Gegenleistung gibt es eine Rente, die nicht reicht, eine Krankenkasse, die weder Patienten noch Ärzte sinnvoll versorgt, und eine kollabierende Pflegeversicherung.</p>
+                    <p>Der Sozialstaat ist mit Abstand der größte Geldschlucker der Staatskasse. Die Hälfte aller Staatsausgaben fließt in diesen Sektor. Deutsche arbeiten also einen großen Teil ihrer Zeit nur, um das Leben anderer Menschen zu finanzieren, die aus verschiedenen Gründen einen Anspruch auf ihre Arbeitsleistung erheben. Diese Quote wird in den nächsten Jahren aufgrund des demografischen Wandels eher zu- als abnehmen, sofern die Politik nicht handelt.<span class="ref"><a href="./quellen/#q-f2a" aria-label="Fußnote 6">6</a></span></p>
+                    <p>Als Gegenleistung erhalten sie eine Rente, die nicht reicht, eine Krankenkasse, die weder Patienten noch Ärzte sinnvoll versorgt, und kollabierende Pflegeversicherungen.</p>
                     <p>Viele junge Leute fragen sich zu Recht, was an diesem auf Zwang basierenden System und der immer weiter fortschreitenden Aushebelung von Eigenverantwortung richtig und solidarisch sein soll.</p>
-                    <p>Der Sozialstaat muss darum stetig weiter verschlankt werden. Ziel sollte sein, dass Leute sich eigenverantwortlich vorsorgen. Die Migrationspolitik muss weiter so reformiert werden, dass eine Einwanderung in die Sozialsysteme unterbunden wird.<span class="ref"><a href="./quellen/#q-f2" aria-label="Fußnote 6">6</a></span></p>
-                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                    <p>Der Sozialstaat muss darum stetig weiter verschlankt werden. Ziel sollte sein, dass Leute sich eigenverantwortlich vorsorgen. Die Migrationspolitik muss weiter so reformiert werden, dass eine Einwanderung in die Sozialsysteme höchstens in Ausnahmefällen denkbar ist.</p>
+                    <a href="./petition/#pt-text">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:2">
                 <button class="chg__head" type="button" aria-expanded="false" aria-controls="chg-p3" id="chg-b3">
-                  <span class="chg__no">03</span><span class="chg__name">Geld verbrennen stoppen<span class="title-dot">.</span></span><span class="chg__short">Rente auslaufen lassen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
+                  <span class="chg__no">03</span><span class="chg__name">Geldverbrennung stoppen<span class="title-dot">.</span></span><span class="chg__short">Rente auslaufen lassen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p3" role="region" aria-labelledby="chg-b3"><div class="chg__panel-in">
-                    <p>Eine besondere Beachtung im Bereich Sozialstaat verdient die Rente. Die Finanzierung dieser ist mittlerweile mit Abstand der größte Posten im Haushalt der Bundesregierung: Neben den Rentenbeiträgen, die jeder Arbeitnehmer zahlen muss, flossen 2025 zusätzlich 25 % des Haushalts der Bundesregierung in diesen Posten.</p>
-                    <p>Beim Rentenstart in den 1950er-Jahren haben sechs Einzahler einen Rentner finanziert, heute kommen auf einen Rentner zwei Einzahler. Junge Leute haben genug davon, die Folgen dieses verhängnisvollen Rentensystems zu büßen. Die staatliche Rente muss dringend auslaufen, und private Anlageformen dürfen nicht weiter durch Steuern bestraft werden.<span class="ref"><a href="./quellen/#q-f3" aria-label="Fußnote 7">7</a></span></p>
-                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                    <p>Wer als junger Mensch in die Rente einzahlt, kann in Echtzeit verfolgen, wie sein Geld de facto verbrannt wird und er es nie wieder sieht. Für keine Einzelaufgabe im Haushalt des Bundes geht so viel Geld drauf: Neben den hohen Rentenbeiträgen, die jeder Arbeitnehmer zahlen muss, flossen 2025 zusätzlich 25 % des Haushalts der Bundesregierung in die Rentenkasse.<span class="ref"><a href="./quellen/#q-f3a" aria-label="Fußnote 7">7</a></span></p>
+                    <p>Beim Rentenstart in den 1950er-Jahren haben sechs Einzahler einen Rentner finanziert, heute kommen auf einen Rentner zwei Einzahler. Junge Leute haben genug davon, die Folgen dieses desaströsen Rentensystems zu büßen. Die staatliche Rente muss dringend auslaufen, und private Anlageformen dürfen nicht weiter durch Steuern bestraft werden. Private Vorsorge muss der Normalfall werden.<span class="ref"><a href="./quellen/#q-f3b" aria-label="Fußnote 8">8</a></span></p>
+                    <a href="./petition/#pt-text">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:3">
@@ -271,10 +270,11 @@
                   <span class="chg__no">04</span><span class="chg__name">Jobs für alle<span class="title-dot">.</span></span><span class="chg__short">Unternehmen entfesseln<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p4" role="region" aria-labelledby="chg-b4"><div class="chg__panel-in">
-                    <p>Die Jobsuche in Deutschland wurde in den letzten Jahren deutlich schwieriger. Viele Unternehmen stellen kein neues Personal an, bauen Stellen ab oder gehen ins Ausland. So erwägen gemäß einer Umfrage rund 20 % der befragten Unternehmen, wirtschaftliche Aktivitäten in Deutschland einzuschränken oder ins Ausland zu verlagern, oder haben dies bereits getan. In der Industrie liegt dieser Anteil bei 40 %.</p>
-                    <p>Das Problem ist hausgemacht: Deutsche Unternehmen leiden massiv an Bürokratie, Arbeitsrecht, Lohnnebenkosten (siehe Punkt zwei), teurer Energie durch eine falsche Energiepolitik und fatalen politischen Lenkungsversuchen wie der Klimapolitik.</p>
-                    <p>Wir benötigen die Kettensäge, damit Unternehmen florieren und junge Leute wieder eine Perspektive haben.<span class="ref"><a href="./quellen/#q-f4" aria-label="Fußnote 8">8</a></span></p>
-                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                    <p>Die Jobsuche in Deutschland wurde in den letzten Jahren deutlich schwieriger, und das liegt zumeist nicht an der „Faulheit“ der Bewerber oder an gehäuften Krankmeldungen.<span class="ref"><a href="./quellen/#q-f4a" aria-label="Fußnote 9">9</a></span></p>
+                    <p>Viele Unternehmen stellen kein neues Personal an, bauen Stellen ab oder gehen ins Ausland. Innerhalb von zwei Jahren wurden zehntausende Stellen ins Ausland verlagert, und allein in der Automobilindustrie wurden 2026 laut Statistischem Bundesamt 43.000 Stellen abgebaut. Wenn in Deutschland investiert wird, dann meist nur in Erhaltung. Wichtige Neuinvestitionen sind in Deutschland fast komplett zum Erliegen gekommen, während Nachbarländer wie Polen hohe Raten an wirtschaftlichem Wachstum erzielen.<span class="ref"><a href="./quellen/#q-f4b" aria-label="Fußnote 10">10</a></span></p>
+                    <p>Das Problem ist hausgemacht: Deutsche Unternehmen leiden massiv an Bürokratie, Arbeitsrecht, Lohnnebenkosten (siehe Punkt zwei), teurerer Energie durch eine falsche Energiepolitik und fatalen politischen Lenkungsversuchen wie der Klimapolitik.</p>
+                    <p>Wir benötigen die Kettensäge, damit Unternehmen florieren und junge Leute wieder eine Perspektive haben.</p>
+                    <a href="./petition/#pt-text">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
               <li class="chg__row" style="--i:4">
@@ -282,15 +282,15 @@
                   <span class="chg__no">05</span><span class="chg__name">Günstige Mieten<span class="title-dot">.</span></span><span class="chg__short">Wohnungsbau wieder ermöglichen<span class="title-dot">.</span></span><i class="chg__plus" aria-hidden="true"></i>
                 </button>
                 <div class="chg__panel" id="chg-p5" role="region" aria-labelledby="chg-b5"><div class="chg__panel-in">
-                    <p>Gerade junge Leute leiden massiv an hohen Mieten. Der Grund dafür: In Deutschland gibt es viel zu wenig Wohnungen.</p>
-                    <p>Doch warum wird zu wenig gebaut? Das liegt daran, dass Bauen in Deutschland sehr teuer geworden ist, leider erneut durch den Staat. 2005 hat es ca. 1.200 Euro gekostet, einen Quadratmeter zu bauen, 2024 waren es ca. 2.600 Euro.</p>
-                    <p>Damit sich das Bauen lohnt, ist es unausweichlich, dass die höheren Baupreise an die Mieter weitergegeben werden. Ähnliches gilt für Instandhaltung und Immobilienkosten. Der Anstieg der Baukosten liegt maßgeblich daran, dass Gebäude heute sehr viele Auflagen erfüllen müssen: Es gibt rund 3.900 Normen, die Gebäude erfüllen müssen, und die Anforderungen an die Energetik durch das Gebäudeenergiegesetz treiben zusätzlich die Kosten in die Höhe. Hinzu kommen eine gestiegene Grunderwerbsteuer und massive Auflagen durch den Denkmalschutz der Länder.</p>
-                    <p>Der Staat muss es wieder erlauben, günstige Gebäude zu bauen, und sollte die bestehenden nicht künstlich verteuern.<span class="ref"><a href="./quellen/#q-f5" aria-label="Fußnote 9">9</a></span></p>
-                    <a href="./petition/">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+                    <p>Gerade junge Menschen leiden massiv an hohen Mieten. Der Grund dafür: In Deutschland gibt es viel zu wenig Wohnungen.</p>
+                    <p>Doch warum wird zu wenig gebaut? Das liegt daran, dass Bauen in Deutschland sehr teuer geworden ist, leider erneut durch den Staat. 2005 hat es ca. 1.200 Euro gekostet, einen Quadratmeter zu bauen, 2025 waren es ca. 2.600 Euro.<span class="ref"><a href="./quellen/#q-f5a" aria-label="Fußnote 11">11</a></span></p>
+                    <p>Damit sich das Bauen lohnt, ist es unausweichlich, dass die höheren Baupreise an die Mieter weitergegeben werden. Ähnliches gilt für Instandhaltung und Immobilienkosten. Der Anstieg der Baukosten liegt maßgeblich daran, dass Gebäude heute sehr viele Auflagen erfüllen müssen: Es gibt rund 3.900 Normen, die Gebäude erfüllen müssen, und die Anforderungen an die Energetik durch das Gebäude-Modernisierungsgesetz treiben zusätzlich die Kosten in die Höhe. Hinzu kommen eine gestiegene Grunderwerbsteuer und massive Auflagen durch die Denkmalschutzverordnung.<span class="ref"><a href="./quellen/#q-f5b" aria-label="Fußnote 12">12</a></span></p>
+                    <p>Die Folgen sind fatal: Die Immobilienpreise sind von 2010 bis 2025 um rund 82 % gestiegen, so dass junge Menschen sich, obwohl günstiges Bauen technisch gesehen gar kein Problem ist, in vielen Regionen Deutschlands für ihr ganzes Leben verschulden müssen, um ein normales Einfamilienhaus zu erwerben. Der Staat erzeugt einen künstlichen Braindrain aus den Metropolregionen. Der Staat muss es wieder erlauben, günstige Gebäude zu bauen, und sollte die bestehenden nicht künstlich verteuern.<span class="ref"><a href="./quellen/#q-f5c" aria-label="Fußnote 13">13</a></span></p>
+                    <a href="./petition/#pt-text">Im Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
                   </div></div>
               </li>
             </ol>
-            <a class="chg__more" href="./petition/">Vollständigen Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
+            <a class="chg__more" href="./petition/#pt-text">Vollständigen Petitionstext lesen <span aria-hidden="true"><svg class="ico ico--ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg></span></a>
           </div>
         </section>
         <i class="edge edge--chg-top" aria-hidden="true"></i>
@@ -465,7 +465,7 @@
           <p class="atl__q" data-words>Wenn du Atlas sehen würdest, den Riesen, der die Welt auf seinen Schultern trägt, wenn du sehen würdest, wie er steht, Blut über seine Brust rinnend, seine Knie einknickend, seine Arme zitternd, mit letzter Kraft die Welt emporhaltend, die je mehr er sich anstrengt, desto schwerer auf seinen Schultern lastet –</p>
           <h2 id="atl-ask" class="atl__ask"><span>was würdest du ihm raten<span class="title-dot">?</span></span></h2>
         </div>
-        <p class="atl__src"><span class="ref"><a href="./quellen/#q-atlas" aria-label="Fußnote 10">10</a></span></p>
+        <p class="atl__src"><span class="ref"><a href="./quellen/#q-atlas" aria-label="Fußnote 14">14</a></span></p>
       </section>
       <!--chapters:end-->
     </main>

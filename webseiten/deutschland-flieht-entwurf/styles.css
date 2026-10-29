@@ -1192,12 +1192,12 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
 
 /* Zwei Großstädte: Text mittig, Glühbirne groß im Hintergrund. */
 .cities{position:relative;z-index:4;display:grid;place-items:center;overflow:hidden;background:#050506;padding:clamp(28px,3.6vw,48px) clamp(24px,5vw,86px)}
-.cities__inner{position:relative;display:grid;place-items:center;width:min(64rem,100%);min-height:clamp(400px,46vh,520px);margin:0 auto}
+.cities__inner{position:relative;display:grid;place-items:center;width:min(64rem,100%);min-height:clamp(300px,34vh,400px);margin:0 auto}
 .cities__copy{position:relative;z-index:1;width:min(46rem,100%);text-align:center}
 .cities__copy::before{content:"";position:absolute;z-index:-1;left:50%;top:48%;width:min(150%,52rem);height:158%;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center 60%,rgba(5,5,6,.88) 0%,rgba(5,5,6,.55) 44%,rgba(5,5,6,.22) 66%,transparent 84%);pointer-events:none}
 .cities__title{max-width:9.4em;margin:0 auto;font:400 clamp(36px,6vw,108px)/.88 Playfair,Georgia,serif;letter-spacing:-.055em}
 .cities__title em{display:block;margin-top:.06em;font-style:italic}
-.cities__map{position:absolute;z-index:0;left:50%;top:50%;width:min(62vw,34vh,320px);transform:translate(-50%,-50%);overflow:visible;pointer-events:none}
+.cities__map{position:absolute;z-index:0;left:50%;top:50%;width:min(56vw,34vh,330px);transform:translate(-50%,-50%);overflow:visible;pointer-events:none}
 .cities__map:not(.is-ready){visibility:hidden}
 .cities__svg{display:block;width:100%;height:auto;overflow:visible}
 .cities__bulb-fill path,.cities__bulb-fill rect{fill:#e6dccb}
@@ -1206,12 +1206,14 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
 .cities__bulb-filament,.cities__bulb-lead{stroke-width:2.2}
 .cities__shred{fill:#e6dccb;transform-box:fill-box;transform-origin:center}
 .cities__shred--dust{fill:#d9cdb8}
+.cities__fly{position:absolute;z-index:2;overflow:visible;pointer-events:none}
+.cities__fly .cities__shred{-webkit-mask-image:linear-gradient(to bottom,#000 0%,transparent 62%);mask-image:linear-gradient(to bottom,#000 0%,transparent 62%)}
 .cities__text{max-width:38rem;margin:clamp(14px,1.8vw,24px) auto 0;color:#c4c4c8;font-size:clamp(16px,1.48vw,21px);line-height:1.45;letter-spacing:-.02em}
 .cities .ref a{color:#ed1018;text-decoration:none;font-weight:600}
 @media(max-width:760px){
   .cities{padding-inline:20px}
-  .cities__inner{min-height:400px}
-  .cities__map{width:min(72vw,260px)}
+  .cities__inner{min-height:320px}
+  .cities__map{width:min(60vw,236px)}
   .cities__title{max-width:none;font-size:clamp(40px,11vw,64px)}
 }
 
@@ -1222,7 +1224,7 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
 .und-dann__bild::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 78% 70% at 50% 42%,rgba(10,9,8,.58) 0%,rgba(10,9,8,.18) 58%,rgba(10,9,8,.32) 100%)}
 .und-dann__bild::after{content:"";position:absolute;inset:0;z-index:1;background:#1c2836;mix-blend-mode:multiply;opacity:.28;pointer-events:none}
 .und-dann__bild > .koernung{z-index:2}
-.und-dann__text{position:absolute;left:50%;top:44%;z-index:2;width:min(40rem,calc(100% - 2.5rem));transform:translate(-50%,-50%);text-align:center;color:#fff}
+.und-dann__text{position:absolute;left:50%;top:calc(50% + (var(--rd2) - var(--rd1)) / 4);z-index:2;width:min(40rem,calc(100% - 2.5rem));transform:translate(-50%,-50%);text-align:center;color:#fff}
 .und-dann__text .reveal{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;min-width:0}
 .und-dann__frage{margin:0;max-width:100%;font:italic 400 clamp(52px,7vw,112px)/.92 Playfair,Georgia,serif;letter-spacing:-.012em;text-wrap:balance;text-shadow:0 2px 28px #0000008c}
 .und-dann__voraussetzung,.und-dann__folgen,.und-dann__schluss{max-width:100%;min-width:0}
@@ -1230,21 +1232,17 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
 .und-dann__folgen{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;align-items:center;gap:.28em;font:400 16px/1.5 Inter,Arial,sans-serif;color:#ffffffb8}
 .und-dann__schluss{margin:0;max-width:min(18ch,100%);text-wrap:balance;font:italic 400 clamp(24px,2.125vw,34px)/1.2 Playfair,Georgia,serif;letter-spacing:-.005em}
 @media(max-width:900px){
-  .und-dann__text{top:42%}
   .und-dann__text .reveal{gap:10px}
   .und-dann__frage{font-size:clamp(44px,12vw,72px)}
 }
 
 /* Schräge Keile wie bei den Forderungen: Großstädte schieben sich über den Globus (Kante fällt nach rechts),
    „Und dann?“ über die Großstädte (Kante steigt nach rechts). Beide fahren beim Hereinscrollen von unten hoch (--kw). */
-.cities{margin-top:calc(-1 * var(--rd1));padding-top:calc(clamp(4px,.8vw,14px) + var(--rd1));padding-bottom:calc(clamp(28px,3.6vw,48px) + var(--rd2));clip-path:polygon(0 0,100% var(--rd1),100% 100%,0 100%);translate:0 calc((1 - var(--kw,1)) * 9vw)}
+.cities{margin-top:calc(-1 * var(--rd1));padding-top:calc(clamp(4px,.8vw,14px) + var(--rd1));padding-bottom:calc(clamp(8px,1vw,16px) + var(--rd2));clip-path:polygon(0 0,100% var(--rd1),100% 100%,0 100%);translate:0 calc((1 - var(--kw,1)) * 9vw)}
 .und-dann{margin-top:calc(-1 * var(--rd2));height:calc(min(68svh,640px) + var(--rd2));min-height:calc(420px + var(--rd2));clip-path:polygon(0 var(--rd2),100% 0,100% 100%,0 100%);translate:0 calc((1 - var(--kw,1)) * 9vw)}
-.und-dann__text{top:calc(44% + var(--rd2) / 2)}
+.und-dann__text{top:calc(50% + (var(--rd2) - var(--rd1)) / 4)}
 .edge--cities-top{z-index:2;top:0;height:var(--rd1);clip-path:polygon(0 0,100% calc(100% - 1.6px),100% 100%,0 1.6px);background:linear-gradient(90deg,#c9161f00,#c9161faa 20%,#c9161f)}
 .edge--und-dann-top{z-index:3;top:0;height:var(--rd2);clip-path:polygon(0 calc(100% - 1.6px),100% 0,100% 1.6px,0 100%);background:linear-gradient(90deg,#c9161f,#c9161faa 80%,#c9161f00)}
-@media(max-width:900px){
-  .und-dann__text{top:calc(42% + var(--rd2) / 2)}
-}
 @media(prefers-reduced-motion:reduce){
   .cities,.und-dann{translate:none}
 }

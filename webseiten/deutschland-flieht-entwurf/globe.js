@@ -4,8 +4,8 @@ var X=class{constructor(){this._partials=new Float64Array(32),this._n=0}add(e){l
  *
  * ZAHLEN: Statistisches Bundesamt (Destatis), GENESIS-Tabelle 12711-0008
  * „Wanderungen zwischen Deutschland und dem Ausland: Deutschland, Jahre,
- * Nationalität, Herkunfts-/Zielländer“. Gezeigt werden die Fortzüge DEUTSCHER
- * Staatsangehöriger 2025, daneben 2024 und der Wanderungssaldo. Abruf:
+ * Nationalität, Herkunfts-/Zielländer“. Gezeigt werden die Fortzüge DEUTSCHER 2025,
+ * daneben 2024 und der Wanderungssaldo. Abruf:
  * 15.10.2026 (Tabellenstand 21.09.2026). Die Gesamtsumme 288.579 stimmt mit
  * der Pressemitteilung überein.
  *
@@ -550,7 +550,7 @@ async function initStoriesGlobe(root) {
     const land = ZIEL_NACH_ID.get(id);
     tooltip.querySelector('strong').textContent = countryName(id);
     tooltip.querySelector('span').textContent = land
-      ? deZahl(land.f25) + ' Fortzüge deutscher Staatsangehöriger 2025'
+      ? deZahl(land.f25) + ' Fortzüge Deutscher 2025'
       : 'Länderwert nicht ausgewiesen';
     const box = stage.getBoundingClientRect();
     tooltip.style.left = klemme(clientX - box.left + 16, 12, width - 205) + 'px';
@@ -622,7 +622,7 @@ async function initStoriesGlobe(root) {
       const n = anzahlGeschichten(land);
       fo.eyebrow.textContent = land.rang ? 'FORTZÜGE 2025 · PLATZ ' + land.rang : 'FORTZÜGE 2025';
       fo.number.textContent = deZahl(land.f25);
-      fo.unit.textContent = 'deutsche Staatsangehörige zogen 2025 hierher fort';
+      fo.unit.textContent = 'Deutsche zogen 2025 hierher fort';
       fo.delta.textContent = veraenderung(land) + ' · ' + saldoText(land);
       fo.count.textContent = n > 0 ? n + ' Geschichten · jeder Kreis eine Person, antippen zum Lesen' : 'Noch keine Geschichten veröffentlicht.';
       fo.number.hidden = fo.unit.hidden = fo.count.hidden = false;

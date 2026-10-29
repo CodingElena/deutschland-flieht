@@ -55,7 +55,7 @@ const EINTRAEGE = [
   {
     datum: '2026-10-02', medium: 'Statistisches Bundesamt, Monatsstatistik', typ: 'statistik', themen: ['Abwanderung'],
     titel: 'Deutsche Fortzüge Januar bis Juli 2026: 172.096',
-    text: 'Die Monatstabelle weist für Januar bis Juli 2026 vorläufig 172.096 Fortzüge deutscher Staatsangehöriger aus. Im Vorjahreszeitraum stehen in derselben Tabelle 163.932, das sind rund 5 Prozent mehr. Der stärkste Monat 2026 war bislang der Juli mit 30.001.',
+    text: 'Die Monatstabelle weist für Januar bis Juli 2026 vorläufig 172.096 Fortzüge Deutscher aus. Im Vorjahreszeitraum stehen in derselben Tabelle 163.932, das sind rund 5 Prozent mehr. Der stärkste Monat 2026 war bislang der Juli mit 30.001.',
     zahl: ['172.096', 'Fortzüge Deutscher Januar bis Juli 2026'],
     url: 'https://www-genesis.destatis.de/datenbank/online/table/12711-0011',
   },
@@ -63,7 +63,7 @@ const EINTRAEGE = [
     datum: '2026-07-30', medium: 'web.de Magazin', typ: 'bericht', themen: ['Abwanderung', 'Fachkräfte'],
     titel: 'Akademiker, Ärzte, IT-Fachkräfte: Wer geht wirklich?',
     text: 'Das Magazin ordnet den Rekord von 288.579 Fortzügen ein und weist darauf hin, dass die Daten zu Qualifikation und Zielen unscharf sind. Für den Anteil der Akademiker unter den Auswandernden nennt es rund 70 Prozent.',
-    zahl: ['288.579', 'Fortzüge deutscher Staatsangehöriger 2025'],
+    zahl: ['288.579', 'Fortzüge Deutscher 2025'],
     url: 'https://web.de/magazine/politik/rekord-auswanderung-akademiker-verlassen-deutschland-42535082',
   },
   {
@@ -82,9 +82,9 @@ const EINTRAEGE = [
   },
   {
     datum: '2026-06-01', medium: 'Statistisches Bundesamt', typ: 'statistik', themen: ['Abwanderung'],
-    titel: 'Wanderungsverlust deutscher Staatsangehöriger steigt auf 97.000',
+    titel: 'Wanderungsverlust Deutscher steigt auf 97.000',
     text: 'Insgesamt sank die Nettozuwanderung 2025 auf rund 235.000 Personen. Bei Deutschen wuchs der Verlust: 97.000 mehr zogen fort, als zurückkehrten. 2024 waren es 81.000.',
-    zahl: ['−97.000', 'Saldo deutscher Staatsangehöriger 2025'],
+    zahl: ['−97.000', 'Saldo Deutscher 2025'],
     url: 'https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/06/PD26_184_12411.html',
   },
   {
@@ -139,9 +139,9 @@ const EINTRAEGE = [
 ];
 
 const BELEGE = [
-  ['288.579', 'Fortzüge deutscher Staatsangehöriger 2025', 'Statistisches Bundesamt, GENESIS 12711-0005', 'Tabellenstand 21.09.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0005'],
-  ['−96.689', 'Wanderungssaldo deutscher Staatsangehöriger 2025 (Zuzüge 191.890)', 'Statistisches Bundesamt, GENESIS 12711-0005', 'Tabellenstand 21.09.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0005'],
-  ['172.096', 'Fortzüge deutscher Staatsangehöriger Januar bis Juli 2026, vorläufig', 'Statistisches Bundesamt, GENESIS 12711-0011', 'Tabellenstand 02.10.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0011'],
+  ['288.579', 'Fortzüge Deutscher 2025', 'Statistisches Bundesamt, GENESIS 12711-0005', 'Tabellenstand 21.09.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0005'],
+  ['−96.689', 'Wanderungssaldo Deutscher 2025 (Zuzüge 191.890)', 'Statistisches Bundesamt, GENESIS 12711-0005', 'Tabellenstand 21.09.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0005'],
+  ['172.096', 'Fortzüge Deutscher Januar bis Juli 2026, vorläufig', 'Statistisches Bundesamt, GENESIS 12711-0011', 'Tabellenstand 02.10.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0011'],
   ['−15.000', 'Wanderungssaldo Juli 2026 (106.000 Zuzüge, 121.000 Fortzüge), alle Staatsangehörigkeiten, vorläufig', 'Statistisches Bundesamt', 'Veröffentlicht 02.10.2026', 'https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Wanderungen/Wanderungsueberschuss.html'],
   ['22.730 · 13.549 · 9.676 · 8.860', 'Fortzüge 2025 in die Schweiz, nach Österreich, Spanien und in die USA', 'Statistisches Bundesamt, GENESIS 12711-0008', 'Tabellenstand 21.09.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0008'],
   ['134.804', 'Fortzüge 2025 ohne Angabe des Ziellandes (46,7 % von 288.579)', 'Statistisches Bundesamt, GENESIS 12711-0008', 'Tabellenstand 21.09.2026', 'https://www-genesis.destatis.de/datenbank/online/table/12711-0008'],

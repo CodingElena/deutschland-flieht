@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Postkarte · Entwurf — Deutschland flieht.</title>
+    <link rel="stylesheet" href="./styles.css?v=u141" />
+    <style>
+      :root {
+        --red: #ed1018;
+        --ink: #2a261f;
+        --rule: #8a8174;
+        --paper-0: #f4ecdf;
+        --paper-1: #e5d9c6;
+      }
+
+      body.draft {
+        margin: 0;
+        min-height: 100vh;
+        background: #050505;
+        color: #f4efeb;
+        font-family: Inter, Arial, sans-serif;
+      }
+
+      .draft__bar {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 28px clamp(20px, 4vw, 40px) 8px;
+      }
+
+      .draft__bar .wortmarke {
+        font-size: 22px;
+      }
+
+      .draft__meta {
+        margin: 0;
+        color: #8e8e93;
+        font: 600 11px/1 Inter, Arial, sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .sheet {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(18px, 2.4vw, 36px);
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 28px clamp(20px, 4vw, 40px) 72px;
+      }
+
+      .side__label {
+        margin: 0 0 10px;
+        color: #8e8e93;
+        font: 600 11px/1 Inter, Arial, sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .card {
+        position: relative;
+        aspect-ratio: 3 / 2;
+        container-type: size;
+        overflow: hidden;
+        background: #111;
+        box-shadow:
+          0 1px 0 #ffffff14 inset,
+          0 18px 50px #000000c0,
+          0 2px 8px #00000080;
+      }
+
+      /* Vorderseite */
+      .front__shade {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, #05080fcc 0%, #05080f00 30%),
+          linear-gradient(180deg, #05050500 58%, #050505d6 100%);
+        pointer-events: none;
+      }
+
+      .front__grain {
+        position: absolute;
+        inset: 0;
+        background: url("./assets/noise.svg") 0 0 / 160px;
+        mix-blend-mode: overlay;
+        opacity: 0.28;
+        pointer-events: none;
+      }
+
+      .front__brand,
+      .front__caption {
+        position: absolute;
+        z-index: 1;
+        left: 6.2%;
+        right: 8%;
+      }
+
+      .front__brand {
+        top: 6.5%;
+      }
+
+      .front__brand .wortmarke {
+        font-size: 4.5cqw;
+        text-shadow: 0 1px 10px #000a;
+      }
+
+      .front__caption {
+        bottom: 7%;
+      }
+
+      .kicker {
+        margin: 0 0 1.6cqh;
+        color: #f4efeb;
+        font: 600 2.15cqw/1 Inter, Arial, sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .front__caption h1 {
+        margin: 0;
+        max-width: 8em;
+        color: #fbf6f1;
+        font: italic 400 7.6cqw/0.92 Playfair, Georgia, serif;
+        letter-spacing: -0.045em;
+        text-shadow: 0 0.4cqw 2.2cqw #000c;
+      }
+
+      .front__caption .title-dot {
+        color: var(--red);
+      }
+
+      /* Rückseite */
+      .back {
+        display: grid;
+        grid-template-columns: 1.12fr 0.88fr;
+        background:
+          linear-gradient(115deg, #ffffff55 0, transparent 34%, transparent 72%, #00000010 100%),
+          linear-gradient(180deg, var(--paper-0), var(--paper-1));
+        color: var(--ink);
+      }
+
+      .back::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("./assets/noise.svg") 0 0 / 150px;
+        mix-blend-mode: multiply;
+        opacity: 0.34;
+        pointer-events: none;
+      }
+
+      .back__msg,
+      .back__addr {
+        position: relative;
+        z-index: 1;
+        min-width: 0;
+      }
+
+      .back__msg {
+        display: flex;
+        flex-direction: column;
+        padding: 7cqw 5.5cqw 5.5cqw 6.5cqw;
+      }
+
+      .back__addr {
+        padding: 6.5cqw 6cqw 5.5cqw 5.5cqw;
+        border-left: 1px solid #8a817488;
+      }
+
+      .back__lead {
+        margin: 0;
+        font: italic 400 4.7cqw/1.22 Playfair, Georgia, serif;
+        letter-spacing: -0.03em;
+      }
+
+      .lines {
+        display: grid;
+        gap: 0;
+        margin-top: auto;
+        padding-top: 6cqh;
+      }
+
+      .lines i {
+        display: block;
+        height: 7.4cqh;
+        border-bottom: 1px solid var(--rule);
+        opacity: 0.7;
+      }
+
+      .back__sign {
+        margin: 3.2cqh 0 0;
+        font: italic 400 3.5cqw/1 Playfair, Georgia, serif;
+        letter-spacing: -0.02em;
+      }
+
+      .back__sign b {
+        color: var(--red);
+        font-weight: 400;
+      }
+
+      .stamp-row {
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        min-height: 34%;
+        padding-top: 1.5cqh;
+      }
+
+      .stamp-wrap {
+        position: relative;
+        width: 42%;
+        margin-right: 1cqw;
+        container-type: inline-size;
+      }
+
+      .stamp {
+        position: relative;
+        aspect-ratio: 0.8;
+        display: grid;
+        place-items: center;
+        padding: 10% 8%;
+        background: linear-gradient(165deg, #ff3b32 0%, #ed1018 46%, #c41016 100%);
+        color: #fbece5;
+        text-align: center;
+        box-shadow:
+          inset 0 0 0 2px #f6ebdf,
+          inset 0 0 0 5px #ed1018,
+          inset 0 0 0 6px #f6ebdfcc,
+          0 1px 0 #0000001a;
+        transform: rotate(7deg);
+        transform-origin: 70% 40%;
+      }
+
+      .stamp small {
+        display: block;
+        margin-bottom: 0.45em;
+        font: 600 9cqw/1 Inter, Arial, sans-serif;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .stamp em {
+        font: italic 400 16.5cqw/0.95 Playfair, Georgia, serif;
+        letter-spacing: -0.03em;
+      }
+
+      .stamp b {
+        color: #fbece5;
+        font-weight: 400;
+      }
+
+      .cancel {
+        position: absolute;
+        z-index: 1;
+        left: -38%;
+        top: 18%;
+        width: 78%;
+        aspect-ratio: 1;
+        border: 1.5px solid #7a3d34;
+        border-radius: 50%;
+        color: #7a3d34;
+        opacity: 0.72;
+        transform: rotate(-16deg);
+        pointer-events: none;
+      }
+
+      .cancel::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border: 1px solid #7a3d34;
+        border-radius: 50%;
+      }
+
+      .cancel span {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font: 600 8.5cqw/1.15 Inter, Arial, sans-serif;
+        letter-spacing: 0.08em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .to {
+        margin: 11cqh 0 0;
+        font: italic 400 4.5cqw/1.05 Playfair, Georgia, serif;
+        letter-spacing: -0.03em;
+      }
+
+      .to span {
+        display: block;
+        margin-bottom: 0.9cqh;
+        font: 600 2cqw/1 Inter, Arial, sans-serif;
+        font-style: normal;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #6d655c;
+      }
+
+      .addr {
+        margin: 2.2cqh 0 0;
+        color: #4a453e;
+        font: 400 2.55cqw/1.45 Inter, Arial, sans-serif;
+      }
+
+      /* Stimme: Testimonial im Kasten rechts */
+      .voice {
+        background: #111;
+      }
+
+      .voice::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("./assets/noise.svg") 0 0 / 160px;
+        mix-blend-mode: overlay;
+        opacity: 0.2;
+        pointer-events: none;
+      }
+
+      .voice__quote {
+        position: absolute;
+        z-index: 1;
+        top: auto;
+        bottom: 7%;
+        right: 3.4%;
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.8cqh;
+        padding: 3.6cqh 2.6cqw;
+        background: linear-gradient(180deg, #f6efe4, #e8dcc9);
+        color: #2a261f;
+        border: 1px solid #2a261f;
+        box-shadow:
+          0 0 0 5px #f4ecdf,
+          0 0 0 6px #2a261f,
+          0 16px 36px #00000066;
+      }
+
+      .voice__quote p:not(.wortmarke) {
+        margin: 0;
+        color: #2a261f;
+        font: italic 400 2.15cqw/1.2 Playfair, Georgia, serif;
+        letter-spacing: -0.03em;
+      }
+
+      .voice__quote .wortmarke {
+        font-size: 1.85cqw;
+        color: #2a261f;
+      }
+
+      @media (max-width: 860px) {
+        .sheet {
+          grid-template-columns: 1fr;
+          max-width: 640px;
+        }
+
+        .draft__bar {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      /* Reiner Kartenausschnitt für den PNG-Export: ?seite=vorne, hinten oder stimme */
+      body.export {
+        min-height: 0;
+        background: #050505;
+        overflow: hidden;
+      }
+
+      body.export .draft__bar,
+      body.export .side__label {
+        display: none;
+      }
+
+      body.export .sheet {
+        display: block;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      body.export .card {
+        width: 100vw;
+        height: 100vh;
+        aspect-ratio: auto;
+        box-shadow: none;
+      }
+    </style>
+  </head>
+  <body class="draft">
+    <header class="draft__bar">
+      <p class="draft__meta">Postkarte · Entwurf</p>
+      <p class="wortmarke">Deutschland flieht<b>.</b></p>
+    </header>
+
+    <main class="sheet">
+      <section data-seite="vorne" aria-labelledby="front-label">
+        <p class="side__label" id="front-label">Vorderseite</p>
+        <article class="card front">
+          <div class="front__shade" aria-hidden="true"></div>
+          <div class="front__grain" aria-hidden="true"></div>
+          <div class="front__brand">
+            <p class="wortmarke">Deutschland flieht<b>.</b></p>
+          </div>
+          <div class="front__caption">
+            <p class="kicker">San Francisco</p>
+            <h1>Es geht nach<br />Amerika<span class="title-dot">.</span></h1>
+          </div>
+        </article>
+      </section>
+
+      <section data-seite="hinten" aria-labelledby="back-label">
+        <p class="side__label" id="back-label">Rückseite</p>
+        <article class="card back">
+          <div class="back__msg">
+            <p class="back__lead">
+              Angekommen.<br />
+              Die Lichter liegen<br />
+              unter dem Nebel.
+            </p>
+            <div class="lines" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+            <p class="back__sign">Deutschland flieht<b>.</b></p>
+          </div>
+          <div class="back__addr">
+            <div class="stamp-row">
+              <div class="stamp-wrap">
+                <div class="cancel" aria-hidden="true"><span>S.F.<br />29 · 10 · 26</span></div>
+                <div class="stamp">
+                  <div>
+                    <small>Postkarte</small>
+                    <em>Deutschland<br />flieht<b>.</b></em>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="to"><span>An</span>die Politik</p>
+            <p class="addr">
+              Deutscher Bundestag<br />
+              Platz der Republik 1<br />
+              11011 Berlin
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section data-seite="stimme" aria-labelledby="voice-label">
+        <p class="side__label" id="voice-label">Stimme</p>
+        <article class="card voice">
+          <div class="voice__quote">
+            <p class="wortmarke">Deutschland flieht<b>.</b></p>
+            <p>Ich bin gegangen, weil ich hier keine Perspektive mehr sah<span class="title-dot">.</span></p>
+          </div>
+        </article>
+      </section>
+    </main>
+    <script>
+      const seite = new URLSearchParams(location.search).get("seite");
+      if (seite === "vorne" || seite === "hinten" || seite === "stimme") {
+        document.body.classList.add("export");
+        document.querySelectorAll("main section").forEach((section) => {
+          if (section.dataset.seite !== seite) section.remove();
+        });
+      }
+    </script>
+  </body>
+</html>

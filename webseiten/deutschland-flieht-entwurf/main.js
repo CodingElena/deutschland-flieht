@@ -1,4 +1,4 @@
-const FORTZUEGE_2025 = 288579; // Destatis GENESIS 12711-0005: Fortzüge deutscher Staatsangehöriger 2025
+const FORTZUEGE_2025 = 288579; // Destatis GENESIS 12711-0005: Fortzüge Deutscher 2025
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -746,7 +746,7 @@ function setupCounter() {
         } else digit.oldFace.textContent = character;
       });
     }
-    container.setAttribute('aria-label', `${number.toLocaleString('de-DE')} Fortzüge deutscher Staatsangehöriger im Jahr 2025.`);
+    container.setAttribute('aria-label', `${number.toLocaleString('de-DE')} Fortzüge Deutscher im Jahr 2025.`);
     displayed = number;
   }
 
@@ -1075,7 +1075,8 @@ function setupFaces() {
   });
 }
 
-/* Zwei Großstädte: die Fläche der Glühbirne zerfällt. Die Fetzen bleiben liegen und halten die Silhouette. */
+/* Zwei Großstädte: die Fläche der Glühbirne zerfällt. Die Fetzen bleiben liegen und halten die Silhouette.
+   Ein Teil bricht aus, rutscht über die schräge Kante und verschwindet im Bild von „Und dann?“. */
 function setupCityTear() {
   const map = document.querySelector('.cities__map');
   const fill = map?.querySelector('.cities__bulb-fill');
@@ -1152,11 +1153,52 @@ function setupCityTear() {
     return 1 - (1 - progress) ** 3;
   }
 
-  function place(piece, scale, leave) {
+  let fly = null;
+
+  /* Dieselbe Glühbirnenfläche, nur über dem Bürobild. Der Abschnitt schneidet alles ab, was noch darüber liegt. */
+  function ensureFly() {
+    if (fly) return fly;
+    const und = document.querySelector('.und-dann');
+    if (!und) return null;
+    fly = svgElement('svg', {
+      class: 'cities__fly',
+      viewBox: svg.getAttribute('viewBox'),
+      overflow: 'visible',
+      'aria-hidden': 'true',
+    });
+    und.insertBefore(fly, und.querySelector('.und-dann__text'));
+    return fly;
+  }
+
+  function syncFly() {
+    if (!fly) return;
+    const bulb = svg.getBoundingClientRect();
+    const host = fly.parentElement.getBoundingClientRect();
+    const box = svg.viewBox.baseVal;
+    if (!bulb.width || !host.width || !box.width) return;
+    const extra = 240;
+    const height = box.height + extra;
+    fly.setAttribute('viewBox', `${box.x} ${box.y} ${box.width} ${height}`);
+    fly.style.left = `${(bulb.left - host.left).toFixed(2)}px`;
+    fly.style.top = `${(bulb.top - host.top).toFixed(2)}px`;
+    fly.style.width = `${bulb.width.toFixed(2)}px`;
+    fly.style.height = `${(bulb.width * height / box.width).toFixed(2)}px`;
+  }
+
+  function place(piece, scale, leave, travel = leave) {
     const { hole, shred, x, y, dx, dy, rot, end } = piece;
     if (hole) hole.setAttribute('transform', `translate(${x} ${y}) scale(${scale.toFixed(4)}) translate(${-x} ${-y})`);
-    shred.style.transform = `translate(${(dx * leave).toFixed(1)}px, ${(dy * leave).toFixed(1)}px) rotate(${(rot * leave).toFixed(1)}deg) scale(${Math.min(scale, 1).toFixed(4)})`;
-    shred.style.opacity = String(1 + (end - 1) * leave);
+    const transform = `translate(${(dx * travel).toFixed(1)}px, ${(dy * travel).toFixed(1)}px) rotate(${(rot * travel).toFixed(1)}deg) scale(${Math.min(scale, 1).toFixed(4)})`;
+    const opacity = String(1 + (end - 1) * leave);
+    shred.style.transform = transform;
+    shred.style.opacity = opacity;
+    if (piece.echo) {
+      piece.echo.style.transform = transform;
+      const sunk = Math.min(1, Math.max(0, travel));
+      const faded = String(opacity * (1 - sunk * sunk));
+      piece.echo.style.opacity = faded;
+      shred.style.opacity = faded;
+    }
   }
 
   function ribbon(x1, y1, x2, y2, width) {
@@ -1193,6 +1235,7 @@ function setupCityTear() {
         shred,
         x: bite.x,
         y: bite.y,
+        mass: bite.r,
         delay: ((dist / reach) * 0.8 + unit(index + 1, bite.seed) * 0.12) * pace,
         grow: 2.35 + near * 0.5 + unit(index + 8, bite.seed) * 0.28,
         dx: Math.cos(angle) * travel,
@@ -1239,6 +1282,7 @@ function setupCityTear() {
           rim: true,
           x,
           y,
+          mass: fine ? 2.4 : 5.4,
           delay: ((dist / reach) * 0.8 + unit(n + 1, wound.seed + salt) * 0.12) * pace,
           grow: 1,
           dx: Math.cos(angle) * travel,
@@ -1250,16 +1294,119 @@ function setupCityTear() {
         place(piece, 1, 0);
       }
     });
+    chooseSpill();
     line.style.opacity = '0';
   }
 
+  /* Größere Brocken, eher aus der unteren Hälfte, brechen aus der Silhouette aus. */
+  function chooseSpill() {
+    const chunks = [];
+    const bits = [];
+    pieces.forEach((piece, index) => {
+      piece.salt = index + 1;
+      if (piece.shred.classList.contains('cities__shred--dust')) return;
+      const depth = Math.min(1, Math.max(0, (piece.y + 48) / 200));
+      const roll = unit(index + 4, piece.x + piece.y);
+      if (piece.rim || piece.mass < 4.6) {
+        if (roll < 0.03 + depth * 0.05) bits.push(piece);
+        return;
+      }
+      if (roll < 0.05 + depth * 0.22) chunks.push(piece);
+    });
+    const picked = chunks.slice(0, 18);
+    if (picked.length < 14) {
+      const extra = pieces
+        .filter((piece) => !piece.rim && piece.mass >= 4.6 && !picked.includes(piece))
+        .sort((a, b) => b.y - a.y);
+      picked.push(...extra.slice(0, 14 - picked.length));
+    }
+    bits.slice(0, 8).forEach((piece) => picked.push(piece));
+    const layer = ensureFly();
+    picked.forEach((piece) => {
+      piece.spill = true;
+      piece.shred.classList.add('cities__shred--spill');
+      shreds.append(piece.shred);
+      if (layer) {
+        piece.echo = piece.shred.cloneNode(true);
+        layer.append(piece.echo);
+      }
+      if (!piece.rim) piece.grow = 1.12 + unit(piece.salt, 2.2) * 0.4;
+      piece.end = 0.96;
+      piece.delay = (0.08 + unit(piece.salt, 4.4) * 0.42) * pace;
+      piece.rot = (unit(piece.salt, 9.1) - 0.5) * 110;
+    });
+    syncFly();
+  }
+
+  /* Ziel liegt ein Stück unter der schrägen Oberkante, also im Bild von „Und dann?“. */
+  function aimSpill() {
+    syncFly();
+    const und = document.querySelector('.und-dann');
+    const cities = map.closest('.cities');
+    const ctm = svg.getScreenCTM();
+    if (!und || !cities || !ctm) return false;
+    const undRect = und.getBoundingClientRect();
+    const citiesRect = cities.getBoundingClientRect();
+    const overlap = citiesRect.bottom - undRect.top;
+    if (overlap < 8 || undRect.width < 8) return false;
+    const unitPx = Math.hypot(ctm.a, ctm.b) || 1;
+    let moved = false;
+    pieces.forEach((piece) => {
+      if (!piece.spill) return;
+      point.x = piece.x;
+      point.y = piece.y;
+      const origin = point.matrixTransform(ctm);
+      const spread = (unit(piece.salt, 1.7) + unit(piece.salt, 8.2) + unit(piece.salt, 2.9)) / 3;
+      const tx = citiesRect.left + (0.16 + spread * 0.68) * citiesRect.width;
+      const along = Math.min(1, Math.max(0, (tx - undRect.left) / undRect.width));
+      const edge = undRect.top + overlap * (1 - along);
+      const size = Math.max(18, piece.mass * 2.1 * unitPx);
+      const into = 22 + unit(piece.salt, 3.3) * 30;
+      const ty = edge + into - size * 0.5;
+      let dx = tx - origin.x;
+      let dy = ty - origin.y;
+      if (dy < 20) return;
+      /* Die Verschiebung liegt im Koordinatensystem der Glühbirne, nicht in Bildschirmpixeln. */
+      dx /= unitPx;
+      dy /= unitPx;
+      if (Math.abs(dx - piece.dx) > 0.6 || Math.abs(dy - piece.dy) > 0.6) moved = true;
+      piece.dx = dx;
+      piece.dy = dy;
+    });
+    return moved;
+  }
+
+  let settled = false;
+
   function finish() {
+    aimSpill();
     pieces.forEach((piece) => place(piece, piece.rim ? 1 : piece.grow, 1));
     fill.style.opacity = '0';
     line.style.opacity = '0';
+    settled = true;
   }
 
   let frame = 0;
+  let follow = 0;
+
+  /* Die Kante schiebt sich beim Scrollen noch nach. Danach die Brocken nachziehen. */
+  function followSpill() {
+    if (follow) return;
+    if (!settled) return;
+    const tick = () => {
+      const moved = aimSpill();
+      if (!moved) {
+        follow = 0;
+        return;
+      }
+      pieces.forEach((piece) => {
+        if (!piece.spill) return;
+        place(piece, piece.rim ? 1 : piece.grow, 1);
+      });
+      follow = requestAnimationFrame(tick);
+    };
+    follow = requestAnimationFrame(tick);
+  }
 
   function tear() {
     if (map.classList.contains('is-torn')) return;
@@ -1269,12 +1416,38 @@ function setupCityTear() {
       return;
     }
     const started = performance.now();
+    const span = appear + widen;
     const step = (now) => {
+      aimSpill();
       const time = (now - started) / 1000;
       let running = false;
       pieces.forEach((piece) => {
         const local = time - piece.delay;
         const resting = piece.rim ? 1 : 0;
+        if (piece.spill) {
+          if (local <= 0) {
+            place(piece, resting, 0, 0);
+            running = true;
+            return;
+          }
+          const progress = Math.min(1, local / span);
+          const travel = progress * progress * (3 - 2 * progress);
+          let scale = piece.rim ? 1 : piece.grow;
+          let fade = 1;
+          if (local < appear) {
+            const opened = ease(local / appear);
+            scale = piece.rim ? 1 : opened;
+            fade = opened;
+          }
+          if (progress < 1) running = true;
+          else scale = piece.rim ? 1 : piece.grow;
+          if (local >= appear && progress < 1) {
+            const opened = ease((local - appear) / widen);
+            scale = piece.rim ? 1 : 1 + (piece.grow - 1) * opened;
+          }
+          place(piece, scale, fade, travel);
+          return;
+        }
         if (local <= 0) {
           place(piece, resting, 0);
           running = true;
@@ -1286,7 +1459,7 @@ function setupCityTear() {
           running = true;
           return;
         }
-        if (local < appear + widen) {
+        if (local < span) {
           const opened = ease((local - appear) / widen);
           place(piece, piece.rim ? 1 : 1 + (piece.grow - 1) * opened, 0.22 + opened * 0.78);
           running = true;
@@ -1297,7 +1470,12 @@ function setupCityTear() {
       const cleared = Math.min(1, Math.max(0, (time - 0.95 * pace) / (1.45 * pace)));
       fill.style.opacity = String(1 - ease(cleared));
       if (cleared < 1) running = true;
-      frame = running ? requestAnimationFrame(step) : 0;
+      if (running) frame = requestAnimationFrame(step);
+      else {
+        frame = 0;
+        settled = true;
+        followSpill();
+      }
     };
     frame = requestAnimationFrame(step);
   }
@@ -1305,6 +1483,11 @@ function setupCityTear() {
   map.classList.add('is-ready');
   void map.offsetWidth;
   fray();
+  window.addEventListener('scroll', () => {
+    syncFly();
+    followSpill();
+  }, { passive: true });
+  window.addEventListener('resize', followSpill, { passive: true });
   if (reduceMotion.matches) finish();
   if (reduceMotion.matches) {
     tear();
@@ -1319,6 +1502,8 @@ function setupCityTear() {
   reduceMotion.addEventListener('change', () => {
     if (!reduceMotion.matches) return;
     cancelAnimationFrame(frame);
+    cancelAnimationFrame(follow);
+    follow = 0;
     finish();
     map.classList.add('is-torn');
   });
