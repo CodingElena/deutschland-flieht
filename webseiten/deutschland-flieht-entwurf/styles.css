@@ -1373,3 +1373,40 @@ html.is-scrolling .koernung::before{animation-play-state:paused}
 .emigration__lead .ref a:hover,
 .cities .ref a:hover{text-decoration:underline;text-underline-offset:2px}
 .chg__panel-in .ref a:hover{color:#e0343d;text-decoration:underline;text-underline-offset:2px}
+
+/* Quelle an der Deutschlandkarte: rechts unten am Abschnitt, über dem überlappenden nächsten Kapitel */
+.emigration .map-quelle{
+  position:absolute;
+  z-index:2;
+  top:auto;
+  right:clamp(24px,5vw,86px);
+  bottom:calc(var(--arc-lap) + 10px);
+  left:auto;
+  width:max-content;
+  max-width:none;
+  margin:0;
+  padding:0;
+  transform:none;
+  text-align:right;
+}
+@media(max-width:760px){
+  .emigration .map-quelle{right:20px}
+}
+
+/* Quelle an der Weltkarte: rechts unten am Abschnitt, wie an der Deutschlandkarte */
+.stories-globe .globe-source{
+  position:absolute;
+  z-index:4;
+  top:auto;
+  left:auto;
+  right:clamp(24px,5vw,86px);
+  bottom:28px;
+  width:max-content;
+  max-width:none;
+  margin:0;
+  padding:0;
+  text-align:right;
+}
+@media(max-width:760px){
+  .stories-globe .globe-source{right:20px}
+}
